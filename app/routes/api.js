@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.sendStatus(200);
@@ -24,6 +26,7 @@ router.get('/bgg/user/:username', function(req, res, next) {
     res.send("Name: " + results.user.firstname.value + " " + results.user.lastname.value);
     //res.sendStatus(200);
     console.log(results);
+
   });
 });
 
