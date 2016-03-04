@@ -1,15 +1,15 @@
 var express = require('express');
-var router = express.Router();
+var routerAPI = express.Router();
 
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+routerAPI.get('/', function(req, res, next) {
   res.sendStatus(200);
 });
 
 /* BGG test. */
-router.get('/bgg/user/:username', function(req, res, next) {
+routerAPI.get('/bgg/user/:username', function(req, res, next) {
 
   var options = {
     timeout: 5000, // timeout of 10s (5s is the default)
@@ -31,4 +31,4 @@ router.get('/bgg/user/:username', function(req, res, next) {
 });
 
 
-module.exports = router;
+module.exports = routerAPI;
