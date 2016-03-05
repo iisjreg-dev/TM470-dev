@@ -13,64 +13,96 @@ db.ping()
   console.log(err);
 });
 
-passport.use(new Strategy({
-    passwordField: 'hash'
-  },
+passport.use(new Strategy(
   function(username, password, cb) {
-    // db.users.findByUsername(username, function(err, user) {
-    //   if (err) { return cb(err); }
-    //   if (!user) { return cb(null, false); }
-    //   if (user.password != password) { return cb(null, false); }
-    //   return cb(null, user);
-    // });
     db.search('Users', username)
     .then(function (result) {
-      //console.log(result);
+      console.log("authenticating...");
       console.log("count = " + result.body.count);
-      console.log(result.body.results[0].value.password);
-      if(result.body.count == 0){ return cb(null, false); }
-      if(result.body.results[0].value.password != password) { return cb(null, false); }
-      return cb(null, result.body.results[0].value);
+      //console.log("password = " + result.body.results[0].value.password);
+      if(result.body.count == 0){ 
+        console.log("no user found");
+        return cb(null, false, { message: 'no user.' }); 
+      }
+      if(result.body.results[0].value.password != password) { 
+        console.log("password incorrect");
+        return cb(null, false, { message: 'Incorrect password.' }); 
+      }
+      console.log("done");
+      return cb(null, result.body.results[0]);
     })
     .fail(function (err) {
       console.log("error : count=" + err.body.count);
-      return cb(err);
+      //return cb(err); //DB failure may not be error, therefore handle as normal
+      var dbErr = "DB failure: " + err;
+      return cb(null, false, { message: dbErr }); 
     });
   })
 );
 
 passport.serializeUser(function(user, cb) {
-  cb(null, user.id);
+  console.log("serializeUser:");
+  console.log("key = " + user.path.key);
+  cb(null, user.path.key);
 });
 
 passport.deserializeUser(function(id, cb) {
-  db.users.findById(id, function (err, user) {
-    if (err) { return cb(err); }
-    cb(null, user);
-  });
+  console.log("deserializeUser:");
+  console.log("id = " + id);
+  db.search('Users', id)
+    .then(function (result) {
+      //console.log(result);
+      
+      console.log("count = " + result.body.count);
+      //console.log(result.body.results[0].value.password);
+      if(result.body.count == 0){ 
+        console.log("no user found");
+        return cb(null, false); 
+      }
+      console.log("done");
+      return cb(null, result.body.results[0]);
+    })
+    .fail(function (err) {
+      console.log("error : count=" + err.body.count);
+      return cb(err);
+    });
 });
 
 
 
 
-/* GET home page. */
+/* GET auth home page. checks auth user*/
 routerAuth.get('/',
   function(req, res) {
-    res.send(req.user);
+    if(req.user){
+      console.log("user exists: " + req.user.value.name);
+      res.sendStatus(200);
+      //res.send(req.user.value.name + " - " + req.user.value.snippet);
+      
+    }
+    else{
+      console.log("user does not exist");
+      res.status(401).send("user does not exist");
+    }
   });
 
 /* login GET test. */
-routerAuth.get('/login/:user/:hash', function(req, res, next) {
-
-  
+routerAuth.get('/login', function(req, res, next) {
+  var loginPage = "/tests/usertest/login.html";
+  res.redirect(loginPage);
 });
 
-/* login POST test. */
+/* login POST test. This should be changed to allow RESTful authentication via Angular*/
 routerAuth.post('/login', 
-  passport.authenticate('local', { failureRedirect: '/' }),
+  passport.authenticate('local', { failureRedirect: '/auth/login', failureFlash: true }),
   function(req, res) {
-    console.log("Success! user = " + req.user.name);
-    res.redirect('/');
+    console.log("Login Success! user = " + req.user.value.name);
+    if(req.session.returnTo){ 
+      res.redirect(req.session.returnTo); 
+    }
+    else{
+      res.redirect('/');
+    }
   });
 
 routerAuth.get('/logout',
@@ -80,7 +112,7 @@ routerAuth.get('/logout',
   });
   
 routerAuth.get('/profile',
-  //require('connect-ensure-login').ensureLoggedIn(),
+  require('connect-ensure-login').ensureLoggedIn('/auth/login'),
   function(req, res){
     res.send(req.user);
   });
