@@ -88,7 +88,15 @@ routerAuth.get('/',
 
 /* login GET test. */
 routerAuth.get('/login', function(req, res, next) {
+  console.log("error messages: " + req.flash('error'));
   var loginPage = "/tests/usertest/login.html";
+  res.redirect(loginPage);
+});
+
+/* signup GET test. */
+routerAuth.get('/signup', function(req, res, next) {
+  console.log("error messages: " + req.flash('error'));
+  var loginPage = "/tests/usertest/signup.html";
   res.redirect(loginPage);
 });
 
@@ -103,6 +111,48 @@ routerAuth.post('/login',
     else{
       res.redirect('/');
     }
+  });
+  
+/* signup POST test. This should be changed to allow RESTful authentication via Angular*/
+routerAuth.post('/signup', 
+  function(req, res, next) {
+    var username = req.body.username;
+    var password = req.body.password;
+    var user = {
+    "username": username,
+    "password": password,
+    "id": 0,
+    "snippet": "test snippet"
+  };
+  //check if username is already assigned in our database
+  db.get('Users', username)
+  .then(function (result){ //case in which user already exists in db
+    console.log('username already exists');
+    res.status(403).send("username already exists"); //username already exists
+  })
+  .fail(function (result) {//case in which user does not already exist in db
+      //console.log(result.body);
+      if (result.body.message == 'The requested items could not be found.'){
+        console.log('Username is free for use');
+        db.post('Users', user)
+        .then(function () {
+          console.log("Success! USER: " + user.username);
+          console.log(user);
+          var newuser = {};
+          
+
+              res.redirect('/');
+          //return res.redirect('/users/' + req.user.username);
+          
+        })
+        .fail(function (err) {
+          console.log("PUT FAIL:" + err.body);
+          res.status(500).send("POST FAIL"); //deferred.reject(new Error(err.body));
+        });
+      } else {
+        res.status(500).send("OTHER FAIL");//deferred.reject(new Error(result.body));
+      }
+  });
   });
 
 routerAuth.get('/logout',
