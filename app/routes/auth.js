@@ -2,6 +2,7 @@ var express = require('express');
 var routerAuth = express.Router();
 var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
+var SignupStrategy = require('passport-local').Strategy;
 var db = require('orchestrate')("725c04b3-ad74-44c6-9c9e-9316e68788cd");
 
 db.ping()
@@ -13,7 +14,7 @@ db.ping()
   console.log(err);
 });
 
-passport.use(new Strategy(
+passport.use('local', new Strategy(
   function(username, password, cb) {
     db.search('Users', username)
     .then(function (result) {
@@ -36,6 +37,52 @@ passport.use(new Strategy(
       //return cb(err); //DB failure may not be error, therefore handle as normal
       var dbErr = "DB failure: " + err;
       return cb(null, false, { message: dbErr }); 
+    });
+  })
+);
+passport.use('signup', new SignupStrategy(
+  function(username, password, cb) {
+    //var username = req.body.username;
+    //var password = req.body.password;
+    var user = {
+      "username": username,
+      "password": password,
+      "id": 0,
+      "snippet": "test 2"
+    };
+    console.log("signing up user : " + username);
+    db.search('Users', username)
+    .then(function (result) {
+      console.log('DB success: ' + result.body.count + " results");
+      if (result.body.count > 0){
+        return cb(null, false, { message: 'username already exists' });
+      }
+      if (result.body.count == 0){
+        console.log('Username is free for use');
+        db.post('Users', user)
+        .then(function () {
+          console.log("POST Success! ");
+          db.search('Users', username)
+          .then(function (result2) {
+            console.log("re-get - user: " + result2.body.results[0].value.username);
+            console.log(user);
+            return cb(null, result2.body.results[0]);
+          })
+          .fail(function (err2) {
+          console.log("GET FAIL:");
+          console.log(err2.body.details);
+          return cb(null, false, { message: 'GET FAIL:' + err2.body });
+        });
+        })
+        .fail(function (err) {
+          console.log("PUT FAIL:" + err.body);
+          return cb(null, false, { message: 'PUT FAIL:' + err.body });
+        });
+      }
+    })
+    .fail(function (result1) {
+        console.log('DB FAIL: ' + result1.body.message);
+        return cb(null, false, { message: 'DB FAIL: ' + result1.body.message});
     });
   })
 );
@@ -100,6 +147,9 @@ routerAuth.get('/signup', function(req, res, next) {
   res.redirect(loginPage);
 });
 
+
+
+
 /* login POST test. This should be changed to allow RESTful authentication via Angular*/
 routerAuth.post('/login', 
   passport.authenticate('local', { failureRedirect: '/auth/login', failureFlash: true }),
@@ -113,46 +163,33 @@ routerAuth.post('/login',
     }
   });
   
-/* signup POST test. This should be changed to allow RESTful authentication via Angular*/
+/* login POST test. This should be changed to allow RESTful authentication via Angular*/
 routerAuth.post('/signup', 
-  function(req, res, next) {
-    var username = req.body.username;
-    var password = req.body.password;
-    var user = {
-    "username": username,
-    "password": password,
-    "id": 0,
-    "snippet": "test snippet"
-  };
-  //check if username is already assigned in our database
-  db.get('Users', username)
-  .then(function (result){ //case in which user already exists in db
-    console.log('username already exists');
-    res.status(403).send("username already exists"); //username already exists
-  })
-  .fail(function (result) {//case in which user does not already exist in db
-      //console.log(result.body);
-      if (result.body.message == 'The requested items could not be found.'){
-        console.log('Username is free for use');
-        db.post('Users', user)
-        .then(function () {
-          console.log("Success! USER: " + user.username);
-          console.log(user);
-          var newuser = {};
-          
-
-              res.redirect('/');
-          //return res.redirect('/users/' + req.user.username);
-          
-        })
-        .fail(function (err) {
-          console.log("PUT FAIL:" + err.body);
-          res.status(500).send("POST FAIL"); //deferred.reject(new Error(err.body));
-        });
-      } else {
-        res.status(500).send("OTHER FAIL");//deferred.reject(new Error(result.body));
-      }
+  passport.authenticate('signup', { failureRedirect: '/auth/signup', failureFlash: true }),
+  function(req, res) {
+    console.log("Signup Success! user = " + req.user.value.name);
+    if(req.session.returnTo){ 
+      res.redirect(req.session.returnTo); 
+    }
+    else{
+      res.redirect('/');
+    }
   });
+  
+routerAuth.get('/checkuser/:username',
+  function(req, res){
+    db.search('Users', req.params.username)
+    .then(function (result) {
+      console.log('DB success: ' + result.body.count + " results");
+      if (result.body.count > 0){
+        //return cb(null, false, { message: 'username already exists' });
+        res.sendStatus(412);// Precondition Failed?
+      }
+      else{
+        res.sendStatus(200);
+      }
+    });
+    //res.send(req.user);
   });
 
 routerAuth.get('/logout',
