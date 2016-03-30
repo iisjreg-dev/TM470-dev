@@ -46,8 +46,11 @@ routerAPI.get('/bgg/user/:username', function(req, res, next) {
 
 
 routerAPI.get('/events/', //get all events
-  require('connect-ensure-login').ensureLoggedIn('/login'),
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
+    if(!req.user){
+      res.status(403).send("not logged in");
+    }
     console.log("user: ");
     console.log(req.user.value.username);
     console.log("list all events");
@@ -71,7 +74,7 @@ routerAPI.get('/events/', //get all events
   });
   
 routerAPI.get('/events/:event', //get 1 event
-  //require('connect-ensure-login').ensureLoggedIn('/auth/login'),
+  require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     console.log("user: ");
     console.log(req.user.value.username);

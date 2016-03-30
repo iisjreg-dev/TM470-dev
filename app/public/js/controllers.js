@@ -22,10 +22,15 @@ angular.module('TM470.controllers', []).
   function ($scope, $http) {
     $http.get("/api/events")
     .then(function(response) {
+      console.log(response.statusCode);
+      //if(response.statusCode)
       //$scope.names = response.data.records;
       //console.log(response.data.results);
       $scope.eventlist = response.data.results;
     //$scope.orderProp = 'created';
+    }, function(error){
+      console.log(error.data);
+      //show login
     });
   }]).
   controller('eventController', ['$scope', '$routeParams', '$http',
