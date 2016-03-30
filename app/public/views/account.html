@@ -1,0 +1,25 @@
+<div class="panel panel-info">
+    <div class="panel-body">
+        
+        Account details<br />
+        
+    </div>
+    <div class="panel-footer">
+               <form name="accountForm" ng-submit="submitForm()">
+                  <div class="form-group">
+                     <input type="text" name="name" placeholder="Name" ng-model="user.name" class="form-control">
+                  </div>
+                  <div class="form-group">
+                     <input type="text" name="smippet" placeholder="Interests" ng-model="user.snippet" class="form-control">
+                  </div>
+                  <div class="form-group">
+                     <input type="password" name="newPassword1" ng-model="newpassword.first" placeholder="Password" class="form-control">
+                  </div>
+                  <div class="form-group">
+                     <input type="password" name="newPassword2" ng-model="newpassword.second" placeholder="Confirm Password" class="form-control">
+                  </div>
+                  <button type="submit" class="btn btn-success">Update account details</button>
+               </form>
+
+    </div>
+</div>
