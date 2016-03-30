@@ -51,7 +51,7 @@ passport.use('signup', new SignupStrategy(
       "snippet": "test 2"
     };
     console.log("signing up user : " + username);
-    db.search('Users', username)
+    db.search('Users', username) //TODO: need to make this .get() and use usernames as keys!!!
     .then(function (result) {
       console.log('DB success: ' + result.body.count + " results");
       if (result.body.count > 0){
@@ -133,14 +133,14 @@ routerAuth.get('/',
     }
   });
 
-/* login GET test. */
+/* login GET test. to be replaced by client-side login */
 routerAuth.get('/login', function(req, res, next) {
   console.log("error messages: " + req.flash('error'));
   var loginPage = "/tests/usertest/login.html";
   res.redirect(loginPage);
 });
 
-/* signup GET test. */
+/* signup GET test. to be replaced by client-side signup */
 routerAuth.get('/signup', function(req, res, next) {
   console.log("error messages: " + req.flash('error'));
   var loginPage = "/tests/usertest/signup.html";

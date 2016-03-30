@@ -1,0 +1,39 @@
+<div class="panel panel-info">
+    <div class="panel-body">
+        
+        EVENTS!!!<br />
+        
+    </div>
+</div>
+
+<table class="table table-hover">
+    <tr>
+        <th>
+            Name
+        </t>
+        <th>
+            Date
+        </th>
+        <th>
+            Time
+        </th>
+        <th>
+            Description
+        </th>
+    </tr>
+    <tr ng-repeat="event in eventlist">
+        <td>
+            {{event.value.name}}
+        </td>
+        <td>
+            {{event.value.date}}
+        </td>
+        <td>
+            {{event.value.time}}
+        </td>
+        <td>
+            {{event.value.Description}}
+        </td>
+    </tr>
+    
+</table>

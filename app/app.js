@@ -19,13 +19,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(path.join(__dirname, 'bower_components')));
 app.use(require('express-session')({ secret: 'TM470', resave: false, saveUninitialized: false })); //change
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
 app.use(function(req, res, next) {
-    console.log(">" + req.method + " " + req.path);
+    console.log(">" + req.method + " " + req.path); //log all requests at start of request, because logger only logs request after request is completed.
     next();
 });
 

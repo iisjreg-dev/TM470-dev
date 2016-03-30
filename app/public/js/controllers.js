@@ -2,26 +2,38 @@
 
 /* Controllers */
 
-angular.module('myApp.controllers', []).
-  controller('AppCtrl', function ($scope, $http) {
+angular.module('TM470.controllers', []).
+  controller('mainController', function ($scope) {
+    // write Ctrl here
 
-    $http({
-      method: 'GET',
-      url: '/api/name'
-    }).
-    success(function (data, status, headers, config) {
-      $scope.name = data.name;
-    }).
-    error(function (data, status, headers, config) {
-      $scope.name = 'Error!';
+  }).
+  controller('BodyController', function($scope) {
+   $scope.ngsuccess = function(input) {
+      success(input);
+   }
+   $scope.ngfailure = function(input) {
+      failure(input);
+   }
+  }).
+  controller('loginController', function($scope) {
+   
+  }).
+  controller('eventsController', ['$scope', '$http',
+  function ($scope, $http) {
+    $http.get("/api/events")
+    .then(function(response) {
+      //$scope.names = response.data.records;
+      //console.log(response.data.results);
+      $scope.eventlist = response.data.results;
+    //$scope.orderProp = 'created';
     });
-
-  }).
-  controller('MyCtrl1', function ($scope) {
-    // write Ctrl here
-
-  }).
-  controller('MyCtrl2', function ($scope) {
-    // write Ctrl here
-
-  });
+  }]).
+  controller('eventController', ['$scope', '$routeParams', '$http',
+  function($scope, $routeParams, $http) {
+    $scope.itemId = $routeParams.itemId;
+    $http.get("/api/events/" + $scope.itemId)
+    .then(function(response) {
+      //$scope.names = response.data.records;
+      $scope.project = response.data;
+    });
+  }]);
