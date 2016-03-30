@@ -56,7 +56,7 @@ routerAPI.get('/events/', //get all events
     console.log("list all events");
     db.search('Events', 'value.organisation: "NOBOG"') //will eventually change to accomodate multiple organisations
     .then(function (result) {
-      console.log(result.body);
+      //console.log(result.body);
       
       console.log("count = " + result.body.count);
       //console.log(result.body.results[0].value.password);
@@ -81,7 +81,7 @@ routerAPI.get('/events/:event', //get 1 event
     console.log("get event " + req.params.event);
     db.get('Events', req.params.event)
     .then(function (result) {
-      console.log(result.body);
+      //console.log(result.body);
       
       //console.log("count = " + result.body.count);
       //console.log(result.body.results[0].value.password);

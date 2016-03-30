@@ -132,6 +132,16 @@ routerAuth.get('/',
       res.status(401).send("user does not exist");
     }
   });
+  
+routerAuth.get('/user',
+  function(req, res) {
+    if(req.user){
+      res.send(req.user);
+    }
+    else{
+      res.status(401).send("user does not exist");
+    }
+  });
 
 /* login GET test. to be replaced by client-side login */
 routerAuth.get('/login', function(req, res, next) {
@@ -195,7 +205,7 @@ routerAuth.get('/checkuser/:username',
 routerAuth.get('/logout',
   function(req, res){
     req.logout();
-    res.redirect('/');
+    res.sendStatus(200);
   });
   
 routerAuth.get('/profile',
