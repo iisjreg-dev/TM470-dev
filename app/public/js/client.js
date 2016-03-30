@@ -23,6 +23,14 @@ config(function ($routeProvider, $locationProvider) {
       templateUrl: 'views/login.html',
       controller: 'loginController'
     }).
+    when('/signup', {
+      templateUrl: 'views/signup.html',
+      controller: 'signupController'
+    }).
+    when('/account', {
+      templateUrl: 'views/account.html',
+      controller: 'accountController'
+    }).
     otherwise({
       redirectTo: '/'
     });

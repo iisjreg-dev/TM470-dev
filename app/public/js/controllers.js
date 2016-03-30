@@ -19,7 +19,7 @@ angular.module('TM470.controllers', []).
         //console.log("auth service fail");
         console.log(error.data);
         $scope.showlogin = true;
-        $location.path("/");
+        //$location.path("/");
     });
 
 
@@ -46,29 +46,55 @@ angular.module('TM470.controllers', []).
     }
     
   }]).
+  controller('mainController', function ($scope) {
+
+  }).
   controller('loginController', function($scope) {
    
   }).
-  controller('eventsController', ['$scope', '$http',
-  function ($scope, $http) {
+  controller('signupController', function($scope) {
+   
+  }).
+  controller('accountController', function ($scope, $http, $location) {
+    if(!$scope.user){
+      $location.path("/login");
+    }
+    $scope.newpassword = {};
+    $scope.submitForm = function() {
+      if(($scope.newpassword.first == $scope.newpassword.second) && $scope.newpassword.second){
+        console.log("changing password");
+        $scope.user.password = $scope.newpassword.second;
+      }
+      console.log("updating");
+      //console.log($scope.user);
+      $http.post("/auth/update", $scope.user)
+        .then(function(data) {
+          console.log(data.status);
+          if(data.status == 200){
+            success("Details updated");
+            
+            //UPDATE AUTH?
+          }
+          //$scope.message = data.message;
+        }, function(err){
+          console.log("update error: ");
+          console.log(err);
+        });
+    };  
+  }).
+  controller('eventsController', ['$scope', '$http', '$location',
+  function ($scope, $http, $location) {
     $http.get("/api/events")
     .then(function(response) {
       console.log(response.status);
-      //console.log(response);
-      //if(response.statusCode)
-      //$scope.names = response.data.records;
-      //console.log(response.data.results);
       $scope.eventlist = response.data.results;
     //$scope.orderProp = 'created';
     }, function(error){
       console.log(error.data);
+      $location.path("/login");
       //show login
     });
   }]).
-  controller('mainController', function ($scope) {
-    // write Ctrl here
-
-  }).
   controller('eventController', ['$scope', '$routeParams', '$http',
   function($scope, $routeParams, $http) {
     $scope.itemId = $routeParams.itemId;

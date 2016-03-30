@@ -13,20 +13,20 @@
    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
    <title>TM470 project</title>
 
+   <!-- Custom styles for this template -->
+   <link href="stylesheets/style.css" rel="stylesheet">
    <!-- Bootstrap core CSS -->
    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
    <link href="bower_components/notie/dist/notie.css" rel="stylesheet">
-   <!-- Custom styles for this template -->
-   <link href="stylesheets/style.css" rel="stylesheet">
-   <script src="bower_components/angular/angular.js"></script>
-   <script src="bower_components/angular-route/angular-route.js"></script>
+   <script src="bower_components/angular/angular.min.js"></script>
+   <script src="bower_components/angular-route/angular-route.min.js"></script>
 
 </head>
 
 <body ng-controller="BodyController">
 
    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
+      <div ng-cloak class="container ng-cloak">
          <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                <span class="sr-only">Toggle navigation</span>
@@ -36,7 +36,7 @@
             </button>
             <a class="navbar-brand" href="/">TM470</a>
          </div>
-         <div id="navbar" class="navbar-collapse collapse ng-cloak">
+         <div id="navbar" ng-cloak class="navbar-collapse collapse ng-cloak">
             <div ng-if="showlogin">
                <form class="navbar-form navbar-right" action="/auth/login" method="post">
                   <div class="form-group">
@@ -45,12 +45,12 @@
                   <div class="form-group">
                      <input type="password" name="password" placeholder="Password" class="form-control">
                   </div>
-                  <button type="submit" class="btn btn-success">Log in</button>
+                  <button type="submit" class="btn btn-success">Log in</button> <a href="/signup" role="submit" class="btn btn-info">Sign Up</a>
                </form>
             </div>
-            <div ng-if="user">
+            <div ng-show="user">
                <div class="navbar-right">
-                       <a class="navbar-brand" href="/">Logged in as {{user.value.name}}</a> <a class="navbar-brand" href="" ng-click="logout()">(Log out)</a>
+                       <a class="navbar-brand" href="/">Logged in as {{user.name}}</a> <a class="navbar-brand" href="" ng-click="logout()">(Log out)</a>
                </div>
             </div>
          </div>
@@ -58,7 +58,7 @@
       </div>
    </nav>
    <div class="container">
-      <div class="row">
+      <div class="row"><br />
          <div ng-view>
 
 

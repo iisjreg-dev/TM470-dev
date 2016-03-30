@@ -52,7 +52,7 @@ routerAPI.get('/events/', //get all events
       res.status(403).send("not logged in");
     }
     console.log("user: ");
-    console.log(req.user.value.username);
+    console.log(req.user.username);
     console.log("list all events");
     db.search('Events', 'value.organisation: "NOBOG"') //will eventually change to accomodate multiple organisations
     .then(function (result) {
@@ -77,7 +77,7 @@ routerAPI.get('/events/:event', //get 1 event
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     console.log("user: ");
-    console.log(req.user.value.username);
+    console.log(req.user.username);
     console.log("get event " + req.params.event);
     db.get('Events', req.params.event)
     .then(function (result) {

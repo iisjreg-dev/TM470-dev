@@ -16,24 +16,25 @@ db.ping()
 
 passport.use('local', new Strategy(
   function(username, password, cb) {
-    db.search('Users', username)
+    db.get('Users', username)
     .then(function (result) {
       console.log("authenticating...");
-      console.log("count = " + result.body.count);
+      var user = result.body;
+      //console.log("count = " + result.body.count);
       //console.log("password = " + result.body.results[0].value.password);
-      if(result.body.count == 0){ 
-        console.log("no user found");
-        return cb(null, false, { message: 'no user.' }); 
-      }
-      if(result.body.results[0].value.password != password) { 
+      // if(result.body.count == 0){ 
+      //   console.log("no user found");
+      //   return cb(null, false, { message: 'no user.' }); 
+      // }
+      if(user.password != password) { 
         console.log("password incorrect");
         return cb(null, false, { message: 'Incorrect password.' }); 
       }
       console.log("done");
-      return cb(null, result.body.results[0]);
+      return cb(null, user);
     })
     .fail(function (err) {
-      console.log("error : count=" + err.body.count);
+      console.log("error : count=" + err);
       //return cb(err); //DB failure may not be error, therefore handle as normal
       var dbErr = "DB failure: " + err;
       return cb(null, false, { message: dbErr }); 
@@ -48,7 +49,8 @@ passport.use('signup', new SignupStrategy(
       "username": username,
       "password": password,
       "id": 0,
-      "snippet": "test 2"
+      "snippet": "test 2",
+      "name": ""
     };
     console.log("signing up user : " + username);
     db.search('Users', username) //TODO: need to make this .get() and use usernames as keys!!!
@@ -59,18 +61,18 @@ passport.use('signup', new SignupStrategy(
       }
       if (result.body.count == 0){
         console.log('Username is free for use');
-        db.post('Users', user)
+        db.put('Users', username, user)
         .then(function () {
           console.log("POST Success! ");
-          db.search('Users', username)
+          db.get('Users', username)
           .then(function (result2) {
-            console.log("re-get - user: " + result2.body.results[0].value.username);
-            console.log(user);
-            return cb(null, result2.body.results[0]);
+            console.log("re-get - user: " + result2.body.username);
+            //    console.log(result2.body);
+            return cb(null, result2.body);
           })
           .fail(function (err2) {
           console.log("GET FAIL:");
-          console.log(err2.body.details);
+          console.log(err2);
           return cb(null, false, { message: 'GET FAIL:' + err2.body });
         });
         })
@@ -89,28 +91,21 @@ passport.use('signup', new SignupStrategy(
 
 passport.serializeUser(function(user, cb) {
   console.log("serializeUser:");
-  console.log("key = " + user.path.key);
-  cb(null, user.path.key);
+  //console.log(user);
+  console.log("key = " + user.username);
+  cb(null, user.username);
 });
 
 passport.deserializeUser(function(id, cb) {
   console.log("deserializeUser:");
   console.log("id = " + id);
-  db.search('Users', id)
+  db.get('Users', id)
     .then(function (result) {
-      //console.log(result);
-      
-      console.log("count = " + result.body.count);
-      //console.log(result.body.results[0].value.password);
-      if(result.body.count == 0){ 
-        console.log("no user found");
-        return cb(null, false); 
-      }
       console.log("done");
-      return cb(null, result.body.results[0]);
+      return cb(null, result.body);
     })
     .fail(function (err) {
-      console.log("error : count=" + err.body.count);
+      console.log("error : count=" + err);
       return cb(err);
     });
 });
@@ -143,28 +138,35 @@ routerAuth.get('/user',
     }
   });
 
-/* login GET test. to be replaced by client-side login */
-routerAuth.get('/login', function(req, res, next) {
-  console.log("error messages: " + req.flash('error'));
-  var loginPage = "/tests/usertest/login.html";
-  res.redirect(loginPage);
-});
+// /* login GET test. to be replaced by client-side login */
+// routerAuth.get('/login', function(req, res, next) {
+//   console.log("error messages: " + req.flash('error'));
+//   var loginPage = "/tests/usertest/login.html";
+//   res.redirect(loginPage);
+// });
 
-/* signup GET test. to be replaced by client-side signup */
-routerAuth.get('/signup', function(req, res, next) {
-  console.log("error messages: " + req.flash('error'));
-  var loginPage = "/tests/usertest/signup.html";
-  res.redirect(loginPage);
-});
+// /* signup GET test. to be replaced by client-side signup */
+// routerAuth.get('/signup', function(req, res, next) {
+//   console.log("error messages: " + req.flash('error'));
+//   var loginPage = "/tests/usertest/signup.html";
+//   res.redirect(loginPage);
+// });
 
 
 
 
 /* login POST test. This should be changed to allow RESTful authentication via Angular*/
 routerAuth.post('/login', 
-  passport.authenticate('local', { failureRedirect: '/auth/login', failureFlash: true }),
+  function(req, res, next){
+    console.log("signing in");
+    console.log(req.body);
+    next();
+  },
+  passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
-    console.log("Login Success! user = " + req.user.value.name);
+    console.log("login done");
+    //console.log(req.user);
+    console.log("Login Success! user = " + req.user.username);
     if(req.session.returnTo){ 
       res.redirect(req.session.returnTo); 
     }
@@ -175,16 +177,69 @@ routerAuth.post('/login',
   
 /* login POST test. This should be changed to allow RESTful authentication via Angular*/
 routerAuth.post('/signup', 
-  passport.authenticate('signup', { failureRedirect: '/auth/signup', failureFlash: true }),
+  passport.authenticate('signup', { failureRedirect: '/signup', failureFlash: true }),
   function(req, res) {
-    console.log("Signup Success! user = " + req.user.value.name);
+    console.log("signup done");
+    //console.log(req.user);
+    console.log("Signup Success! user = " + req.user.username);
     if(req.session.returnTo){ 
       res.redirect(req.session.returnTo); 
     }
     else{
-      res.redirect('/');
+      res.redirect('/account');
     }
   });
+  
+routerAuth.post('/update', 
+  function(req, res) {
+    //console.log(req.body);
+    //var update = JSON.parse(Object.keys(req.body)[0]);
+    console.log("update " + req.body.username);
+    if(req.body.password){
+      db.newPatchBuilder('Users', req.body.username)
+      .replace('snippet', req.body.snippet)
+      .replace('name', req.body.name)
+      .replace('password', req.body.password)
+      .apply()
+      .then(function (result) {
+          // All changes were applied successfully
+          console.log("update success");
+          res.sendStatus(200);
+      })
+      .fail(function (err) {
+          // No changes were applied
+          console.log(err.body);
+          res.sendStatus(500);
+      });
+    }
+    else{
+      db.newPatchBuilder('Users', req.body.username)
+      .replace('snippet', req.body.snippet)
+      .replace('name', req.body.name)
+      .apply()
+      .then(function (result) {
+          // All changes were applied successfully
+          console.log("update success");
+          res.sendStatus(200);
+      })
+      .fail(function (err) {
+          // No changes were applied
+          console.log(err.body);
+          res.sendStatus(500);
+      });
+    }
+    
+    
+    
+    
+    // if(req.session.returnTo){ 
+    //   res.redirect(req.session.returnTo); 
+    // }
+    // else{
+    //   res.redirect('/');
+    // }
+  });
+  
   
 routerAuth.get('/checkuser/:username',
   function(req, res){
@@ -208,10 +263,10 @@ routerAuth.get('/logout',
     res.sendStatus(200);
   });
   
-routerAuth.get('/profile',
-  require('connect-ensure-login').ensureLoggedIn('/auth/login'),
-  function(req, res){
-    res.send(req.user);
-  });
+// routerAuth.get('/profile',
+//   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
+//   function(req, res){
+//     res.send(req.user);
+//   });
 
 module.exports = routerAuth;
