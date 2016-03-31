@@ -1,15 +1,17 @@
 var express = require('express');
 var routerAPI = express.Router();
+var console = require('better-console');
 
 var db = require('orchestrate')("725c04b3-ad74-44c6-9c9e-9316e68788cd");
 
 db.ping()
 .then(function () {
   // you key is VALID
+  console.info("DB ok");
 })
 .fail(function (err) {
   // your key is INVALID
-  console.log(err);
+  console.error(err);
 });
 
 
@@ -29,7 +31,7 @@ routerAPI.get('/bgg/user/:username', function(req, res, next) {
         multiplier: 2,
         max: 15e3
     }
-  }
+  };
   var bgg = require('bgg')(options);
   bgg('users', {name: req.params.username})
   .then(function(results){
@@ -49,28 +51,31 @@ routerAPI.get('/events/', //get all events
   //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
+      console.error("not logged in");
       res.status(403).send("not logged in");
     }
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("list all events");
-    db.search('Events', 'value.organisation: "NOBOG"') //will eventually change to accomodate multiple organisations
-    .then(function (result) {
-      //console.log(result.body);
-      
-      console.log("count = " + result.body.count);
-      //console.log(result.body.results[0].value.password);
-      if(result.body.count == 0){ 
-        console.log("no events found");
-        res.status(404).send("no events found"); 
-      }
-      console.log("done");
-      res.send(result.body); 
-    })
-    .fail(function (err) {
-      console.log("error : count=" + err.body.count);
-      res.send(err); 
-    });
+    else{
+      console.log("user: ");
+      console.log(req.user.username);
+      console.log("list all events");
+      db.search('Events', 'value.organisation: "NOBOG"') //will eventually change to accomodate multiple organisations
+      .then(function (result) {
+        //console.log(result.body);
+        
+        console.log("count = " + result.body.count);
+        //console.log(result.body.results[0].value.password);
+        if(result.body.count == 0){ 
+          console.log("no events found");
+          res.status(404).send("no events found"); 
+        }
+        console.log("done");
+        res.send(result.body); 
+      })
+      .fail(function (err) {
+        console.log("error : count=" + err.body.count);
+        res.send(err); 
+      });
+    }
   });
   
 routerAPI.get('/events/:event', //get 1 event

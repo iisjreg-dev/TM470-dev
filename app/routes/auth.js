@@ -1,5 +1,6 @@
 var express = require('express');
 var routerAuth = express.Router();
+var console = require('better-console');
 var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var SignupStrategy = require('passport-local').Strategy;
@@ -11,7 +12,7 @@ db.ping()
 })
 .fail(function (err) {
   // your key is INVALID
-  console.log(err);
+  console.error(err);
 });
 
 passport.use('local', new Strategy(
