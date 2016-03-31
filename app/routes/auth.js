@@ -4,6 +4,7 @@ var console = require('better-console');
 var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var SignupStrategy = require('passport-local').Strategy;
+const crypto = require('crypto');
 var db = require('orchestrate')("725c04b3-ad74-44c6-9c9e-9316e68788cd");
 
 db.ping()
@@ -14,6 +15,11 @@ db.ping()
   // your key is INVALID
   console.error(err);
 });
+
+function hashedPW(password, salt){
+  var key = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512');
+  return key.toString('hex');
+}
 
 passport.use('local', new Strategy(
   function(username, password, cb) {
@@ -27,7 +33,9 @@ passport.use('local', new Strategy(
       //   console.log("no user found");
       //   return cb(null, false, { message: 'no user.' }); 
       // }
-      if(user.password != password) { 
+      
+      //check salt and hash
+      if(user.password != hashedPW(password,user.salt)) { 
         console.log("password incorrect");
         return cb(null, false, { message: 'Incorrect password.' }); 
       }
@@ -42,13 +50,20 @@ passport.use('local', new Strategy(
     });
   })
 );
+
 passport.use('signup', new SignupStrategy(
   function(username, password, cb) {
     //var username = req.body.username;
     //var password = req.body.password;
+    
+    //hash and salt
+    var buf = crypto.randomBytes(256);
+    var salt = buf.toString('hex'); //check*
+    
     var user = {
       "username": username,
-      "password": password,
+      "password": hashedPW(password,salt),
+      "salt": salt,
       "id": 0,
       "snippet": "test 2",
       "name": ""
@@ -110,12 +125,13 @@ passport.deserializeUser(function(id, cb) {
       return cb(err);
     });
 });
+//END OF PASSPORT
+//
+//
 
 
 
-
-/* GET auth home page. checks auth user*/
-routerAuth.get('/',
+routerAuth.get('/', //sends 200 status if logged in
   function(req, res) {
     if(req.user){
       console.log("user exists: " + req.user.value.name);
@@ -124,17 +140,18 @@ routerAuth.get('/',
       
     }
     else{
-      console.log("user does not exist");
+      console.error("user does not exist");
       res.status(401).send("user does not exist");
     }
   });
   
-routerAuth.get('/user',
+routerAuth.get('/user', //returns user object
   function(req, res) {
     if(req.user){
       res.send(req.user);
     }
     else{
+      console.error("user does not exist");
       res.status(401).send("user does not exist");
     }
   });
@@ -172,7 +189,7 @@ routerAuth.post('/login',
       res.redirect(req.session.returnTo); 
     }
     else{
-      res.redirect('/');
+      res.redirect('/main');
     }
   });
   
@@ -191,46 +208,56 @@ routerAuth.post('/signup',
     }
   });
   
-routerAuth.post('/update', 
+routerAuth.post('/update',  
   function(req, res) {
-    //console.log(req.body);
+    //console.log(req.body); 
     //var update = JSON.parse(Object.keys(req.body)[0]);
-    console.log("update " + req.body.username);
-    if(req.body.password){
-      db.newPatchBuilder('Users', req.body.username)
-      .replace('snippet', req.body.snippet)
-      .replace('name', req.body.name)
-      .replace('password', req.body.password)
-      .apply()
-      .then(function (result) {
-          // All changes were applied successfully
-          console.log("update success");
-          res.sendStatus(200);
-      })
-      .fail(function (err) {
-          // No changes were applied
-          console.log(err.body);
-          res.sendStatus(500);
-      });
+    if(req.user){
+      console.log("update " + req.user.username + "/" + req.body.username);
+      if(req.body.password){
+        //hash and salt
+        var buf = crypto.randomBytes(256);
+        var salt = buf.toString('hex'); //check*
+        
+        
+        db.newPatchBuilder('Users', req.body.username)
+        .replace('snippet', req.body.snippet)
+        .replace('name', req.body.name)
+        .replace('password', hashedPW(req.body.password,salt))
+        .replace('salt', salt)
+        .apply()
+        .then(function (result) {
+            // All changes were applied successfully
+            console.log("update success");
+            res.sendStatus(200);
+        })
+        .fail(function (err) {
+            // No changes were applied
+            console.log(err.body);
+            res.sendStatus(500);
+        });
+      }
+      else{
+        db.newPatchBuilder('Users', req.body.username)
+        .replace('snippet', req.body.snippet)
+        .replace('name', req.body.name)
+        .apply()
+        .then(function (result) {
+            // All changes were applied successfully
+            console.log("update success");
+            res.sendStatus(200);
+        })
+        .fail(function (err) {
+            // No changes were applied
+            console.log(err.body);
+            res.sendStatus(500);
+        });
+      }
     }
     else{
-      db.newPatchBuilder('Users', req.body.username)
-      .replace('snippet', req.body.snippet)
-      .replace('name', req.body.name)
-      .apply()
-      .then(function (result) {
-          // All changes were applied successfully
-          console.log("update success");
-          res.sendStatus(200);
-      })
-      .fail(function (err) {
-          // No changes were applied
-          console.log(err.body);
-          res.sendStatus(500);
-      });
+      console.log("update failed - not logged in");
+      res.sendStatus(401);
     }
-    
-    
     
     
     // if(req.session.returnTo){ 

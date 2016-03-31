@@ -24,7 +24,7 @@ angular.module('TM470.controllers', []).
 
 
     $scope.ngsuccess = function(input) {
-      success(input); //reference to javascript function
+      success(input); //reference to notie javascript function
     }
     $scope.ngfailure = function(input) {
       failure(input);
@@ -37,10 +37,12 @@ angular.module('TM470.controllers', []).
         console.log("logged out");
         $scope.user = null;
         $scope.showlogin = true;
+        success("Logged out");
         $location.path("/");
     }, function(error){
         console.log("logout fail");
         console.log(error.data);
+        failure("Could not logout");
         
     });
     }
@@ -55,10 +57,11 @@ angular.module('TM470.controllers', []).
   controller('signupController', function($scope) {
    
   }).
+  controller('aboutController', function($scope) {
+   
+  }).
   controller('accountController', function ($scope, $http, $location) {
-    if(!$scope.user){
-      $location.path("/login");
-    }
+     
     $scope.newpassword = {};
     $scope.submitForm = function() {
       if(($scope.newpassword.first == $scope.newpassword.second) && $scope.newpassword.second){
@@ -71,6 +74,7 @@ angular.module('TM470.controllers', []).
         .then(function(data) {
           console.log(data.status);
           if(data.status == 200){
+            
             success("Details updated");
             
             //UPDATE AUTH?
@@ -79,8 +83,13 @@ angular.module('TM470.controllers', []).
         }, function(err){
           console.log("update error: ");
           console.log(err);
+          failure("Not logged in"); 
+          $location.path("/login");
         });
     };  
+    // if(!$scope.user){ //NEED TO FIX - USER IS NOT SET BY THE TIME THE PAGE LOADS???
+    //   $location.path("/login");
+    // } 
   }).
   controller('eventsController', ['$scope', '$http', '$location',
   function ($scope, $http, $location) {

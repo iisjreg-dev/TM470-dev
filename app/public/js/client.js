@@ -12,7 +12,7 @@ angular.module('TM470', [
 config(function ($routeProvider, $locationProvider) {
   $routeProvider.
     when('/', {
-      templateUrl: 'views/main.html',
+      templateUrl: 'views/about.html',
       controller: 'mainController'
     }).
     when('/events', {
@@ -30,6 +30,10 @@ config(function ($routeProvider, $locationProvider) {
     when('/account', {
       templateUrl: 'views/account.html',
       controller: 'accountController'
+    }).
+    when('/main', {
+      templateUrl: 'views/main.html',
+      controller: 'aboutController'
     }).
     otherwise({
       redirectTo: '/'

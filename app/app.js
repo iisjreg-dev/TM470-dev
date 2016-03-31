@@ -19,10 +19,9 @@ var app = express();
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //logging
-//(testing better-console)
-console.log("log");
-console.warn("Warning!");
-console.info("Information");
+//console.log("log");
+//console.warn("Warning!");
+console.info("Started");
 function pad(str, max) {
   str = str.toString();
   return str.length < max ? pad("0" + str, max) : str;
@@ -57,11 +56,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(require('express-session')({ secret: 'TM470', resave: false, saveUninitialized: false })); //change
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
+app.use(flash()); //NEEDS MORE TESTING
 
 
 
 
+
+app.use('/auth', auth);
+app.use('/api', api);
+
+// //flash messages TESTING
 // app.use(function(req, res, next){
 //     res.locals.success_messages = req.flash('success');
 //     res.locals.error_messages = req.flash('error');
@@ -70,8 +74,6 @@ app.use(flash());
 //     next();
 // });
 
-app.use('/auth', auth);
-app.use('/api', api);
 app.use('*', function(req, res){ //catch anything else and send index.html, so that Angular can route
   res.sendFile(__dirname + '/public/index.html');
 });
