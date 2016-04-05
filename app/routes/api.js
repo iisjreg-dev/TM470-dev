@@ -58,7 +58,7 @@ routerAPI.get('/events/', //get all events
       console.log("user: ");
       console.log(req.user.username);
       console.log("list all events");
-      db.search('Events', 'value.organisation: "NOBOG"') //will eventually change to accomodate multiple organisations
+      db.list('Events') //will eventually change to accomodate multiple organisations
       .then(function (result) {
         //console.log(result.body);
         

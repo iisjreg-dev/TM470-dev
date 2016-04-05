@@ -6,15 +6,21 @@
     </div>
     <div class="panel-footer">
 
-               <form action="/auth/signup" method="post">
-                  <div class="form-group">
-                     <input type="text" name="username" placeholder="Username" class="form-control">
-                  </div>
-                  <div class="form-group">
-                     <input type="password" name="password" placeholder="Password" class="form-control">
-                  </div>
-                  <button type="submit" class="btn btn-success">Sign up</button>
-               </form>
+                <form name="signupForm" ng-submit="submitForm()">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" name="username" placeholder="Username" ng-model="user.username" class="form-control" ng-blur="checkUser()">
+                            <span class="input-group-addon">
+                            <i ng-if="checkingUser" class="glyphicon glyphicon-hourglass"></i>
+                            <i ng-if="userOK" ng-hide="checkingUser" class="glyphicon glyphicon-ok"></i>
+                            <i ng-if="userNotOK" ng-hide="checkingUser" class="glyphicon glyphicon-remove"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Password" ng-model="user.password" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-success">Sign up</button>
+                </form>
 
     </div>
 </div>

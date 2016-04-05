@@ -5,7 +5,9 @@
 angular.module('TM470.controllers', []).
   controller('BodyController', ['$scope', '$http', '$location',
   function($scope, $http, $location) {
-    
+    // if(!$scope.user){ //NEED TO FIX - USER IS NOT SET BY THE TIME THE PAGE LOADS???
+    //   $location.path("/login");
+    // }
     //AUTH
     $http.get("/auth/user")
     .then(function(response) {
@@ -54,15 +56,55 @@ angular.module('TM470.controllers', []).
   controller('loginController', function($scope) {
    
   }).
-  controller('signupController', function($scope) {
-   
+  controller('signupController', function($scope, $http, $location, $window) {
+    $scope.checkUser = function() {
+      $scope.checkingUser = true;
+      $http.get("/auth/checkuser/" + $scope.user.username)
+        .then(function(data) {
+          console.log(data.status);
+          if(data.status == 200){
+            $scope.checkingUser = false;
+            $scope.userOK = true;
+            $scope.userNotOK = false;
+          }
+        }, function(err){
+          //console.log("usercheck error");
+          console.log(err.status);
+          $scope.checkingUser = false;
+          $scope.userOK = false;
+          $scope.userNotOK = true;
+        });
+    }
+
+    $scope.submitForm = function() {
+      console.log("signing up");
+      //console.log($scope.user);
+      $http.post("/auth/signup", $scope.user)
+        .then(function(data) {
+          console.log(data.status);
+          if(data.status == 200){
+            
+            success("Signed up"); 
+            $location.path("/account");
+            location.reload();
+            //UPDATE AUTH?
+          }
+          //$scope.message = data.message;
+        }, function(err){
+          console.log("sign up error: ");
+          console.log(err);
+          failure("Could not sign up: " + err); 
+          //$location.path("/login");
+        });
+    };
   }).
   controller('aboutController', function($scope) {
    
   }).
-  controller('accountController', function ($scope, $http, $location) {
-     
+  controller('accountController', function ($rootScope, $scope, $http, $location) {
+ 
     $scope.newpassword = {};
+    $scope.updateName = $scope.name;
     $scope.submitForm = function() {
       if(($scope.newpassword.first == $scope.newpassword.second) && $scope.newpassword.second){
         console.log("changing password");
@@ -72,11 +114,16 @@ angular.module('TM470.controllers', []).
       //console.log($scope.user);
       $http.post("/auth/update", $scope.user)
         .then(function(data) {
-          console.log(data.status);
+          //console.log(data.status);
           if(data.status == 200){
             
             success("Details updated");
-            
+            console.log($scope); 
+            console.log($scope.user.name); 
+            //console.log($scope.$parent);
+            //$scope.$parent.user.name = $scope.user.updateName;
+            //$scope.user.name = $scope.user.name;
+            //console.log($scope.$parent.user.name);
             //UPDATE AUTH?
           }
           //$scope.message = data.message;
@@ -87,9 +134,7 @@ angular.module('TM470.controllers', []).
           $location.path("/login");
         });
     };  
-    // if(!$scope.user){ //NEED TO FIX - USER IS NOT SET BY THE TIME THE PAGE LOADS???
-    //   $location.path("/login");
-    // } 
+
   }).
   controller('eventsController', ['$scope', '$http', '$location',
   function ($scope, $http, $location) {
