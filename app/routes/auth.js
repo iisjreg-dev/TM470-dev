@@ -105,18 +105,18 @@ passport.use('signup', new SignupStrategy(
 );
 
 passport.serializeUser(function(user, cb) {
-  console.log("serializeUser:");
+  console.log("serializeUser: " + user.username);
   //console.log(user);
-  console.log("key = " + user.username);
+  //console.log("key = " + user.username);
   cb(null, user.username);
 });
 
 passport.deserializeUser(function(id, cb) {
-  console.log("deserializeUser:");
-  console.log("id = " + id);
+  console.log("deserializeUser: " + id);
+  //console.log("id = " + id);
   db.get('Users', id, null, { 'without_fields': ['value.password', 'value.salt']})
     .then(function (result) {
-      console.log("done");
+      //console.log("done");
       return cb(null, result.body);
     })
     .fail(function (err) {
@@ -229,7 +229,7 @@ routerAuth.post('/update',
   
 routerAuth.get('/checkuser/:username', //check username is available - returns 200 if username does not exist or 406 if it does
   function(req, res){
-    db.get('Users', req.params.username)
+    db.get('Users', decodeURIComponent(req.params.username))
     .then(function (result) {
       console.log('DB success: ' + result.body.count + " results");
       if (result.body.count > 0){

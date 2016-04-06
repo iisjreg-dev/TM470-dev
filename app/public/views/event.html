@@ -19,10 +19,28 @@
             TODO***
             <div class="form-group">
                 <div class="row">
-                    <div class="col-lg-5">
-                        <input type="text" name="name" placeholder="Game" ng-model="match.game" class="form-control">
+                    <div class="col-lg-12">
+                        <div class="input-group">
+                            <input type="text" name="name" placeholder="Game (search BoardGameGeek)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
+                            <span class="input-group-addon">
+                            <i ng-if="checkingGame" class="glyphicon glyphicon-hourglass"></i>
+                            <i ng-if="match.id" ng-hide="checkingGame" class="glyphicon glyphicon-ok"></i>
+                            <i ng-if="notFound" ng-hide="checkingGame" class="glyphicon glyphicon-remove"></i></span>
+                        </div>
+                        <input type="hidden" name="BGGid" ng-model="match.id">
                     </div>
-                    <div class="col-lg-5">
+                </div>
+                <div class="row">    
+                    <div class="col-lg-12" ng-show="BGGresults">
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="res in BGGresults" ng-click="select(res.id,res.name.value)">
+                                <b>{{res.name.value}}</b> ({{res.yearpublished.value}})
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">    
+                    <div class="col-lg-10">
                         <input type="text" name="description" placeholder="Description" ng-model="match.description" class="form-control">
                     </div>
                     <div class="col-lg-2">

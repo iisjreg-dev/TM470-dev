@@ -16,13 +16,19 @@ angular.module('TM470.filters', []).
     }
   }).
   filter('timeAgo', function() {
-    return function(input,future) {
+    return function(input) {
        var aMoment = moment(input);
-       if(future){
-          return aMoment.toNow(true);
+       //var now = new Date();
+       if(aMoment.isAfter()){
+          return aMoment.toNow();
        }
        else{
-          return aMoment.fromNow();
+          if(aMoment.isBefore()){
+            return aMoment.fromNow();
+          }
+          else{
+            return "Today";
+          }
        }
     }
   });

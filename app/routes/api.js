@@ -42,6 +42,29 @@ routerAPI.get('/bgg/user/:username', function(req, res, next) {
   });
 });
 
+routerAPI.get('/bgg/game/:game', function(req, res, next) {
+  console.log("check game");
+  var options = {
+    timeout: 5000, // timeout of 10s (5s is the default)
+    // see https://github.com/cujojs/rest/blob/master/docs/interceptors.md#module-rest/interceptor/retry
+    retry: {
+        initial: 100,
+        multiplier: 2,
+        max: 15e3
+    }
+  };
+  var bgg = require('bgg')(options);
+  var game = decodeURIComponent(req.params.game);
+  console.log(game);
+  bgg('search', {query: game, type: 'boardgame,boardgameexpansion'})
+  .then(function(results){
+    res.send(results.items);
+    //res.sendStatus(200);
+    console.log(results.items);
+
+  });
+});
+
 
 
 //EVENT MANAGEMENT
@@ -55,8 +78,8 @@ routerAPI.get('/events/', //get all events
       res.status(403).send("not logged in");
     }
     else{
-      console.log("user: ");
-      console.log(req.user.username);
+      //console.log("user: ");
+      //console.log(req.user.username);
       console.log("list all events");
       db.list('Events') //will eventually change to accomodate multiple organisations
       .then(function (result) {
@@ -68,7 +91,7 @@ routerAPI.get('/events/', //get all events
           console.log("no events found");
           res.status(404).send("no events found"); 
         }
-        console.log("done");
+        //console.log("done");
         res.send(result.body); 
       })
       .fail(function (err) {
@@ -161,7 +184,7 @@ routerAPI.get('/events/:event/matches/', //get all matches
         .related('contains')
         .then(function (result) {
           console.log("Matches for event: " + req.params.event);
-          console.log(result.body.results);
+          //console.log(result.body.results);
           res.send(result.body.results);
         });
     }

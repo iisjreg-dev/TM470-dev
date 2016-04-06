@@ -58,22 +58,24 @@ angular.module('TM470.controllers', []).
   }).
   controller('signupController', function($scope, $http, $location, $window) {
     $scope.checkUser = function() {
-      $scope.checkingUser = true;
-      $http.get("/auth/checkuser/" + $scope.user.username)
-        .then(function(data) {
-          console.log(data.status);
-          if(data.status == 200){
+      if($scope.user.username){
+        $scope.checkingUser = true;
+        $http.get("/auth/checkuser/" + encodeURIComponent($scope.user.username))
+          .then(function(data) {
+            console.log(data.status);
+            if(data.status == 200){
+              $scope.checkingUser = false;
+              $scope.userOK = true;
+              $scope.userNotOK = false;
+            }
+          }, function(err){
+            //console.log("usercheck error");
+            console.log(err.status);
             $scope.checkingUser = false;
-            $scope.userOK = true;
-            $scope.userNotOK = false;
-          }
-        }, function(err){
-          //console.log("usercheck error");
-          console.log(err.status);
-          $scope.checkingUser = false;
-          $scope.userOK = false;
-          $scope.userNotOK = true;
-        });
+            $scope.userOK = false;
+            $scope.userNotOK = true;
+          });
+      }
     }
 
     $scope.submitForm = function() {
@@ -195,6 +197,14 @@ angular.module('TM470.controllers', []).
   controller('eventController', ['$scope', '$routeParams', '$http', '$location',
   function($scope, $routeParams, $http, $location) {
     $scope.itemId = $routeParams.event;
+    
+    $http.get("/api/events/" + $scope.itemId)
+    .then(function(response) {
+      //$scope.names = response.data.records;
+      //console.log(response.data);
+      $scope.eventDetail = response.data;
+    });
+    
     function getMatches(){
       $http.get("/api/events/" + $scope.itemId + "/matches/")
       .then(function(response) {
@@ -214,6 +224,50 @@ angular.module('TM470.controllers', []).
       console.log("/events/" + $routeParams.event + "/matches/" + key);
       $location.path("/events/" + $routeParams.event + "/matches/" + key);
     };
+    
+    $scope.checkGame = function(){
+      if($scope.match.game){
+        $scope.checkingGame = true;
+        $http.get("/api/bgg/game/" + encodeURIComponent($scope.match.game))
+          .then(function(data) {
+            console.log(data.status);
+            if(data.status == 200){
+              $scope.checkingGame = false;
+              if(data.data.total==1){
+                $scope.BGGresults = new Array();
+                $scope.BGGresults.push(data.data.item);
+              }
+              else{
+                if(data.data.total>1){
+                  $scope.BGGresults = data.data.item;
+                }
+                else{
+                  console.log(data.status);
+                  $scope.notFound = true;
+                }
+              }
+              // console.log(data.data);
+              // console.log("---");
+              // console.log(data.data.item);
+              //$scope.userOK = true;
+              //$scope.userNotOK = false;
+            }
+          }, function(err){
+            //console.log("usercheck error");
+            console.log(err.status);
+            $scope.checkingUser = false;
+            $scope.notFound = true;
+            //$scope.userNotOK = true;
+          });
+      }
+    }
+    
+    $scope.select = function(id,name){
+      console.log(id);
+      $scope.BGGresults = [];
+      $scope.match.game = name;
+      $scope.match.id = id;
+    }
     
     $scope.submitForm = function(){
       if($scope.match.game && $scope.match.description){
