@@ -78,6 +78,7 @@ routerAPI.get('/events/', //get all events
     }
   });
   
+  
 routerAPI.get('/events/:event', //get 1 event
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
@@ -95,6 +96,7 @@ routerAPI.get('/events/:event', //get 1 event
         res.status(404).send("no events found"); 
       }
       console.log("done");
+      result.body.eventKey = req.params.event;
       res.send(result.body); 
     })
     .fail(function (err) {
@@ -107,22 +109,16 @@ routerAPI.post('/events/', //post event
   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
   function(req, res){
     console.log("user: ");
-    console.log(req.user.value.username);
+    console.log(req.user.username);
     console.log("add event " + req.body.name);
-    db.post('Events', {
-      "name" : req.body.name,
-      "date" : req.body.date,
-      "time" : req.body.time,
-      "description" : req.body.desc,
-      "organisation" : req.body.organisation
-      })
+    db.post('Events', req.body)
     .then(function (result) {
       if(result.statusCode == "201"){
         console.log("status: 201");
         console.log("create link to user");
         db.newGraphBuilder()
         .create()
-        .from('Users', req.user.path.key)
+        .from('Users', req.user.username)
         .related('created')
         .to('Events', result.path.key)
         .then(function (res) {
@@ -142,6 +138,112 @@ routerAPI.post('/events/', //post event
     });
   });
   
+  
+////MATCH MANAGEMENT
+
+routerAPI.get('/events/:event/matches/', //get all matches
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    if(!req.user){
+      console.error("not logged in");
+      res.status(403).send("not logged in");
+    }
+    else{
+      console.log("user: ");
+      console.log(req.user.username);
+      console.log("list all matches");
+      
+      //NEED TO GRAPH SEARCH
+      //res.sendStatus(503);
+      db.newGraphReader()
+        .get()
+        .from('Events', req.params.event)
+        .related('contains')
+        .then(function (result) {
+          console.log("Matches for event: " + req.params.event);
+          console.log(result.body.results);
+          res.send(result.body.results);
+        });
+    }
+  });
+  
+  
+routerAPI.get('/events/:event/matches/:match', //get 1 event
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("get match " + req.params.match);
+    db.get('Matches', req.params.match)
+    .then(function (result) {
+      //console.log(result.body);
+      
+      //console.log("count = " + result.body.count);
+      //console.log(result.body.results[0].value.password);
+      if(result.body.count == 0){ 
+        console.log("no maatches found");
+        res.status(404).send("no matches found"); 
+      }
+      console.log("done");
+      res.send(result.body); 
+    })
+    .fail(function (err) {
+      console.log("error : count=" + err.body.count);
+      res.send(err); 
+    });
+  });
+  
+routerAPI.post('/events/:event/matches/', //post event
+  require('connect-ensure-login').ensureLoggedIn('/auth/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("add match " + req.body.game);
+    console.log(req.body);
+    db.post('Matches', req.body)
+    .then(function (result) {
+      if(result.statusCode == "201"){
+        console.log("status: 201");
+        console.log("create links");
+        console.log("user key: " + req.user.username);
+        console.log("event key: " + req.body.eventKey);
+        console.log("match key: " + result.path.key);
+        db.newGraphBuilder()
+        .create()
+        .from('Users', req.user.username)
+        .related('created')
+        .to('Matches', result.path.key)
+        .then(function (res) {
+          console.log("user link created");
+        })
+        .fail(function (res) {
+          console.log("user link error");
+        });
+        db.newGraphBuilder()
+        .create()
+        .from('Events', req.body.eventKey)
+        .related('contains')
+        .to('Matches', result.path.key)
+        .then(function (res) {
+          console.log("event link created");
+        })
+        .fail(function (res) {
+          console.log("event link error");
+        });
+        console.log("done");
+        res.status(201).send(result.path.key); 
+        //res.redirect("/events/" + result.path.key); //should change response for API usage
+      }
+      else{
+        res.status(result.statusCode).send("error");
+      }
+    })
+    .fail(function (err) {
+      console.log("error");
+      console.log(err);
+      res.status(500).send(err); 
+    });
+  });
   
 
 module.exports = routerAPI;

@@ -101,6 +101,9 @@ angular.module('TM470.controllers', []).
   controller('aboutController', function($scope) {
    
   }).
+  controller('matchController', function($scope) {
+   
+  }).
   controller('accountController', function ($rootScope, $scope, $http, $location) {
  
     $scope.newpassword = {};
@@ -138,23 +141,103 @@ angular.module('TM470.controllers', []).
   }).
   controller('eventsController', ['$scope', '$http', '$location',
   function ($scope, $http, $location) {
-    $http.get("/api/events")
-    .then(function(response) {
-      console.log(response.status);
-      $scope.eventlist = response.data.results;
-    //$scope.orderProp = 'created';
-    }, function(error){
-      console.log(error.data);
-      $location.path("/login");
-      //show login
-    });
+    $scope.event = {};
+    $scope.showAddEvent = false;
+    function getEvents(){
+      $http.get("/api/events")
+      .then(function(response) {
+        console.log(response.status);
+        $scope.eventlist = response.data.results;
+      //$scope.orderProp = 'created';
+      }, function(error){
+        console.log(error.data);
+        $location.path("/login");
+        //show login
+      });
+    }
+    getEvents();
+    
+    $scope.addEvent = function(){
+      $scope.event = {};
+      $scope.showAddEvent = true;
+    };
+    
+    $scope.go = function(key){
+      console.log("/events/" + key);
+      $location.path("/events/" + key);
+    }
+    
+    $scope.submitForm = function(){
+      if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){
+        $http.post("/api/events", $scope.event)
+        .then(function(data) {
+          //console.log(data.status);
+          if(data.status == 201){
+            $scope.event = {};
+            success("Event added");
+            console.log("success");
+            getEvents();
+
+          }
+          //$scope.message = data.message;
+        }, function(err){
+          console.error("update error: ");
+          console.error(err);
+          failure("Error adding event"); 
+          //$location.path("/login");
+        });
+      }
+      else{
+        failure("Please complete the form");
+      }
+    }
   }]).
-  controller('eventController', ['$scope', '$routeParams', '$http',
-  function($scope, $routeParams, $http) {
-    $scope.itemId = $routeParams.itemId;
-    $http.get("/api/events/" + $scope.itemId)
-    .then(function(response) {
-      //$scope.names = response.data.records;
-      $scope.project = response.data;
-    });
+  controller('eventController', ['$scope', '$routeParams', '$http', '$location',
+  function($scope, $routeParams, $http, $location) {
+    $scope.itemId = $routeParams.event;
+    function getMatches(){
+      $http.get("/api/events/" + $scope.itemId + "/matches/")
+      .then(function(response) {
+        //$scope.names = response.data.records;
+        //console.log(response.data);
+        $scope.matchlist = response.data;
+      });
+    }
+    getMatches();
+    
+    $scope.addMatch = function(){
+      $scope.match = {};
+      $scope.showAddMatch = true;
+    };
+    
+    $scope.go = function(key){
+      console.log("/events/" + $routeParams.event + "/matches/" + key);
+      $location.path("/events/" + $routeParams.event + "/matches/" + key);
+    };
+    
+    $scope.submitForm = function(){
+      if($scope.match.game && $scope.match.description){
+        $scope.match.eventKey = $scope.eventDetail.eventKey;
+        $http.post("/api/events/"+$routeParams.event +"/matches", $scope.match)
+        .then(function(data) {
+          //console.log(data.status);
+          if(data.status == 201){
+            $scope.match = {};
+            success("Match added");
+            console.log("success");
+            getMatches();
+
+          }
+          //$scope.message = data.message;
+        }, function(err){
+          console.error("update error: ");
+          console.error(err);
+          failure("Error adding match"); 
+          //$location.path("/login");
+        });
+      }
+      else{
+        failure("Please complete the form");
+      }
+    }
   }]);

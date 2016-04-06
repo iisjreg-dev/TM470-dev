@@ -19,6 +19,14 @@ config(function ($routeProvider, $locationProvider) {
       templateUrl: 'views/events.html',
       controller: 'eventsController'
     }).
+    when('/events/:event', {
+      templateUrl: 'views/event.html',
+      controller: 'eventController'
+    }).
+    when('/events/:event/matches/:match', {
+      templateUrl: 'views/match.html',
+      controller: 'matchController'
+    }).
     when('/login', {
       templateUrl: 'views/login.html',
       controller: 'loginController'
@@ -36,6 +44,7 @@ config(function ($routeProvider, $locationProvider) {
       controller: 'aboutController'
     }).
     otherwise({
+      //failure("404");
       redirectTo: '/'
     });
 

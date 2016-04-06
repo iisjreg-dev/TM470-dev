@@ -1,0 +1,73 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="media">
+            <div class="media-body">
+                Match Detail ***TODO***<br />
+                <small ng-show="eventDetail.name">
+                    Name: {{eventDetail.name}} ({{eventDetail.description}})<br/>
+                    Date: {{eventDetail.date | dateFilter:"Do MMM YYYY"}}, Time: {{eventDetail.time | dateFilter:"HH:mm"}}
+                </small>    
+            </div>
+            <div class="media-right">
+                <input type="button" ng-hide="showAddMatch" ng-click="addMatch()" role="button" class="btn btn-success media-object" value="Add Match">
+                <input type="button" ng-show="showAddMatch" ng-click="showAddMatch = false" role="button" class="btn btn-success media-object" value="Close form">
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer" ng-show="showAddMatch">
+        <form name="addMatchForm" ng-submit="submitForm()">
+            TODO***
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <input type="text" name="name" placeholder="Game" ng-model="match.game" class="form-control">
+                    </div>
+                    <div class="col-lg-5">
+                        <input type="text" name="description" placeholder="Description" ng-model="match.description" class="form-control">
+                    </div>
+                    <div class="col-lg-2">
+                        <input type="number" name="numPlayers" placeholder="# Players" ng-model="match.numPlayers" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Add</button>
+        </form>
+    </div>
+</div>
+
+    <table ng-show="matchlist" class="table table-hover"> <!--change ng-show to look at user object -->
+        <thead>
+        <tr>
+            <th>
+                Game
+            </t>
+            <th>
+                Description
+            </th>
+            <th>
+                # players
+            </th>
+            <th>
+                Players
+            </th>
+        </tr>
+        </thead>
+        <tr ng-repeat="mch in matchlist" ng-click="go(mch.path.key)">
+            <td>
+                {{mch.value.game}}
+            </td>
+            <td>
+                {{mch.value.description}}
+            </td>
+            <td>
+                {{mch.value.numPlayers}}
+            </td>
+            <td>
+                {{mch.value.players}}
+            </td>
+        </tr>
+        
+    </table>
