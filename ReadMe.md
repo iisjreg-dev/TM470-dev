@@ -1,7 +1,7 @@
-Commands to remember:
+Open University TM470 Computing Project:
 
-Ungit: ungit --urlBase http://$IP --port $PORT
+An online event management and matchmaking system for board game clubs
 
-Run: nodemon in app directory
+by
 
-upload JSON files to Orchestrate: orcup -a YOUR_API_KEY -c COLLECTION [file]
+Jarryd van Zanten
