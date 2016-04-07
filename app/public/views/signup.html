@@ -10,7 +10,8 @@
                     <div class="form-group">
                         <div class="input-group">
                             <input type="text" name="username" placeholder="Username" ng-model="user.username" class="form-control" ng-blur="checkUser()">
-                            <span class="input-group-addon">
+                            <span class="input-group-addon" ng-click="checkUser()">
+                            <i ng-hide="checkingUser || userOK || userNotOK" class="glyphicon glyphicon-search"></i>
                             <i ng-if="checkingUser" class="glyphicon glyphicon-hourglass"></i>
                             <i ng-if="userOK" ng-hide="checkingUser" class="glyphicon glyphicon-ok"></i>
                             <i ng-if="userNotOK" ng-hide="checkingUser" class="glyphicon glyphicon-remove"></i></span>

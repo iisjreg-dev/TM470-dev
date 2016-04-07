@@ -231,16 +231,22 @@ routerAuth.get('/checkuser/:username', //check username is available - returns 2
   function(req, res){
     db.get('Users', decodeURIComponent(req.params.username))
     .then(function (result) {
-      console.log('DB success: ' + result.body.count + " results");
-      if (result.body.count > 0){
-        //return cb(null, false, { message: 'username already exists' });
+      //console.log(result.body);
+      console.log('DB success: ');
+      if (result.body.username){ //username already exists
         res.sendStatus(406);// Not Acceptable
       }
-      else{
+      else{ //result is not a user, i.e. no result
         res.sendStatus(200);
       }
+    })
+    .fail(function (err) {
+      if(err.body.code == "items_not_found"){ //username not found
+        res.sendStatus(200);
+      }
+      console.log("error: ")
+      //console.log(err.body);
     });
-    //res.send(req.user);
   });
 
 routerAuth.get('/logout',
@@ -248,13 +254,6 @@ routerAuth.get('/logout',
     req.logout();
     res.sendStatus(200);
   });
-  
-// routerAuth.get('/profile',
-//   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
-//   function(req, res){
-//     res.send(req.user);
-//   });
-
 
 routerAuth.get('/', //sends 200 status if logged in
   function(req, res) {

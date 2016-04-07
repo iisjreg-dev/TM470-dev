@@ -35,7 +35,7 @@ logger.token('fixclfdate', function getclfDate(req) { //needed to remove the ext
 });
 app.use(logger(':id :fixclfdate :method :url :status :response-time ms - :res[content-length]'));
 var requests = 0;
-app.use(function(req, res, next) { //increment request counter ---- think of neater way of doing this without using uuids (too long)
+app.use(function(req, res, next) { //increment request counter ---- TODO: think of neater way of doing this without using uuids (too long)
   requests++;
   req.id = pad(requests,5);
   next();
@@ -58,13 +58,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash()); //NEEDS MORE TESTING
 
-
-
-
-
-app.use('/auth', auth);
-app.use('/api', api);
-
 // //flash messages TESTING
 // app.use(function(req, res, next){
 //     res.locals.success_messages = req.flash('success');
@@ -74,9 +67,14 @@ app.use('/api', api);
 //     next();
 // });
 
+
+app.use('/auth', auth);
+app.use('/api', api);
 app.use('*', function(req, res){ //catch anything else and send index.html, so that Angular can route
   res.sendFile(__dirname + '/public/index.html');
 });
+
+
 
 
 // catch 404 and forward to error handler

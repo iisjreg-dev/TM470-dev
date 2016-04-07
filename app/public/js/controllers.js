@@ -3,7 +3,7 @@
 /* Controllers */
 
 angular.module('TM470.controllers', []).
-  controller('BodyController', ['$scope', '$http', '$location',
+  controller('BodyController', ['$scope', '$http', '$location', //INDEX.HTML - AVAILABLE ON ALL PAGES
   function($scope, $http, $location) {
     // if(!$scope.user){ //NEED TO FIX - USER IS NOT SET BY THE TIME THE PAGE LOADS???
     //   $location.path("/login");
@@ -12,8 +12,6 @@ angular.module('TM470.controllers', []).
     $http.get("/auth/user")
     .then(function(response) {
         console.log("auth success");
-        //console.log(response.status);
-        //console.log(response);
         $scope.user = response.data;
         $scope.showlogin = false;
 
@@ -24,15 +22,15 @@ angular.module('TM470.controllers', []).
         //$location.path("/");
     });
 
-
+    //reference to notie.js javascript functions for use in template pages 
     $scope.ngsuccess = function(input) {
-      success(input); //reference to notie javascript function
+      success(input); 
     }
     $scope.ngfailure = function(input) {
       failure(input);
     }
     
-    
+    //AJAX logout
     $scope.logout = function(){
       $http.get("/auth/logout")
       .then(function(response) {
@@ -45,18 +43,19 @@ angular.module('TM470.controllers', []).
         console.log("logout fail");
         console.log(error.data);
         failure("Could not logout");
-        
     });
     }
     
   }]).
-  controller('mainController', function ($scope) {
+  controller('mainController', function ($scope) { //MAIN.HTML - mainly used for testing -- will eventual be a 'dashboard'
 
   }).
-  controller('loginController', function($scope) {
+  controller('loginController', function($scope) { //LOGIN.HTML - TODO: need to make login use AJAX
    
   }).
-  controller('signupController', function($scope, $http, $location, $window) {
+  controller('signupController', function($scope, $http, $location, $window) { //SIGNUP.HTML
+  
+    //Live username checking - TODO: add tooltips/more info to result
     $scope.checkUser = function() {
       if($scope.user.username){
         $scope.checkingUser = true;
@@ -68,6 +67,13 @@ angular.module('TM470.controllers', []).
               $scope.userOK = true;
               $scope.userNotOK = false;
             }
+            else{
+              console.log("not available");
+              console.log(data.status);
+              $scope.checkingUser = false;
+              $scope.userOK = false;
+              $scope.userNotOK = true;
+            }
           }, function(err){
             //console.log("usercheck error");
             console.log(err.status);
@@ -77,7 +83,8 @@ angular.module('TM470.controllers', []).
           });
       }
     }
-
+    
+    //SIGNUP SUBMIT
     $scope.submitForm = function() {
       console.log("signing up");
       //console.log($scope.user);
@@ -85,13 +92,11 @@ angular.module('TM470.controllers', []).
         .then(function(data) {
           console.log(data.status);
           if(data.status == 200){
-            
             success("Signed up"); 
             $location.path("/account");
             location.reload();
             //UPDATE AUTH?
           }
-          //$scope.message = data.message;
         }, function(err){
           console.log("sign up error: ");
           console.log(err);
@@ -100,13 +105,13 @@ angular.module('TM470.controllers', []).
         });
     };
   }).
-  controller('aboutController', function($scope) {
+  controller('aboutController', function($scope) { //ABOUT.HTML - no controller needed yet
    
   }).
-  controller('matchController', function($scope) {
+  controller('matchController', function($scope) { //MATCH.HTML - TODO: Match management
    
   }).
-  controller('accountController', function ($rootScope, $scope, $http, $location) {
+  controller('accountController', function ($rootScope, $scope, $http, $location) { //ACCOUNT.HTML - updating user details and password
  
     $scope.newpassword = {};
     $scope.updateName = $scope.name;
@@ -115,36 +120,34 @@ angular.module('TM470.controllers', []).
         console.log("changing password");
         $scope.user.password = $scope.newpassword.second;
       }
-      console.log("updating");
-      //console.log($scope.user);
+      else{
+        if($scope.newpassword.first != $scope.newpassword.second){
+          failure("Please confirm password");
+        }
+      }
+      console.log("updating user");
       $http.post("/auth/update", $scope.user)
         .then(function(data) {
           //console.log(data.status);
           if(data.status == 200){
-            
             success("Details updated");
-            console.log($scope); 
             console.log($scope.user.name); 
-            //console.log($scope.$parent);
-            //$scope.$parent.user.name = $scope.user.updateName;
-            //$scope.user.name = $scope.user.name;
-            //console.log($scope.$parent.user.name);
             //UPDATE AUTH?
           }
-          //$scope.message = data.message;
         }, function(err){
           console.log("update error: ");
           console.log(err);
-          failure("Not logged in"); 
+          failure("Not logged in"); //TODO: Check
           $location.path("/login");
         });
     };  
-
   }).
-  controller('eventsController', ['$scope', '$http', '$location',
+  controller('eventsController', ['$scope', '$http', '$location', //EVENTS.HTML
   function ($scope, $http, $location) {
     $scope.event = {};
     $scope.showAddEvent = false;
+    
+    //Load event list
     function getEvents(){
       $http.get("/api/events")
       .then(function(response) {
@@ -160,7 +163,7 @@ angular.module('TM470.controllers', []).
     getEvents();
     
     $scope.addEvent = function(){
-      $scope.event = {};
+      $scope.event = {}; //clear addEvent form
       $scope.showAddEvent = true;
     };
     
@@ -170,18 +173,16 @@ angular.module('TM470.controllers', []).
     }
     
     $scope.submitForm = function(){
-      if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){
+      if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){ //all fields completed
         $http.post("/api/events", $scope.event)
         .then(function(data) {
           //console.log(data.status);
-          if(data.status == 201){
+          if(data.status == 201){ //CREATED
             $scope.event = {};
             success("Event added");
             console.log("success");
             getEvents();
-
           }
-          //$scope.message = data.message;
         }, function(err){
           console.error("update error: ");
           console.error(err);
@@ -194,13 +195,13 @@ angular.module('TM470.controllers', []).
       }
     }
   }]).
-  controller('eventController', ['$scope', '$routeParams', '$http', '$location',
+  controller('eventController', ['$scope', '$routeParams', '$http', '$location', //EVENT.HTML
   function($scope, $routeParams, $http, $location) {
     $scope.itemId = $routeParams.event;
     
+    //get current event detail
     $http.get("/api/events/" + $scope.itemId)
     .then(function(response) {
-      //$scope.names = response.data.records;
       //console.log(response.data);
       $scope.eventDetail = response.data;
     });
@@ -208,7 +209,6 @@ angular.module('TM470.controllers', []).
     function getMatches(){
       $http.get("/api/events/" + $scope.itemId + "/matches/")
       .then(function(response) {
-        //$scope.names = response.data.records;
         //console.log(response.data);
         $scope.matchlist = response.data;
       });
@@ -225,6 +225,7 @@ angular.module('TM470.controllers', []).
       $location.path("/events/" + $routeParams.event + "/matches/" + key);
     };
     
+    //live check of game names from BoardGameGeek - TODO: retrieve full game details after selection
     $scope.checkGame = function(){
       if($scope.match.game){
         $scope.checkingGame = true;
@@ -233,40 +234,35 @@ angular.module('TM470.controllers', []).
             console.log(data.status);
             if(data.status == 200){
               $scope.checkingGame = false;
-              if(data.data.total==1){
+              if(data.data.total==1){ //If only 1 result, data is not in array, so put it in one
                 $scope.BGGresults = new Array();
                 $scope.BGGresults.push(data.data.item);
               }
-              else{
-                if(data.data.total>1){
+              else if(data.data.total>1){
                   $scope.BGGresults = data.data.item;
-                }
-                else{
-                  console.log(data.status);
-                  $scope.notFound = true;
-                }
               }
-              // console.log(data.data);
-              // console.log("---");
-              // console.log(data.data.item);
-              //$scope.userOK = true;
-              //$scope.userNotOK = false;
+              else{
+                console.log(data.status);
+                $scope.notFound = true;
+              }
             }
           }, function(err){
             //console.log("usercheck error");
             console.log(err.status);
             $scope.checkingUser = false;
             $scope.notFound = true;
-            //$scope.userNotOK = true;
           });
       }
     }
     
+    //choose game from suggestions -- TODO: give more information around suggestions
     $scope.select = function(id,name){
       console.log(id);
-      $scope.BGGresults = [];
-      $scope.match.game = name;
-      $scope.match.id = id;
+      $scope.BGGresults = []; //clear results
+      $scope.match.game = name; //update game name
+      $scope.match.id = id; //store BGG id for retrieval
+      
+      //TODO: retrieve full game info
     }
     
     $scope.submitForm = function(){
@@ -282,7 +278,6 @@ angular.module('TM470.controllers', []).
             getMatches();
 
           }
-          //$scope.message = data.message;
         }, function(err){
           console.error("update error: ");
           console.error(err);
