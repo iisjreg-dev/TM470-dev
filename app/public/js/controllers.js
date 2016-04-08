@@ -217,6 +217,8 @@ angular.module('TM470.controllers', []).
     
     $scope.addMatch = function(){
       $scope.match = {};
+      $scope.BGGresults = []; //clear results
+      $scope.gameDetail = {};
       $scope.showAddMatch = true;
     };
     
@@ -229,7 +231,7 @@ angular.module('TM470.controllers', []).
     $scope.checkGame = function(){
       if($scope.match.game){
         $scope.checkingGame = true;
-        $http.get("/api/bgg/game/" + encodeURIComponent($scope.match.game))
+        $http.get("/api/bgg/game/search/" + encodeURIComponent($scope.match.game))
           .then(function(data) {
             console.log(data.status);
             if(data.status == 200){
@@ -237,9 +239,11 @@ angular.module('TM470.controllers', []).
               if(data.data.total==1){ //If only 1 result, data is not in array, so put it in one
                 $scope.BGGresults = new Array();
                 $scope.BGGresults.push(data.data.item);
+                $scope.notFound = false;
               }
               else if(data.data.total>1){
                   $scope.BGGresults = data.data.item;
+                  $scope.notFound = false;
               }
               else{
                 console.log(data.status);
@@ -257,12 +261,34 @@ angular.module('TM470.controllers', []).
     
     //choose game from suggestions -- TODO: give more information around suggestions
     $scope.select = function(id,name){
-      console.log(id);
+      console.log("selected: " + id);
+      $scope.gettingGameDetail = true;
       $scope.BGGresults = []; //clear results
+      $scope.gameDetail = {};
       $scope.match.game = name; //update game name
       $scope.match.id = id; //store BGG id for retrieval
       
-      //TODO: retrieve full game info
+        //retrieve full game info
+        $http.get("/api/bgg/game/" + $scope.match.id)
+          .then(function(data) {
+            console.log(data.status);
+            if(data.status == 200){
+              $scope.gettingGameDetail = false;
+              $scope.showGameDetail = true;
+              //console.log(data.data);
+              $scope.gameDetail = data.data; //data.data.item;
+              $scope.match.description = data.data.description;
+              $scope.match.numPlayers = data.data.minplayers.value + "-" + data.data.maxplayers.value;
+            }
+          }, function(err){
+            //console.log("usercheck error");
+            console.log(err.status);
+            $scope.gettingGameDetail = false;
+            $scope.showGameDetail = false;
+            //$scope.checkingUser = false;
+            //$scope.notFound = true;
+          });
+      
     }
     
     $scope.submitForm = function(){

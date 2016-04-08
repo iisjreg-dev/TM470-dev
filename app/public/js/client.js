@@ -7,7 +7,8 @@ angular.module('TM470', [
   'TM470.controllers',
   'TM470.filters',
   'TM470.services',
-  'TM470.directives'
+  'TM470.directives',
+  'ngSanitize'
 ]).
 config(function ($routeProvider, $locationProvider) {
   $routeProvider.

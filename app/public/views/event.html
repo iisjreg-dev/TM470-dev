@@ -22,29 +22,54 @@
                     <div class="col-lg-12">
                         <div class="input-group">
                             <input type="text" name="name" placeholder="Game (search BoardGameGeek)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
-                            <span class="input-group-addon">
+                            <span class="input-group-addon" ng-click="checkGame()">
+                            <i ng-hide="checkingGame || match.id || notFound" class="glyphicon glyphicon-search" style="cursor: pointer;"></i>
                             <i ng-if="checkingGame" class="glyphicon glyphicon-hourglass"></i>
                             <i ng-if="match.id" ng-hide="checkingGame" class="glyphicon glyphicon-ok"></i>
                             <i ng-if="notFound" ng-hide="checkingGame" class="glyphicon glyphicon-remove"></i></span>
                         </div>
                         <input type="hidden" name="BGGid" ng-model="match.id">
                     </div>
-                </div>
-                <div class="row">    
-                    <div class="col-lg-12" ng-show="BGGresults">
+                </div><br />
+                <div class="row" ng-show="BGGresults && BGGresults.length > 0">    
+                    <div class="col-lg-12">
                         <ul class="list-group">
-                            <li class="list-group-item" ng-repeat="res in BGGresults" ng-click="select(res.id,res.name.value)">
+                            <li class="list-group-item">
+                                Suggestions:
+                            </li>
+                            <li class="list-group-item" style="cursor: pointer;" ng-repeat="res in BGGresults" ng-click="select(res.id,res.name.value)">
                                 <b>{{res.name.value}}</b> ({{res.yearpublished.value}})
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div class="row">    
-                    <div class="col-lg-10">
+                <div class="row" ng-hide="match.id">    
+                    <div class="col-md-10">
                         <input type="text" name="description" placeholder="Description" ng-model="match.description" class="form-control">
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-md-2">
                         <input type="number" name="numPlayers" placeholder="# Players" ng-model="match.numPlayers" class="form-control">
+                    </div>
+                </div>
+                <div class="row" ng-show="gettingGameDetail">   
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            Getting game details!
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-if="showGameDetail">    
+                    <div class="col-lg-12">
+                        <div class="media">
+                            <div class="media-left">
+                                    <img class="media-object" ng-src="{{gameDetail.thumbnail}}">
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">{{gameDetail.name.value}}</h4>
+                                <small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></small><br>
+                                <p ng-bind-html="gameDetail.description"></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

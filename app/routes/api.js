@@ -42,7 +42,7 @@ routerAPI.get('/bgg/user/:username', function(req, res, next) {
   });
 });
 
-routerAPI.get('/bgg/game/:game', function(req, res, next) {
+routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for game
   console.log("check game");
   var options = {
     timeout: 5000, // timeout of 10s (5s is the default)
@@ -62,6 +62,28 @@ routerAPI.get('/bgg/game/:game', function(req, res, next) {
     //res.sendStatus(200);
     console.log(results.items);
 
+  });
+});
+
+routerAPI.get('/bgg/game/:gameId', function(req, res, next) { //GET GAME DETAIL
+  console.log("get game");
+  var options = {
+    timeout: 5000, // timeout of 10s (5s is the default)
+    // see https://github.com/cujojs/rest/blob/master/docs/interceptors.md#module-rest/interceptor/retry
+    retry: {
+        initial: 100,
+        multiplier: 2,
+        max: 15e3
+    }
+  };
+  var bgg = require('bgg')(options);
+  var gameId = req.params.gameId;
+  console.log(gameId);
+  bgg('thing', {id: gameId, type: "boardgame"})
+  .then(function(results){
+    res.send(results.items.item);
+    //res.sendStatus(200);
+    console.log(results.items.item);
   });
 });
 

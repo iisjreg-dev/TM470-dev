@@ -231,12 +231,12 @@ routerAuth.get('/checkuser/:username', //check username is available - returns 2
   function(req, res){
     db.get('Users', decodeURIComponent(req.params.username))
     .then(function (result) {
-      //console.log(result.body);
-      console.log('DB success: ');
+      console.log('DB success: Users key found');
       if (result.body.username){ //username already exists
         res.sendStatus(406);// Not Acceptable
       }
       else{ //result is not a user, i.e. no result
+        console.log(result.body);
         res.sendStatus(200);
       }
     })
