@@ -60,12 +60,12 @@ routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for 
   .then(function(results){
     res.send(results.items);
     //res.sendStatus(200);
-    console.log(results.items);
+    console.log(results.items.item);
 
   });
 });
 
-routerAPI.get('/bgg/game/:gameId', function(req, res, next) { //GET GAME DETAIL
+routerAPI.get('/bgg/game/:type/:gameId', function(req, res, next) { //GET GAME DETAIL
   console.log("get game");
   var options = {
     timeout: 5000, // timeout of 10s (5s is the default)
@@ -78,11 +78,13 @@ routerAPI.get('/bgg/game/:gameId', function(req, res, next) { //GET GAME DETAIL
   };
   var bgg = require('bgg')(options);
   var gameId = req.params.gameId;
+  var type = req.params.type;
   console.log(gameId);
-  bgg('thing', {id: gameId, type: "boardgame"})
+  bgg('thing', {id: gameId, type: type})
   .then(function(results){
     res.send(results.items.item);
     //res.sendStatus(200);
+    console.log(results);
     console.log(results.items.item);
   });
 });
@@ -111,7 +113,7 @@ routerAPI.get('/events/', //get all events
         //console.log(result.body.results[0].value.password);
         if(result.body.count == 0){ 
           console.log("no events found");
-          res.status(404).send("no events found"); 
+          res.status(200).send("no events found"); 
         }
         //console.log("done");
         res.send(result.body); 
@@ -148,6 +150,66 @@ routerAPI.get('/events/:event', //get 1 event
       console.log("error : count=" + err.body.count);
       res.send(err); 
     });
+  });
+  
+routerAPI.delete('/events/:event', //delete event
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("delete event " + req.params.event);
+    
+    
+    //delete all matches for event
+    var matches = [];
+    
+    // db.newGraphBuilder()
+    //       .remove()
+    //       .from('users', 'Steve')
+    //       .related('likes')
+    //       .to('movies', 'Superbad')
+    
+    db.newGraphReader()
+      .get()
+      .from('Events', req.params.event)
+      .related('contains')
+      .then(function (result) {
+        console.log("Matches for event: " + req.params.event);
+        //console.log(result.body.results);
+        //res.send(result.body.results);
+        matches = result.body.results;
+
+        console.log("# matches: " + matches.length);
+        
+        for(var i=0;i<matches.length;i++){
+          var iMatch = matches[i].path.key;
+          console.log(i + " - " + iMatch);
+          db.remove('Matches', iMatch, true)
+            .then(function (result) {
+              //console.log(result.body);
+              //console.log("match " + matches[i].path.key + " deleted");
+              console.log("deleted");
+            })
+            .fail(function (err) {
+              console.log("Match remove error : " + err);
+              res.send(err); 
+            });
+        }  
+        
+        //delete event 
+        db.remove('Events', req.params.event, true)
+        .then(function (result) {
+          console.log("event " + req.params.event + " deleted");
+          res.sendStatus(200); 
+        })
+        .fail(function (err) {
+          console.log("Event remove error : " + err);
+          res.send(err); 
+        });
+        
+      });
+      
+    
   });
   
 routerAPI.post('/events/', //post event
@@ -187,7 +249,7 @@ routerAPI.post('/events/', //post event
 ////MATCH MANAGEMENT
 
 routerAPI.get('/events/:event/matches/', //get all matches
-  //require('connect-ensure-login').ensureLoggedIn('/login'),
+  require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
       console.error("not logged in");
@@ -213,7 +275,7 @@ routerAPI.get('/events/:event/matches/', //get all matches
   });
   
   
-routerAPI.get('/events/:event/matches/:match', //get 1 event
+routerAPI.get('/events/:event/matches/:match', //get 1 match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     console.log("user: ");
@@ -238,7 +300,23 @@ routerAPI.get('/events/:event/matches/:match', //get 1 event
     });
   });
   
-routerAPI.post('/events/:event/matches/', //post event
+routerAPI.delete('/events/:event/matches/:match', //delete match
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("delete match " + req.params.match);
+    db.remove('Matches', req.params.match, true)
+    .then(function (result) {
+      res.sendStatus(200); 
+    })
+    .fail(function (err) {
+      console.log("error : " + err.body);
+      res.send(err.body); 
+    });
+  });
+  
+routerAPI.post('/events/:event/matches/', //post match
   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
   function(req, res){
     console.log("user: ");

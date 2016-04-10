@@ -1,4 +1,7 @@
 <div class="panel panel-primary">
+    
+    <!-- EVENT SUMMARY -->
+    
     <div class="panel-body">
         <div class="media">
             <div class="media-body">
@@ -14,9 +17,11 @@
             </div>
         </div>
     </div>
+    
+    <!-- ADD MATCH FORM -->
+    
     <div class="panel-footer" ng-show="showAddMatch">
         <form name="addMatchForm" ng-submit="submitForm()">
-            TODO***
             <div class="form-group">
                 <div class="row">
                     <div class="col-lg-12">
@@ -31,45 +36,57 @@
                         <input type="hidden" name="BGGid" ng-model="match.id">
                     </div>
                 </div><br />
-                <div class="row" ng-show="BGGresults && BGGresults.length > 0">    
+                <div class="row" ng-show="BGGresults && BGGresults.length > 0" ng-hide="notFound || checkingGame">    
                     <div class="col-lg-12">
                         <ul class="list-group">
                             <li class="list-group-item">
                                 Suggestions:
                             </li>
-                            <li class="list-group-item" style="cursor: pointer;" ng-repeat="res in BGGresults" ng-click="select(res.id,res.name.value)">
+                            <li class="list-group-item" style="cursor: pointer;" ng-repeat="res in BGGresults" ng-click="select(res.id,res.name.value,res.type)">
                                 <b>{{res.name.value}}</b> ({{res.yearpublished.value}})
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div class="row" ng-hide="match.id">    
+                <div class="row" ng-show="gettingGameDetail || checkingGame || notFound">   
+                    <div class="col-md-12">
+                        <div class="alert alert-info" ng-show="gettingGameDetail">
+                            Getting game details!
+                        </div>
+                        <div class="alert alert-info" ng-show="checkingGame">
+                            Searching for game...
+                        </div>
+                        <div class="alert alert-warning" ng-show="notFound" ng-hide="checkingGame || gettingGameDetail">
+                            Game not found. You can enter a description and number of players, below.
+                        </div>
+                    </div><br />
+                </div>
+                <div class="row" ng-show="notFound">    <!-- GAME NOT FOUND< ALLOW FOR MANUAL ENTRY -->
                     <div class="col-md-10">
                         <input type="text" name="description" placeholder="Description" ng-model="match.description" class="form-control">
                     </div>
                     <div class="col-md-2">
-                        <input type="number" name="numPlayers" placeholder="# Players" ng-model="match.numPlayers" class="form-control">
-                    </div>
-                </div>
-                <div class="row" ng-show="gettingGameDetail">   
-                    <div class="col-md-12">
-                        <div class="alert alert-info">
-                            Getting game details!
-                        </div>
+                        <input type="text" name="numPlayers" placeholder="# Players" ng-model="match.numPlayers" class="form-control">
                     </div>
                 </div>
                 <div class="row" ng-if="showGameDetail">    
                     <div class="col-lg-12">
-                        <div class="media">
-                            <div class="media-left">
-                                    <img class="media-object" ng-src="{{gameDetail.thumbnail}}">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">{{gameDetail.name.value}}</h4>
-                                <small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></small><br>
-                                <p ng-bind-html="gameDetail.description"></p>
-                            </div>
-                        </div>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <div class="media">
+                                    <div class="media-left">
+                                            <img class="media-object" ng-src="{{gameDetail.thumbnail}}">
+                                    </div>
+                                    <div class="media-body">
+                                        <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
+                                        <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
+                                        <small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
+                                        <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span>
+                                        <p ng-bind-html="gameDetail.description"></p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -81,35 +98,42 @@
     </div>
 </div>
 
-    <table ng-show="matchlist" class="table table-hover"> <!--change ng-show to look at user object -->
+<!-- LIST OF MATCHES -->
+
+    <table ng-show="matchlist" class="table table-hover"> <!--change ng-show to look at user object? -->
         <thead>
         <tr>
             <th>
                 Game
             </t>
             <th>
-                Description
+                Catagories
             </th>
             <th>
                 # players
             </th>
             <th>
-                Players
+                Interested Players
+            </th>
+            <th>    
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="mch in matchlist" ng-click="go(mch.path.key)">
-            <td>
-                {{mch.value.game}}
+        <tr ng-repeat="mch in matchlist" style="cursor: default;">
+            <td ng-click="go(mch.path.key)">
+                <p>{{mch.value.game}}</p>
             </td>
-            <td>
-                {{mch.value.description}}
+            <td ng-click="go(mch.path.key)">
+                <span ng-repeat="cat in mch.value.catagories">{{cat.value}}&nbsp; </span>
             </td>
-            <td>
+            <td ng-click="go(mch.path.key)">
                 {{mch.value.numPlayers}}
             </td>
-            <td>
+            <td ng-click="go(mch.path.key)">
                 {{mch.value.players}}
+            </td>
+            <td>
+                <input type="button" ng-click="joinMatch()" role="button" class="btn btn-default" value="Join"> <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

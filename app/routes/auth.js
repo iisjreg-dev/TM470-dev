@@ -141,12 +141,12 @@ routerAuth.post('/login',
     console.log("login done");
     //console.log(req.user);
     console.log("Login Success! user = " + req.user.username);
-    if(req.session.returnTo){ 
-      res.redirect(req.session.returnTo); 
-    }
-    else{
+    // if(req.session.returnTo){ 
+    //   res.redirect(req.session.returnTo); 
+    // }
+    // else{
       res.redirect('/main');
-    }
+    // }
   });
   
 /* login POST test. This should be changed to allow RESTful authentication via Angular*/
@@ -156,13 +156,13 @@ routerAuth.post('/signup',
     console.log("signup done");
     //console.log(req.user);
     console.log("Signup Success! user = " + req.user.username);
-    if(req.session.returnTo){ 
-      res.redirect(req.session.returnTo); 
-    }
-    else{
+    // if(req.session.returnTo){ 
+    //   res.redirect(req.session.returnTo); 
+    // }
+    // else{
       //res.redirect('/account');
       res.sendStatus(200);
-    }
+    // }
   });
   
 routerAuth.post('/update',  

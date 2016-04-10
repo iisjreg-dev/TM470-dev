@@ -17,8 +17,15 @@
                           <input type="text" name="name" placeholder="Event Name" ng-model="event.name" class="form-control">
                       </div>
                       <div class="col-lg-6">
-                        <input type="text" name="description" placeholder="Event Description" ng-model="event.description" class="form-control">
+                        <input type="text" name="venue" placeholder="Venue" ng-model="event.venue" class="form-control">
                     </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                      <div class="col-lg-12">
+                          <input type="text" name="description" placeholder="Event Description" ng-model="event.description" class="form-control">
+                      </div>
                 </div>
             </div>
             <div class="form-group">
@@ -54,20 +61,26 @@
             <th>
                 Description
             </th>
+            <th>
+                
+            </th>
         </tr>
         </thead>
-        <tr ng-repeat="ev in eventlist" ng-click="go(ev.path.key)">
-            <td>
+        <tr ng-repeat="ev in eventlist">
+            <td ng-click="go(ev.path.key)">
                 {{ev.value.name}}
             </td>
-            <td>
+            <td ng-click="go(ev.path.key)">
                 {{ev.value.date | dateFilter:"Do MMM YYYY"}}
             </td>
-            <td>
+            <td ng-click="go(ev.path.key)">
                 {{ev.value.time | dateFilter:"HH:mm"}}
             </td>
-            <td>
+            <td ng-click="go(ev.path.key)">
                 {{ev.value.description}}
+            </td>
+            <td>
+                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

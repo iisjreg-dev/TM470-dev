@@ -194,6 +194,29 @@ angular.module('TM470.controllers', []).
         failure("Please complete the form");
       }
     }
+    
+    $scope.delete = function(key){
+      console.log("deleting " + key);
+      $http.delete("/api/events/" + key)
+        .then(function(data) {
+          console.log(data.status);
+          // if(data.status == 201){
+          //   $scope.match = {}; //clear results
+          //   $scope.BGGresults = []; 
+          //   $scope.gameDetail = {};
+          //   $scope.showGameDetail = false;
+          //   success("Match added");
+          //   console.log("success");
+          getEvents();
+
+          // }
+        }, function(err){
+          console.error("delete error: ");
+          console.error(err);
+          failure("Error deleting match"); 
+          //$location.path("/login");
+        });
+    }
   }]).
   controller('eventController', ['$scope', '$routeParams', '$http', '$location', //EVENT.HTML
   function($scope, $routeParams, $http, $location) {
@@ -204,6 +227,10 @@ angular.module('TM470.controllers', []).
     .then(function(response) {
       //console.log(response.data);
       $scope.eventDetail = response.data;
+    }, function(error){
+      console.log(error.data);
+      $location.path("/login");
+      //show login
     });
     
     function getMatches(){
@@ -211,6 +238,10 @@ angular.module('TM470.controllers', []).
       .then(function(response) {
         //console.log(response.data);
         $scope.matchlist = response.data;
+      }, function(error){
+        console.log(error.data);
+        $location.path("/login");
+        //show login
       });
     }
     getMatches();
@@ -219,6 +250,7 @@ angular.module('TM470.controllers', []).
       $scope.match = {};
       $scope.BGGresults = []; //clear results
       $scope.gameDetail = {};
+      $scope.showGameDetail = false;
       $scope.showAddMatch = true;
     };
     
@@ -259,23 +291,32 @@ angular.module('TM470.controllers', []).
       }
     }
     
-    //choose game from suggestions -- TODO: give more information around suggestions
-    $scope.select = function(id,name){
+    $scope.select = function(id,name,type){
       console.log("selected: " + id);
       $scope.gettingGameDetail = true;
       $scope.BGGresults = []; //clear results
       $scope.gameDetail = {};
       $scope.match.game = name; //update game name
       $scope.match.id = id; //store BGG id for retrieval
+      $scope.match.type = type;
       
         //retrieve full game info
-        $http.get("/api/bgg/game/" + $scope.match.id)
+        $http.get("/api/bgg/game/" + $scope.match.type + "/" + $scope.match.id)
           .then(function(data) {
             console.log(data.status);
             if(data.status == 200){
               $scope.gettingGameDetail = false;
               $scope.showGameDetail = true;
               //console.log(data.data);
+              console.log("# of names: " + data.data.name.length);
+              if(data.data.name.length){
+                for(var i=0;i<data.data.name.length;i++){
+                  if(data.data.name[i].type == "primary"){
+                    data.data.name = data.data.name[i];
+                    break;
+                  }
+                }
+              }
               $scope.gameDetail = data.data; //data.data.item;
               $scope.match.description = data.data.description;
               $scope.match.numPlayers = data.data.minplayers.value + "-" + data.data.maxplayers.value;
@@ -294,11 +335,23 @@ angular.module('TM470.controllers', []).
     $scope.submitForm = function(){
       if($scope.match.game && $scope.match.description){
         $scope.match.eventKey = $scope.eventDetail.eventKey;
+        $scope.match.catagories = [];
+        if($scope.gameDetail.link.length){
+          for(var i=0;i<$scope.gameDetail.link.length;i++){ //ONLY STORE THE CATAGORIES IN THE DATABASE FOR LISTING
+            if($scope.gameDetail.link[i].type == "boardgamecategory"){
+              $scope.match.catagories.push($scope.gameDetail.link[i]);
+            }
+          }
+        }
+        // $scope.match.catagories = $scope.gameDetail.link;
         $http.post("/api/events/"+$routeParams.event +"/matches", $scope.match)
         .then(function(data) {
           //console.log(data.status);
           if(data.status == 201){
-            $scope.match = {};
+            $scope.match = {}; //clear results
+            $scope.BGGresults = []; 
+            $scope.gameDetail = {};
+            $scope.showGameDetail = false;
             success("Match added");
             console.log("success");
             getMatches();
@@ -315,4 +368,30 @@ angular.module('TM470.controllers', []).
         failure("Please complete the form");
       }
     }
+    
+    $scope.delete = function(key){
+      console.log("deleting " + key);
+      $http.delete("/api/events/"+ $routeParams.event +"/matches/" + key)
+        .then(function(data) {
+          console.log(data.status);
+          if(data.status == 200){
+            success("Match deleted");
+          }
+          //   $scope.match = {}; //clear results
+          //   $scope.BGGresults = []; 
+          //   $scope.gameDetail = {};
+          //   $scope.showGameDetail = false;
+          //   
+          //   console.log("success");
+          getMatches();
+
+          // }
+        }, function(err){
+          console.error("delete error: ");
+          console.error(err);
+          failure("Error deleting match"); 
+          //$location.path("/login");
+        });
+    }
+    
   }]);
