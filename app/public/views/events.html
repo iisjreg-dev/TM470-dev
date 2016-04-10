@@ -51,7 +51,7 @@
         <tr>
             <th>
                 Name
-            </t>
+            </th>
             <th>
                 Date
             </th>
@@ -66,7 +66,7 @@
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="ev in eventlist">
+        <tr ng-repeat="ev in eventlist" style="cursor: pointer;">
             <td ng-click="go(ev.path.key)">
                 {{ev.value.name}}
             </td>
@@ -80,7 +80,7 @@
                 {{ev.value.description}}
             </td>
             <td>
-                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

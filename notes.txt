@@ -5,3 +5,5 @@ Ungit: ungit --urlBase http://$IP --port $PORT
 Run: nodemon in app directory
 
 upload JSON files to Orchestrate: orcup -a YOUR_API_KEY -c COLLECTION [file]
+
+bgg node module amended to remove sanitisation: interceptor.js line 4 = var parserConfig = {object: true, sanitize: false};

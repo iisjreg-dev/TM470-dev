@@ -1,72 +1,62 @@
 <div class="panel panel-primary">
+    
+    <!-- MATCH SUMMARY -->
+    
     <div class="panel-body">
-        <div class="media">
-            <div class="media-body">
-                Match Detail ***TODO***<br />
-                <small ng-show="eventDetail.name">
-                    Name: {{eventDetail.name}} ({{eventDetail.description}})<br/>
-                    Date: {{eventDetail.date | dateFilter:"Do MMM YYYY"}}, Time: {{eventDetail.time | dateFilter:"HH:mm"}}
-                </small>    
-            </div>
-            <div class="media-right">
-                <input type="button" ng-hide="showAddMatch" ng-click="addMatch()" role="button" class="btn btn-success media-object" value="Add Match">
-                <input type="button" ng-show="showAddMatch" ng-click="showAddMatch = false" role="button" class="btn btn-success media-object" value="Close form">
+        <div class="row">    
+            <div class="col-lg-12">
+                <ul class="list-group">
+                    <li class="list-group-item" ng-show="!gameDetail">
+                        <div class="alert alert-info">
+                            Getting game details!
+                        </div>
+                    </li>
+                    <li class="list-group-item" ng-if="gameDetail">
+                        <div class="media">
+                            <div class="media-left">
+                                    <img class="media-object" ng-src="{{gameDetail.thumbnail}}">
+                            </div>
+                            <div class="media-body">
+                                <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
+                                <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
+                                <p><small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
+                                <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></p>
+                                <p>Playing time: {{gameDetail.playingtime.value}} minutes</p>
+                                <p ng-bind-html="gameDetail.description"></p>
+                                <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
-    <div class="panel-footer" ng-show="showAddMatch">
-        <form name="addMatchForm" ng-submit="submitForm()">
-            TODO***
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-5">
-                        <input type="text" name="name" placeholder="Game" ng-model="match.game" class="form-control">
-                    </div>
-                    <div class="col-lg-5">
-                        <input type="text" name="description" placeholder="Description" ng-model="match.description" class="form-control">
-                    </div>
-                    <div class="col-lg-2">
-                        <input type="number" name="numPlayers" placeholder="# Players" ng-model="match.numPlayers" class="form-control">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-success">Add</button>
-        </form>
+    
+    <!-- ADD MATCH FORM -->
+    
+    <div class="panel-footer">
+        <input type="button" ng-click="joinMatch()" role="button" class="btn btn-default btn-sm" value="Join">
     </div>
 </div>
 
-    <table ng-show="matchlist" class="table table-hover"> <!--change ng-show to look at user object -->
+<!-- LIST OF PLAYERS -->
+
+    <table ng-if="playerList" class="table table-hover">
         <thead>
         <tr>
             <th>
-                Game
-            </t>
-            <th>
-                Description
+                Interested Players
             </th>
-            <th>
-                # players
-            </th>
-            <th>
-                Players
+            <th>    
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="mch in matchlist" ng-click="go(mch.path.key)">
+        <tr ng-repeat="ply in playerList" style="cursor: pointer;">
             <td>
-                {{mch.value.game}}
+                <p>{{ply.value.name}}</p>
             </td>
             <td>
-                {{mch.value.description}}
-            </td>
-            <td>
-                {{mch.value.numPlayers}}
-            </td>
-            <td>
-                {{mch.value.players}}
+                <a ng-if="user.admin" ng-click="delete(ply)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

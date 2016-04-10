@@ -43,7 +43,7 @@
                                 Suggestions:
                             </li>
                             <li class="list-group-item" style="cursor: pointer;" ng-repeat="res in BGGresults" ng-click="select(res.id,res.name.value,res.type)">
-                                <b>{{res.name.value}}</b> ({{res.yearpublished.value}})
+                                <b>{{res.name.value}}</b> ({{res.yearpublished.value}}) <small><i ng-if="res.type != 'boardgame'">({{res.type}})</i></small>
                             </li>
                         </ul>
                     </div>
@@ -83,6 +83,7 @@
                                         <small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
                                         <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span>
                                         <p ng-bind-html="gameDetail.description"></p>
+                                        <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
                                     </div>
                                 </div>
                             </li>
@@ -105,7 +106,7 @@
         <tr>
             <th>
                 Game
-            </t>
+            </th>
             <th>
                 Catagories
             </th>
@@ -119,7 +120,7 @@
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="mch in matchlist" style="cursor: default;">
+        <tr ng-repeat="mch in matchlist" style="cursor: pointer;">
             <td ng-click="go(mch.path.key)">
                 <p>{{mch.value.game}}</p>
             </td>
@@ -133,7 +134,7 @@
                 {{mch.value.players}}
             </td>
             <td>
-                <input type="button" ng-click="joinMatch()" role="button" class="btn btn-default" value="Join"> <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i></a>
+                <input type="button" ng-click="joinMatch()" role="button" class="btn btn-default btn-sm" value="Join"> <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

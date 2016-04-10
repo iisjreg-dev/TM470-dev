@@ -108,9 +108,6 @@ angular.module('TM470.controllers', []).
   controller('aboutController', function($scope) { //ABOUT.HTML - no controller needed yet
    
   }).
-  controller('matchController', function($scope) { //MATCH.HTML - TODO: Match management
-   
-  }).
   controller('accountController', function ($rootScope, $scope, $http, $location) { //ACCOUNT.HTML - updating user details and password
  
     $scope.newpassword = {};
@@ -394,4 +391,80 @@ angular.module('TM470.controllers', []).
         });
     }
     
+  }]).
+  controller('matchController', ['$scope', '$routeParams', '$http', '$location', //MATCH.HTML
+  function($scope, $routeParams, $http, $location) {
+    $scope.eventKey = $routeParams.event;
+    $scope.matchKey = $routeParams.match;
+    $scope.playerList = {};
+    
+    
+    function getDetail(){
+     $http.get("/api/bgg/game/boardgame/" + $scope.match.id)
+      .then(function(data) {
+        console.log(data.status);
+        if(data.status == 200){
+          //$scope.gettingGameDetail = false;
+          //$scope.showGameDetail = true;
+          //console.log(data.data);
+          //console.log("# of names: " + data.data.name.length);
+          if(data.data.name.length){
+            for(var i=0;i<data.data.name.length;i++){
+              if(data.data.name[i].type == "primary"){
+                data.data.name = data.data.name[i];
+                break;
+              }
+            }
+          }
+          $scope.gameDetail = data.data; //data.data.item;
+        }
+      }, function(err){
+        //console.log("usercheck error");
+        console.log(err.status);
+        //$scope.gettingGameDetail = false;
+      });
+    }
+    
+    function getPlayers(){
+      $http.get("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/players")
+      .then(function(response) {
+        //console.log("players");
+        //console.log(response.data);
+        $scope.playerList = response.data;
+      }, function(error){
+        console.log(error.data);
+        $location.path("/login");
+        //show login
+      });
+    }
+    
+    //get current match detail
+    $http.get("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey)
+    .then(function(response) {
+      //console.log(response.data);
+      $scope.match = response.data;
+      getDetail();
+    }, function(error){
+      console.log(error.data);
+      $location.path("/login");
+      //show login
+    });
+    
+    getPlayers();
+    
+    $scope.joinMatch = function(){
+      $http.get("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/join")
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Joined match");
+          getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error joining match");
+          //$location.path("/login");
+          //show login
+        });
+    };
+
   }]);

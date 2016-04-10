@@ -56,7 +56,7 @@ routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for 
   var bgg = require('bgg')(options);
   var game = decodeURIComponent(req.params.game);
   console.log(game);
-  bgg('search', {query: game, type: 'boardgame,boardgameexpansion'})
+  bgg('search', {query: game, type: 'boardgame'})
   .then(function(results){
     res.send(results.items);
     //res.sendStatus(200);
@@ -66,7 +66,6 @@ routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for 
 });
 
 routerAPI.get('/bgg/game/:type/:gameId', function(req, res, next) { //GET GAME DETAIL
-  console.log("get game");
   var options = {
     timeout: 5000, // timeout of 10s (5s is the default)
     // see https://github.com/cujojs/rest/blob/master/docs/interceptors.md#module-rest/interceptor/retry
@@ -79,13 +78,17 @@ routerAPI.get('/bgg/game/:type/:gameId', function(req, res, next) { //GET GAME D
   var bgg = require('bgg')(options);
   var gameId = req.params.gameId;
   var type = req.params.type;
-  console.log(gameId);
-  bgg('thing', {id: gameId, type: type})
+  console.log("get " + type + " " + gameId);
+  //bgg('thing', {id: gameId, type: type}) //NEED TO BETTER HANDLE TYPES
+  bgg('thing', {id: gameId, stats: 1})
   .then(function(results){
-    res.send(results.items.item);
-    //res.sendStatus(200);
-    console.log(results);
-    console.log(results.items.item);
+    if(results.items.item){
+      res.send(results.items.item);
+    }
+    else{
+      console.log(results);
+      res.sendStatus(404);
+    }
   });
 });
 
@@ -228,7 +231,7 @@ routerAPI.post('/events/', //post event
         .from('Users', req.user.username)
         .related('created')
         .to('Events', result.path.key)
-        .then(function (res) {
+        .then(function (result2) {
           console.log("link created");
         });
         console.log("done");
@@ -288,7 +291,7 @@ routerAPI.get('/events/:event/matches/:match', //get 1 match
       //console.log("count = " + result.body.count);
       //console.log(result.body.results[0].value.password);
       if(result.body.count == 0){ 
-        console.log("no maatches found");
+        console.log("no matches found");
         res.status(404).send("no matches found"); 
       }
       console.log("done");
@@ -298,6 +301,33 @@ routerAPI.get('/events/:event/matches/:match', //get 1 match
       console.log("error : count=" + err.body.count);
       res.send(err); 
     });
+  });
+  
+routerAPI.get('/events/:event/matches/:match/join', //join match
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("join match " + req.params.match);
+    
+    db.newGraphBuilder()
+      .create()
+      .from('Users', req.user.username)
+      .related('playing')
+      .to('Matches', req.params.match)
+      .then(function (result) {
+        console.log("link created");
+        res.sendStatus(200);
+      });
+    db.newGraphBuilder()
+      .create()
+      .from('Matches', req.params.match)
+      .related('players')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link created");
+        res.sendStatus(200);
+      });
   });
   
 routerAPI.delete('/events/:event/matches/:match', //delete match
@@ -368,5 +398,30 @@ routerAPI.post('/events/:event/matches/', //post match
     });
   });
   
+routerAPI.get('/events/:event/matches/:match/players', //get players
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    if(!req.user){
+      console.error("not logged in");
+      res.status(403).send("not logged in");
+    }
+    else{
+      console.log("user: ");
+      console.log(req.user.username);
+      console.log("list all players");
+      
+      //NEED TO GRAPH SEARCH
+      //res.sendStatus(503);
+      db.newGraphReader()
+        .get()
+        .from('Matches', req.params.match)
+        .related('players')
+        .then(function (result) {
+          //console.log("Players for match: " + req.params.match);
+          //console.log(result.body.results);
+          res.send(result.body.results);
+        });
+    }
+  });
 
 module.exports = routerAPI;
