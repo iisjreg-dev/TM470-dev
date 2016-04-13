@@ -6,6 +6,35 @@
         <div class="row">    
             <div class="col-lg-12">
                 <ul class="list-group">
+                    <li class="list-group-item" ng-show="!match">
+                        <div class="alert alert-info">
+                            Getting game details!
+                        </div>
+                    </li>
+                    <li class="list-group-item" ng-if="match">
+                        <div class="media">
+                            <div class="media-left">
+                                    <img class="media-object" ng-src="{{match.thumbnail}}">
+                            </div>
+                            <div class="media-body">
+                                <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
+                                <h4 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span></h4>
+                                <p><small><i class="glyphicon glyphicon-user"></i> {{match.numPlayers}} </small>
+                                <span class="label label-info" ng-repeat="link in match.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></p>
+                                <p ng-bind-html="match.description"></p>
+                                <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- VERSION 2
+    <div class="panel-body">
+        <div class="row">    
+            <div class="col-lg-12">
+                <ul class="list-group">
                     <li class="list-group-item" ng-show="!gameDetail">
                         <div class="alert alert-info">
                             Getting game details!
@@ -17,7 +46,6 @@
                                     <img class="media-object" ng-src="{{gameDetail.thumbnail}}">
                             </div>
                             <div class="media-body">
-                                <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
                                 <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
                                 <p><small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
                                 <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></p>
@@ -30,7 +58,7 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </div> -->
     
     <!-- ADD MATCH FORM -->
     

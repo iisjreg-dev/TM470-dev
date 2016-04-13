@@ -70,6 +70,20 @@
                     </div>
                 </div>
                 <div class="row" ng-if="showGameDetail">    
+                    <div class="col-md-2">
+                        <img ng-src="{{gameDetail.thumbnail}}">
+                    </div>
+                    <div class="col-md-10">
+                        <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
+                        <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
+                        <small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
+                        <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span>
+                        <p ng-bind-html="gameDetail.description"></p>
+                        <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
+                    </div>
+                </div>
+                <!-- version 2 
+                <div class="row" ng-if="showGameDetail">    
                     <div class="col-lg-12">
                         <ul class="list-group">
                             <li class="list-group-item">
@@ -78,7 +92,6 @@
                                             <img class="media-object" ng-src="{{gameDetail.thumbnail}}">
                                     </div>
                                     <div class="media-body">
-                                        <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
                                         <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
                                         <small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
                                         <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span>
@@ -89,7 +102,7 @@
                             </li>
                         </ul>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="form-group">
                 <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
@@ -134,7 +147,7 @@
                 {{mch.value.players}}
             </td>
             <td>
-                <input type="button" ng-click="joinMatch()" role="button" class="btn btn-default btn-sm" value="Join"> <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

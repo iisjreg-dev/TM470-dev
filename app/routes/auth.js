@@ -145,11 +145,10 @@ routerAuth.post('/login',
     //   res.redirect(req.session.returnTo); 
     // }
     // else{
-      res.redirect('/main');
+      res.redirect('/main'); //TODO: Change to status
     // }
   });
   
-/* login POST test. This should be changed to allow RESTful authentication via Angular*/
 routerAuth.post('/signup', 
   passport.authenticate('signup', { failureRedirect: '/signup', failureFlash: true }),
   function(req, res) {

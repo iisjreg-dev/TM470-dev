@@ -83,6 +83,7 @@ routerAPI.get('/bgg/game/:type/:gameId', function(req, res, next) { //GET GAME D
   bgg('thing', {id: gameId, stats: 1})
   .then(function(results){
     if(results.items.item){
+      console.log(results.items.item);
       res.send(results.items.item);
     }
     else{
@@ -310,7 +311,7 @@ routerAPI.get('/events/:event/matches/:match/join', //join match
     console.log(req.user.username);
     console.log("join match " + req.params.match);
     
-    db.newGraphBuilder()
+    db.newGraphBuilder() //CREATE USER > MATCH LINK
       .create()
       .from('Users', req.user.username)
       .related('playing')
@@ -319,7 +320,7 @@ routerAPI.get('/events/:event/matches/:match/join', //join match
         console.log("link created");
         res.sendStatus(200);
       });
-    db.newGraphBuilder()
+    db.newGraphBuilder() //CREATE MATCH > USER LINK
       .create()
       .from('Matches', req.params.match)
       .related('players')

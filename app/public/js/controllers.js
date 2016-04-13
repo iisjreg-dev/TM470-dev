@@ -317,6 +317,8 @@ angular.module('TM470.controllers', []).
               $scope.gameDetail = data.data; //data.data.item;
               $scope.match.description = data.data.description;
               $scope.match.numPlayers = data.data.minplayers.value + "-" + data.data.maxplayers.value;
+              $scope.match.yearpublished = data.data.yearpublished.value;
+              $scope.match.thumbnail = data.data.thumbnail;
             }
           }, function(err){
             //console.log("usercheck error");
@@ -333,6 +335,7 @@ angular.module('TM470.controllers', []).
       if($scope.match.game && $scope.match.description){
         $scope.match.eventKey = $scope.eventDetail.eventKey;
         $scope.match.catagories = [];
+        // $scope.match.yearpublished = 
         if($scope.gameDetail.link.length){
           for(var i=0;i<$scope.gameDetail.link.length;i++){ //ONLY STORE THE CATAGORIES IN THE DATABASE FOR LISTING
             if($scope.gameDetail.link[i].type == "boardgamecategory"){
@@ -389,7 +392,22 @@ angular.module('TM470.controllers', []).
           failure("Error deleting match"); 
           //$location.path("/login");
         });
-    }
+    };
+    
+    // $scope.joinMatch = function(key){ //TODO: NEED TO THINK ABOUT HOW JOINING A MATCH WILL WORK FROM THE EVENT PAGE
+    //   $http.get("/api/events/" + $scope.itemId + "/matches/" + key + "/join")
+    //     .then(function(response) {
+    //       console.log(response.status);
+    //       //$scope.match = response.data;
+    //       success("Joined match");
+    //       //getPlayers();
+    //     }, function(error){
+    //       console.log(error.data);
+    //       failure("Error joining match");
+    //       //$location.path("/login");
+    //       //show login
+    //     });
+    // };
     
   }]).
   controller('matchController', ['$scope', '$routeParams', '$http', '$location', //MATCH.HTML
@@ -443,7 +461,7 @@ angular.module('TM470.controllers', []).
     .then(function(response) {
       //console.log(response.data);
       $scope.match = response.data;
-      getDetail();
+      //getDetail(); //TODO: REVIEW - MAY BE UNNECESSARILY SENDING REQUESTS FOR DATA THAT IS ALREADY STORED
     }, function(error){
       console.log(error.data);
       $location.path("/login");
