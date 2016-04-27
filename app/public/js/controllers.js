@@ -22,7 +22,7 @@ angular.module('TM470.controllers', []).
         //$location.path("/");
     });
 
-    //reference to notie.js javascript functions for use in template pages 
+    //reference to notie.js javascript functions for use in template pages -- TODO: SHould use Angular DI in a Service.
     $scope.ngsuccess = function(input) {
       success(input); 
     }
@@ -47,7 +47,7 @@ angular.module('TM470.controllers', []).
     }
     
   }]).
-  controller('mainController', function ($scope) { //MAIN.HTML - mainly used for testing -- will eventual be a 'dashboard'
+  controller('mainController', function ($scope) { //MAIN.HTML - mainly used for testing -- will eventual be a 'dashboard' or list of upcoming events/notifications
 
   }).
   controller('loginController', function($scope) { //LOGIN.HTML - TODO: need to make login use AJAX
@@ -120,6 +120,7 @@ angular.module('TM470.controllers', []).
       else{
         if($scope.newpassword.first != $scope.newpassword.second){
           failure("Please confirm password");
+          return;
         }
       }
       console.log("updating user");
@@ -277,12 +278,13 @@ angular.module('TM470.controllers', []).
               else{
                 console.log(data.status);
                 $scope.notFound = true;
+                $scope.checkingGame = false;
               }
             }
           }, function(err){
             //console.log("usercheck error");
             console.log(err.status);
-            $scope.checkingUser = false;
+            $scope.checkingGame = false;
             $scope.notFound = true;
           });
       }
@@ -296,6 +298,7 @@ angular.module('TM470.controllers', []).
       $scope.match.game = name; //update game name
       $scope.match.id = id; //store BGG id for retrieval
       $scope.match.type = type;
+      $scope.expand = false;
       
         //retrieve full game info
         $http.get("/api/bgg/game/" + $scope.match.type + "/" + $scope.match.id)
@@ -305,7 +308,7 @@ angular.module('TM470.controllers', []).
               $scope.gettingGameDetail = false;
               $scope.showGameDetail = true;
               //console.log(data.data);
-              console.log("# of names: " + data.data.name.length);
+              //console.log("# of names: " + data.data.name.length);
               if(data.data.name.length){
                 for(var i=0;i<data.data.name.length;i++){
                   if(data.data.name[i].type == "primary"){
@@ -315,7 +318,17 @@ angular.module('TM470.controllers', []).
                 }
               }
               $scope.gameDetail = data.data; //data.data.item;
-              $scope.match.description = data.data.description;
+              
+              var description = data.data.description.trim();
+              description = description.replace(/&#10;/g, '<br />');
+              $scope.match.description = description;
+              $scope.gameDetail.description = description;
+              
+              var shortDesc = data.data.description.substr(0,350);
+              shortDesc = shortDesc.concat("...");
+              $scope.match.description_short = shortDesc.replace(/&#10;/g, '<br />');
+              $scope.gameDetail.description_short = shortDesc.replace(/&#10;/g, '<br />');
+              
               $scope.match.numPlayers = data.data.minplayers.value + "-" + data.data.maxplayers.value;
               $scope.match.yearpublished = data.data.yearpublished.value;
               $scope.match.thumbnail = data.data.thumbnail;

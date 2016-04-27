@@ -172,9 +172,9 @@ routerAuth.post('/update',
       console.log("update " + req.user.username + "/" + req.body.username);
       if(req.body.password){
         //hash and salt
-        var buf = crypto.randomBytes(256);
-        var salt = buf.toString('hex'); //check*
-        
+        //var buf = crypto.randomBytes(256);
+        //var salt = buf.toString('hex'); //check*
+        var salt = new Buffer(crypto.randomBytes(512)).toString('hex');
         
         db.newPatchBuilder('Users', req.body.username)
         .replace('snippet', req.body.snippet)

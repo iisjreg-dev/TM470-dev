@@ -48,11 +48,19 @@ routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for 
     timeout: 5000, // timeout of 10s (5s is the default)
     // see https://github.com/cujojs/rest/blob/master/docs/interceptors.md#module-rest/interceptor/retry
     retry: {
-        initial: 100,
+        initial: 200,
         multiplier: 2,
         max: 15e3
+    }, 
+    toJSONConfig: {
+        object: true,
+        reversible: false,
+        coerce: true,
+        sanitize: false,
+        trim: true
     }
   };
+  
   var bgg = require('bgg')(options);
   var game = decodeURIComponent(req.params.game);
   console.log(game);
@@ -60,8 +68,12 @@ routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for 
   .then(function(results){
     res.send(results.items);
     //res.sendStatus(200);
-    console.log(results.items.item);
+    //console.log(results.items.item);
 
+  }, function(error){
+    console.log(error);
+    res.sendStatus(500);
+    return;
   });
 });
 
@@ -73,8 +85,16 @@ routerAPI.get('/bgg/game/:type/:gameId', function(req, res, next) { //GET GAME D
         initial: 100,
         multiplier: 2,
         max: 15e3
+    }, 
+    toJSONConfig: {
+        object: true,
+        reversible: false,
+        coerce: true,
+        sanitize: false,
+        trim: true
     }
   };
+  
   var bgg = require('bgg')(options);
   var gameId = req.params.gameId;
   var type = req.params.type;
@@ -83,7 +103,7 @@ routerAPI.get('/bgg/game/:type/:gameId', function(req, res, next) { //GET GAME D
   bgg('thing', {id: gameId, stats: 1})
   .then(function(results){
     if(results.items.item){
-      console.log(results.items.item);
+      //console.log(results.items.item);
       res.send(results.items.item);
     }
     else{

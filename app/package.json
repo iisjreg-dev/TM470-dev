@@ -8,7 +8,7 @@
   "dependencies": {
     "bcryptjs": "^2.3.0",
     "better-console": "^0.2.4",
-    "bgg": "^1.0.0",
+    "bgg": "https://github.com/iisjreg-dev/bgg/tarball/master",
     "body-parser": "~1.13.2",
     "connect-ensure-login": "^0.1.1",
     "connect-flash": "^0.1.1",
