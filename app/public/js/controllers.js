@@ -474,6 +474,18 @@ angular.module('TM470.controllers', []).
     .then(function(response) {
       //console.log(response.data);
       $scope.match = response.data;
+      
+      var description = response.data.description.trim();
+      description = description.replace(/&#10;/g, '<br />');
+      $scope.match.description = description;
+      //$scope.gameDetail.description = description;
+      
+      var shortDesc = response.data.description.substr(0,350);
+      shortDesc = shortDesc.concat("...");
+      $scope.match.description_short = shortDesc.replace(/&#10;/g, '<br />');
+      //$scope.gameDetail.description_short = shortDesc.replace(/&#10;/g, '<br />'); 
+      
+      
       //getDetail(); //TODO: REVIEW - MAY BE UNNECESSARILY SENDING REQUESTS FOR DATA THAT IS ALREADY STORED
     }, function(error){
       console.log(error.data);

@@ -12,8 +12,8 @@
                 </small>    
             </div>
             <div class="media-right">
-                <input type="button" ng-hide="showAddMatch" ng-click="addMatch()" role="button" class="btn btn-success media-object" value="Add Match">
-                <input type="button" ng-show="showAddMatch" ng-click="showAddMatch = false" role="button" class="btn btn-success media-object" value="Close form">
+                <button type="button" ng-hide="showAddMatch" ng-click="addMatch()" role="button" class="btn btn-success media-object">Add Match</button>
+                <button ng-show="showAddMatch" ng-click="showAddMatch = false" role="button" class="btn btn-default media-object"><i class="glyphicon glyphicon-remove"></i></button>
             </div>
         </div>
     </div>
@@ -84,10 +84,12 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
+            <div class="media">
+                <div class="media-body">
+                    <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">    
+                </div>
+                <div class="media-right"><button type="submit" class="btn btn-success">Add</button></div>
             </div>
-            <button type="submit" class="btn btn-success">Add</button>
         </form>
     </div>
 </div>
@@ -109,7 +111,7 @@
             <th>
                 Interested Players
             </th>
-            <th>    
+            <th>&nbsp;
             </th>
         </tr>
         </thead>
@@ -126,7 +128,7 @@
             <td ng-click="go(mch.path.key)">
                 {{mch.value.players}}
             </td>
-            <td>
+            <td style="text-align: right">
                 <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
