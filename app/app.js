@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var flash= require('connect-flash');
+var git = require('git-rev')
 require('date-utils');
 
 var api = require('./routes/api');
@@ -22,6 +23,10 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 //console.log("log");
 //console.warn("Warning!");
 console.info("Started");
+console.info("PORT: " + app.address().port);
+git.tag(function (str) {
+  console.info('GIT version: ', str);
+})
 function pad(str, max) {
   str = str.toString();
   return str.length < max ? pad("0" + str, max) : str;
