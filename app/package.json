@@ -17,6 +17,7 @@
     "debug": "~2.2.0",
     "express": "~4.13.1",
     "express-session": "^1.13.0",
+    "git-rev": "^0.2.1",
     "morgan": "~1.6.1",
     "orchestrate": "~0.8.0",
     "passport": "^0.3.2",

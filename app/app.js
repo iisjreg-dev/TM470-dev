@@ -23,9 +23,9 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 //console.log("log");
 //console.warn("Warning!");
 console.info("Started");
-console.info("PORT: " + app.address().port);
+
 git.tag(function (str) {
-  console.info('GIT version: ', str);
+  console.info('GIT version:', str);
 })
 function pad(str, max) {
   str = str.toString();
