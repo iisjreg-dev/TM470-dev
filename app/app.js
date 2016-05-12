@@ -24,7 +24,7 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 //console.warn("Warning!");
 console.info("Started");
 
-git.tag(function (str) {
+git.short(function (str) {
   console.info('GIT version:', str);
 })
 function pad(str, max) {
