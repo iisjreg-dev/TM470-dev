@@ -102,7 +102,7 @@
             <th>
                 Game
             </th>
-            <th>
+            <th class="col-sm-5">
                 Catagories
             </th>
             <th>
@@ -126,7 +126,7 @@
                 {{mch.value.numPlayers}}
             </td>
             <td ng-click="go(mch.path.key)">
-                {{mch.value.players}}
+                <small>{{mch.value.players}}</small>
             </td>
             <td style="text-align: right">
                 <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>

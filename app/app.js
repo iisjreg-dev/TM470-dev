@@ -7,7 +7,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var flash= require('connect-flash');
-var git = require('git-rev')
+var git = require('git-rev');
+var helmet = require('helmet');
 require('date-utils');
 
 var api = require('./routes/api');
@@ -26,7 +27,8 @@ console.info("Started");
 
 git.short(function (str) {
   console.info('GIT version:', str);
-})
+});
+
 function pad(str, max) {
   str = str.toString();
   return str.length < max ? pad("0" + str, max) : str;
@@ -62,6 +64,7 @@ app.use(require('express-session')({ secret: 'TM470', resave: false, saveUniniti
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash()); //NEEDS MORE TESTING
+app.use(helmet());
 
 // //flash messages TESTING
 // app.use(function(req, res, next){

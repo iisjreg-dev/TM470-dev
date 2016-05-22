@@ -5,7 +5,7 @@
                 List of events</div>
             <div class="media-right">
                 <input type="button" ng-hide="showAddEvent" ng-click="addEvent()" role="button" class="btn btn-success media-object" value="Add event">
-                <input type="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-success media-object" value="Close form">
+                <a role="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-default media-object"><i class="glyphicon glyphicon-remove"></i></a>
             </div>
         </div>
     </div>
@@ -41,12 +41,18 @@
             <div class="form-group">
                 <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
             </div>
-            <button type="submit" class="btn btn-success">Add</button>
+            <div class="media">
+                <div class="media-body">
+                    <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">    
+                </div>
+                <div class="media-right"><button type="submit" class="btn btn-success">Add</button></div>
+            </div>
         </form>
     </div>
 </div>
-
-    <table ng-show="eventlist" class="table table-hover"> <!--change ng-show to also look at user object -->
+    <div ng-show="eventlist">
+        <h3>Upcoming events</h3>
+    <table class="table table-hover"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
             <th>
@@ -58,7 +64,7 @@
             <th>
                 Time
             </th>
-            <th>
+            <th class="col-sm-5">
                 Description
             </th>
             <th>
@@ -85,3 +91,47 @@
         </tr>
         
     </table>
+    </div>
+    
+    <div ng-show="eventlist2">
+        <h3>Past Events</h3>
+    <table class="table table-hover"> <!--change ng-show to also look at user object -->
+        <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Time
+            </th>
+            <th class="col-sm-5">
+                Description
+            </th>
+            <th>
+                
+            </th>
+        </tr>
+        </thead>
+        <tr ng-repeat="ev in eventlist2" style="cursor: pointer;">
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.name}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.date | dateFilter:"Do MMM YYYY"}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.time | dateFilter:"HH:mm"}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.description}}
+            </td>
+            <td>
+                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
+            </td>
+        </tr>
+        
+    </table>
+    </div>

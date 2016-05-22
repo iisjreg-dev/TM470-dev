@@ -1,0 +1,63 @@
+<div class="panel panel-primary">
+    
+    <!-- EVENT SUMMARY -->
+    
+    <div class="panel-body">
+        <div class="media">
+            <div class="media-body">
+                My matches
+            </div>
+            <div class="media-right">
+
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<!-- LIST OF MATCHES -->
+
+    <table ng-show="matchlist" class="table table-hover"> <!--change ng-show to look at user object? -->
+        <thead>
+        <tr>
+            <th>
+                Date
+            </th>
+            <th>
+                Event
+            </th>
+            <th>
+                Game
+            </th>
+            <th class="col-sm-5">
+                Catagories
+            </th>
+            <th>
+                Players
+            </th>
+            <th>&nbsp; <!-- actions -->
+            </th>
+        </tr>
+        </thead>
+        <tr ng-repeat="mch in matchlist" style="cursor: pointer;">
+            <td ng-click="go(mch.value.eventKey, mch.path.key)">
+                <p>{{mch.value.date | dateFilter:"Do MMM YYYY"}}</p>
+            </td>
+            <td>
+                <p><a ng-href="/events/{{mch.value.eventKey}}">{{mch.value.eventName}}</a></p>
+            </td>
+            <td ng-click="go(mch.value.eventKey, mch.path.key)">
+                <p><b>{{mch.value.game}}</b></p>
+            </td>
+            <td ng-click="go(mch.value.eventKey, mch.path.key)">
+                <span ng-repeat="cat in mch.value.catagories">{{cat.value}}&nbsp; </span>
+            </td>
+            <td ng-click="go(mch.value.eventKey, mch.path.key)">
+                <small>{{mch.value.players}}</small>
+            </td>
+            <td style="text-align: right">
+                <a ng-if="user.admin" ng-click="leave(mch.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
+            </td>
+        </tr>
+        
+    </table>

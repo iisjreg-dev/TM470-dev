@@ -150,7 +150,20 @@ angular.module('TM470.controllers', []).
       $http.get("/api/events")
       .then(function(response) {
         console.log(response.status);
-        $scope.eventlist = response.data.results;
+        var pastEvents = [];
+        var futureEvents = [];
+        response.data.results.forEach(function(event){
+          //console.log("event date", event.value.date);
+          var aMoment = moment(event.value.date);
+          if(aMoment.isBefore()){
+            pastEvents.push(event);
+          }
+          else{
+            futureEvents.push(event);
+          }
+        });
+        if(futureEvents.length > 0){$scope.eventlist = futureEvents;}
+        if(pastEvents.length > 0){$scope.eventlist2 = pastEvents;}
       //$scope.orderProp = 'created';
       }, function(error){
         console.log(error.data);
@@ -496,7 +509,7 @@ angular.module('TM470.controllers', []).
     getPlayers();
     
     $scope.joinMatch = function(){
-      $http.get("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/join")
+      $http.post("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey, $scope.user)
         .then(function(response) {
           console.log(response.status);
           //$scope.match = response.data;
@@ -510,4 +523,52 @@ angular.module('TM470.controllers', []).
         });
     };
 
+  }]).
+  controller('mymatchController', ['$scope', '$routeParams', '$http', '$location', //MYMATCHES.HTML
+  function($scope, $routeParams, $http, $location) {
+    $scope.itemId = $routeParams.event;
+    
+    function getMatches(){
+      $http.get("/api/mymatches")
+      .then(function(response) {
+        //console.log(response.data);
+        $scope.matchlist = response.data;
+      }, function(error){
+        console.log(error.data);
+        $location.path("/login");
+        //show login
+      });
+    }
+    getMatches();
+    
+    $scope.go = function(event, key){
+      console.log("/events/" + event + "/matches/" + key);
+      $location.path("/events/" + event + "/matches/" + key);
+    };
+    
+    $scope.leave = function(key){
+      console.log("leave match " + key);
+      $http.delete("/api/mymatches/"+ key)
+        .then(function(data) {
+          console.log(data.status);
+          if(data.status == 200){
+            success("Left match");
+          }
+          //   $scope.match = {}; //clear results
+          //   $scope.BGGresults = []; 
+          //   $scope.gameDetail = {};
+          //   $scope.showGameDetail = false;
+          //   
+          //   console.log("success");
+          getMatches();
+
+          // }
+        }, function(err){
+          console.error("delete error: ");
+          console.error(err);
+          failure("Error leaving match"); 
+          //$location.path("/login");
+        });
+    };
+    
   }]);

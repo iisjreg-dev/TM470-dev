@@ -1,7 +1,7 @@
 var express = require('express');
 var routerAPI = express.Router();
 var console = require('better-console');
-
+var Q = require('kew');
 var db = require('orchestrate')("725c04b3-ad74-44c6-9c9e-9316e68788cd");
 
 db.ping()
@@ -293,8 +293,40 @@ routerAPI.get('/events/:event/matches/', //get all matches
         .then(function (result) {
           console.log("Matches for event: " + req.params.event);
           //console.log(result.body.results);
-          res.send(result.body.results);
+          //res.send(result.body.results);
+          return result.body.results;
+        })
+        .then(function (matchlist) {
+          var promises = [];
+          
+          for(var i in matchlist){
+            //console.log("match", matchlist[i].path.key);
+            promises.push(db.newGraphReader()
+              .get()
+              .from('Matches', matchlist[i].path.key)
+              .related('players')
+              //.withoutFields(['value.password', 'value.salt'])
+              .then(function (players) {
+                var playerNames = [];
+                //console.log(players.body.results);
+                players.body.results.forEach(function(player) {
+                  playerNames.push(player.value.name);
+                });
+                return playerNames.join(", ");
+              })
+            );
+          }
+          
+          Q.all(promises)
+          .then(function (content) {
+            for(var i in matchlist){
+              matchlist[i].value.players = content[i];
+            }
+            res.send(matchlist); //only send after all promises are fulfilled
+          });
+          return true;
         });
+      
     }
   });
   
@@ -324,7 +356,7 @@ routerAPI.get('/events/:event/matches/:match', //get 1 match
     });
   });
   
-routerAPI.get('/events/:event/matches/:match/join', //join match
+routerAPI.post('/events/:event/matches/:match', //join match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     console.log("user: ");
@@ -427,8 +459,8 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
       res.status(403).send("not logged in");
     }
     else{
-      console.log("user: ");
-      console.log(req.user.username);
+      //console.log("user: ");
+      //console.log(req.user.username);
       console.log("list all players");
       
       //NEED TO GRAPH SEARCH
@@ -437,10 +469,102 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
         .get()
         .from('Matches', req.params.match)
         .related('players')
+        //.withoutFields(['value.password', 'value.salt'])
         .then(function (result) {
           //console.log("Players for match: " + req.params.match);
           //console.log(result.body.results);
           res.send(result.body.results);
+        });
+    }
+  });
+  
+routerAPI.get('/mymatches', //get my matches
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    if(!req.user){
+      console.error("not logged in");
+      res.status(403).send("not logged in");
+    }
+    else{
+      console.log("user: ");
+      console.log(req.user.username);   
+      console.log("list my matches");
+      
+      var matches = db.newGraphReader()
+        .get()
+        .from('Users', req.user.username)
+        .related('playing')
+        .then(function (result) {
+          console.log(result.body.count);
+          return result.body.results;
+        })
+        .then(function (matchlist){
+          var promises = []; //promises for event info
+          var promises2 = []; //promises for player info
+          var promisesCombined = [];
+          
+          for(var i in matchlist){
+            //console.log(matchlist[i].value.eventKey);
+            
+            promises.push(db.get('Events', matchlist[i].value.eventKey) //get the event for each match
+              .then(function (event) {
+                return event; //return it to the promise
+              })
+              .fail(function (err) {
+                console.log("event error : " + err);
+              })
+            );
+            
+            promises2.push(db.newGraphReader() //get players for each match
+              .get()
+              .from('Matches', matchlist[i].path.key)
+              .related('players')
+              //.withoutFields(['value.password', 'value.salt'])
+              .then(function (players) {
+                var playerNames = [];
+                players.body.results.forEach(function(player) {
+                  playerNames.push(player.value.name);
+                });
+                return playerNames.join(", ");
+              })
+              .fail(function (err) {
+                console.log("player error : " + err);
+              })
+            );
+            
+          }
+          
+          promisesCombined.push(Q.all(promises) //create a promise for the completion of the event Promises
+            .then(function (content) {
+              for(var i in matchlist){
+                matchlist[i].value.date = content[i].body.date;
+                matchlist[i].value.eventName = content[i].body.name;
+              }
+              return true;
+            })
+          );
+          
+          promisesCombined.push(Q.all(promises2) //create a promise for the completion of the player Promises
+            .then(function (content) {
+              for(var i in matchlist){
+                matchlist[i].value.players = content[i];
+              }
+              return true;
+            })
+          );
+          
+          Q.all(promisesCombined) //all promises are now complete (returned true), so send response
+          .then(function (content) {
+            res.send(matchlist);
+          })
+          .fail(function (err) {
+            console.log("player error : " + err);
+          });
+          
+          return true;
+        })
+        .fail(function (err) {
+          res.status(500).send(err);
         });
     }
   });
