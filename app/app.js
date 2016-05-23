@@ -96,7 +96,7 @@ app.use('/auth', auth);
 app.use('/api', api);
 app.use('*', function(req, res, next){ //catch anything else and send index.html, so that Angular can route
   res.sendFile(__dirname + '/public/index.html');
-  next();
+  //next();
 });
 
 
