@@ -25,7 +25,6 @@ git.short(function (str) {
 
 //do not log
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(express.static(path.join(__dirname, 'public')));
 
 //logging
 
@@ -82,6 +81,7 @@ app.use(passport.session());
 app.use(flash()); //NEEDS MORE TESTING
 app.use(helmet());
 
+
 // //flash messages TESTING
 // app.use(function(req, res, next){
 //     res.locals.success_messages = req.flash('success');
@@ -91,6 +91,7 @@ app.use(helmet());
 //     next();
 // });
 
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/auth', auth);
 app.use('/api', api);
