@@ -58,7 +58,7 @@ expressWinston.requestWhitelist.push('id');
 app.use(expressWinston.logger({
       transports: [
         new winston.transports.File({
-          filename:         'all-logs.log',
+          filename:         '../all-logs.log',
           handleExceptions: true,
           json:             true,
           maxsize:          5242880, //5MB
