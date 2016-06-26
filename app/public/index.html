@@ -40,7 +40,6 @@
          <div id="navbar" ng-cloak class="navbar-collapse collapse ng-cloak">
             <ul ng-if="user" class="nav navbar-nav">
                <li><a href="/events" data-toggle="collapse" data-target=".navbar-collapse.in">EVENTS</a></li>
-               <li><a href="/account" data-toggle="collapse" data-target=".navbar-collapse.in">ACCOUNT</a></li>
                <li><a href="/mymatches" data-toggle="collapse" data-target=".navbar-collapse.in">MY MATCHES</a></li>
             </ul>
             <form class="nav navbar-right" role="login">
@@ -49,7 +48,7 @@
                   <a href="/signup" role="button" class="btn btn-info" data-toggle="collapse" data-target=".navbar-collapse.in">Sign Up</a>
                </div>
                <div ng-show="user">
-                  <a ng-show="user.name" class="navbar-brand" href="/">Logged in as {{user.name}}</a>  <a class="navbar-brand" href="" ng-click="logout()">(Log out)</a>
+                  <a ng-show="user.name" class="navbar-brand" href="/account">{{user.name}} <small><i class="glyphicon glyphicon-user"></i></small></a>  <a class="navbar-brand" href="" ng-click="logout()">(Log out)</a>
                </div>
             </form>
          </div>

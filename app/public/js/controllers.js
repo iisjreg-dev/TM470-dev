@@ -361,6 +361,7 @@ angular.module('TM470.controllers', []).
       if($scope.match.game && $scope.match.description){
         $scope.match.eventKey = $scope.eventDetail.eventKey;
         $scope.match.catagories = [];
+        $scope.match.proposedBy = $scope.user;    
         // $scope.match.yearpublished = 
         if($scope.gameDetail.link.length){
           for(var i=0;i<$scope.gameDetail.link.length;i++){ //ONLY STORE THE CATAGORIES IN THE DATABASE FOR LISTING
@@ -480,18 +481,35 @@ angular.module('TM470.controllers', []).
         // values.forEach(function(){
         //   players.push(this.username);
         // })
+        var found = false;
         for(var x in response.data){
-          players.push(response.data[x].value.username);
+          if(!found){
+            console.info("resp " + x + ": " + response.data[x].value.username);
+            if(response.data[x].value.username == $scope.user.username){
+              found = true;
+              $scope.inMatch = true;
+              if(response.data[x].value.canBring){
+                $scope.canBring = true;
+              }
+              else{
+                $scope.canBring = false;
+              }
+              if(response.data[x].value.canTeach){
+                $scope.canTeach = true;
+              }
+              else{
+                $scope.canTeach = false;
+              }
+            }
+            else{
+              $scope.inMatch = false;
+            }
+          }
         }
         // console.info(players);
         // console.info($scope.user.username);
         // console.info(players.indexOf($scope.user.username));
-        if(players.indexOf($scope.user.username) >= 0){
-          $scope.inMatch = true;
-        }
-        else{
-          $scope.inMatch = false;
-        }
+
       }, function(error){
         console.log(error.data);
         $location.path("/login");
@@ -525,8 +543,72 @@ angular.module('TM470.controllers', []).
     
     getPlayers();
     
+    $scope.canBringGame = function(){
+      $http.post("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/bring", $scope.user)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Updated");
+          $scope.match.canBring = true;
+          getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error");
+          //$location.path("/login");
+          //show login
+        });
+    };
+    
+    $scope.cannotBringGame = function(){
+      $http.delete("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/bring", $scope.user)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Updated");
+          $scope.match.canBring = false;
+          getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error");
+          //$location.path("/login");
+          //show login
+        });
+    };
+    
+    $scope.canTeachGame = function(){
+      $http.post("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/teach", $scope.user)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Updated");
+          $scope.match.canTeach = true;
+          getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error");
+          //$location.path("/login");
+          //show login
+        });
+    };
+    
+    $scope.cannotTeachGame = function(){
+      $http.delete("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/teach", $scope.user)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Updated");
+          $scope.match.canTeach = false;
+          getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error");
+          //$location.path("/login");
+          //show login
+        });
+    };
+    
     $scope.joinMatch = function(){
-      $http.post("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey, $scope.user)
+      $http.post("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/players", $scope.user)
         .then(function(response) {
           console.log(response.status);
           //$scope.match = response.data;
@@ -542,7 +624,7 @@ angular.module('TM470.controllers', []).
     };
     
     $scope.leaveMatch = function(){
-      $http.delete("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey, $scope.user)
+      $http.delete("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/players", $scope.user)
         .then(function(response) {
           console.log(response.status);
           //$scope.match = response.data;
@@ -580,9 +662,9 @@ angular.module('TM470.controllers', []).
       $location.path("/events/" + event + "/matches/" + key);
     };
     
-    $scope.leave = function(key){
+    $scope.leave = function(event, key){
       console.log("leave match " + key);
-      $http.delete("/api/mymatches/"+ key)
+      $http.delete("/api/events/" + event + "/matches/" + key + "/players")
         .then(function(data) {
           console.log(data.status);
           if(data.status == 200){

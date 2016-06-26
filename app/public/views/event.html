@@ -26,7 +26,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="input-group">
-                            <input type="text" name="name" placeholder="Game (search BoardGameGeek)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
+                            <input type="text" name="name" placeholder="Game Name (search BoardGameGeek.com)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
                             <span class="input-group-addon" ng-click="checkGame()">
                             <i ng-hide="checkingGame || match.id || notFound" class="glyphicon glyphicon-search" style="cursor: pointer;"></i>
                             <i ng-if="checkingGame" class="glyphicon glyphicon-hourglass"></i>
@@ -129,7 +129,7 @@
                 <small>{{mch.value.players}}</small>
             </td>
             <td style="text-align: right">
-                <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="delete(mch.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

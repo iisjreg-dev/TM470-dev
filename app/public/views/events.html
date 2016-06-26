@@ -55,13 +55,13 @@
     <table class="table table-hover"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
-            <th>
+            <th class="col-sm-3">
                 Name
             </th>
-            <th>
+            <th class="col-sm-2">
                 Date
             </th>
-            <th>
+            <th class="col-sm-2">
                 Time
             </th>
             <th class="col-sm-5">
@@ -86,7 +86,7 @@
                 {{ev.value.description}}
             </td>
             <td>
-                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         
@@ -94,20 +94,20 @@
     </div>
     
     <div ng-show="eventlist2">
-        <h3>Past Events</h3>
+        <h3 class="text-muted">Past Events</h3>
     <table class="table table-hover"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
-            <th>
+            <th class="col-sm-3 text-muted">
                 Name
             </th>
-            <th>
+            <th class="col-sm-2 text-muted">
                 Date
             </th>
-            <th>
+            <th class="col-sm-2 text-muted">
                 Time
             </th>
-            <th class="col-sm-5">
+            <th class="col-sm-5 text-muted">
                 Description
             </th>
             <th>
@@ -116,20 +116,20 @@
         </tr>
         </thead>
         <tr ng-repeat="ev in eventlist2" style="cursor: pointer;">
-            <td ng-click="go(ev.path.key)">
+            <td ng-click="go(ev.path.key)" class="text-muted">
                 {{ev.value.name}}
             </td>
-            <td ng-click="go(ev.path.key)">
+            <td ng-click="go(ev.path.key)" class="text-muted">
                 {{ev.value.date | dateFilter:"Do MMM YYYY"}}
             </td>
-            <td ng-click="go(ev.path.key)">
+            <td ng-click="go(ev.path.key)" class="text-muted">
                 {{ev.value.time | dateFilter:"HH:mm"}}
             </td>
-            <td ng-click="go(ev.path.key)">
+            <td ng-click="go(ev.path.key)" class="text-muted">
                 {{ev.value.description}}
             </td>
             <td>
-                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

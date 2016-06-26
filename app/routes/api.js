@@ -356,7 +356,7 @@ routerAPI.get('/events/:event/matches/:match', //get 1 match
     });
   });
   
-routerAPI.post('/events/:event/matches/:match', //join match
+routerAPI.post('/events/:event/matches/:match/players', //join match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     console.log("user: ");
@@ -383,14 +383,14 @@ routerAPI.post('/events/:event/matches/:match', //join match
       });
   });
   
-routerAPI.delete('/events/:event/matches/:match', //leave match
+routerAPI.delete('/events/:event/matches/:match/players', //leave match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     console.log("user: ");
     console.log(req.user.username);
     console.log("leave match " + req.params.match);
     
-    db.newGraphBuilder() //CREATE USER > MATCH LINK
+    db.newGraphBuilder() //REMOVE USER > MATCH LINK
       .remove()
       .from('Users', req.user.username)
       .related('playing')
@@ -399,10 +399,120 @@ routerAPI.delete('/events/:event/matches/:match', //leave match
         console.log("link removed");
         //res.sendStatus(200);
       });
-    db.newGraphBuilder() //CREATE MATCH > USER LINK
+    db.newGraphBuilder() //REMOVE MATCH > USER LINK
       .remove()
       .from('Matches', req.params.match)
       .related('players')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link removed");
+        res.sendStatus(200);
+      });
+    
+  });
+  
+routerAPI.post('/events/:event/matches/:match/bring', //bring game
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("bring game " + req.params.match);
+    
+    db.newGraphBuilder() //CREATE USER > MATCH BRING LINK
+      .create()
+      .from('Users', req.user.username)
+      .related('canBring')
+      .to('Matches', req.params.match)
+      .then(function (result) {
+        console.log("link created");
+        //res.sendStatus(200);
+      });
+    db.newGraphBuilder() //CREATE MATCH BRING > USER LINK
+      .create()
+      .from('Matches', req.params.match)
+      .related('canBring')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link created");
+        res.sendStatus(200);
+      });
+  });
+  
+routerAPI.delete('/events/:event/matches/:match/bring', //not bring a game
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("not bring game " + req.params.match);
+    
+    db.newGraphBuilder() //REMOVE USER > MATCH BRING LINK
+      .remove()
+      .from('Users', req.user.username)
+      .related('canBring')
+      .to('Matches', req.params.match)
+      .then(function (result) {
+        console.log("link removed");
+        //res.sendStatus(200);
+      });
+    db.newGraphBuilder() //REMOVE MATCH BRING > USER LINK
+      .remove()
+      .from('Matches', req.params.match)
+      .related('canBring')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link removed");
+        res.sendStatus(200);
+      });
+    
+  });
+  
+routerAPI.post('/events/:event/matches/:match/teach', //teach game
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("teach game " + req.params.match);
+    
+    db.newGraphBuilder() //CREATE USER > MATCH BRING LINK
+      .create()
+      .from('Users', req.user.username)
+      .related('canTeach')
+      .to('Matches', req.params.match)
+      .then(function (result) {
+        console.log("link created");
+        //res.sendStatus(200);
+      });
+    db.newGraphBuilder() //CREATE MATCH BRING > USER LINK
+      .create()
+      .from('Matches', req.params.match)
+      .related('canTeach')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link created");
+        res.sendStatus(200);
+      });
+  });
+  
+routerAPI.delete('/events/:event/matches/:match/teach', //not teach a game
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("not teach game " + req.params.match);
+    
+    db.newGraphBuilder() //REMOVE USER > MATCH BRING LINK
+      .remove()
+      .from('Users', req.user.username)
+      .related('canTeach')
+      .to('Matches', req.params.match)
+      .then(function (result) {
+        console.log("link removed");
+        //res.sendStatus(200);
+      });
+    db.newGraphBuilder() //REMOVE MATCH BRING > USER LINK
+      .remove()
+      .from('Matches', req.params.match)
+      .related('canTeach')
       .to('Users', req.user.username)
       .then(function (result) {
         console.log("link removed");
@@ -493,16 +603,81 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
       
       //NEED TO GRAPH SEARCH
       //res.sendStatus(503);
-      db.newGraphReader()
+      var players = db.newGraphReader()
         .get()
         .from('Matches', req.params.match)
         .related('players')
-        //.withoutFields(['value.password', 'value.salt'])
+        //.withoutFields(['value.password', 'value.salt']) //WHY IS THIS COMMENTED OUT?
         .then(function (result) {
-          //console.log("Players for match: " + req.params.match);
-          //console.info("DEBUG");
-          //console.log(result.body.results);
-          res.send(result.body.results);
+          console.log(result.body.results);
+          return result.body.results;
+        })
+        .then(function(playerList){
+          var promises = []; 
+          //var promises2 = []; 
+          
+          promises.push(db.newGraphReader() //get players for each match that canBring game
+            .get()
+            .from('Matches', req.params.match)
+            .related('canBring')
+            .then(function (players) {
+              var playerNames = [];
+              players.body.results.forEach(function(player) {
+                playerNames.push(player.value.username);
+              });
+              //return playerNames.join(", ");
+              
+              for(var i in playerList){ //check each player to see if they can bring game
+                if(playerNames.indexOf(playerList[i].value.username) >= 0){
+                  playerList[i].value.canBring = true;
+                }
+              }
+              
+              return true;
+            })
+            .fail(function (err) {
+              console.log("player error 1: " + err);
+            })
+          );
+          
+          promises.push(db.newGraphReader() //get players for each match that canTeach game
+            .get()
+            .from('Matches', req.params.match)
+            .related('canTeach')
+            .then(function (players) {
+              var playerNames = [];
+              players.body.results.forEach(function(player) {
+                playerNames.push(player.value.username);
+              });
+              //return playerNames.join(", ");
+              
+              for(var i in playerList){ //check each player to see if they can bring game
+                if(playerNames.indexOf(playerList[i].value.username) >= 0){
+                  playerList[i].value.canTeach = true;
+                }
+              }
+              
+              return true;
+            })
+            .fail(function (err) {
+              console.log("player error 2: " + err);
+            })
+          );
+            
+          Q.all(promises) //all promises are now complete (returned true), so send response
+          .then(function (content) {
+            // console.log("playerList");
+            // console.log(playerList);
+            // console.log("content");
+            // console.log(content);
+            res.send(playerList);
+          })
+          .fail(function (err) {
+            console.log("player error send: " + err);
+          });
+            
+            
+          //res.send(playerList);
         });
     }
   });

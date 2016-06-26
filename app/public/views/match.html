@@ -11,7 +11,7 @@
                     </div>
                     <div class="col-md-10">
                         <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
-                        <h4 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span></h4>
+                        <h4 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <small><span class="text-success" ng-if="match.proposedBy">Proposed by {{match.proposedBy.name}}</span></small></h4>
                         <small><i class="glyphicon glyphicon-user"></i> {{match.numPlayers}} </small>
                         <span class="label label-info" ng-repeat="link in match.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span><br /><br />
                         <div ng-hide="expand"><p ng-bind-html="match.description_short"></p> <a class="btn btn-xs btn-default" ng-click="expand = true;">More</a> </div>
@@ -25,11 +25,21 @@
     
     
     <div class="panel-footer">
-        <div class="media">
-            <div class="media-body">
-                <div class="media-right"><a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default">Back to event</a> </div> 
+        <div class="row">
+            <div class="col-sm-2">
+                <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default">Back to event</a>
             </div>
-            <div class="media-right"><input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success" value="Show interest"><input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger" value="Remove interest"></div>
+            <div class="col-sm-10 text-right">
+                <div class="btn-group" role="group">
+                    <input ng-show="inMatch && !canBring" type="button" ng-click="canBringGame()" role="button" class="btn btn-default" value="I can bring this game">
+                    <input ng-show="inMatch && canBring" type="button" ng-click="cannotBringGame()" role="button" class="btn btn-default" value="I can't bring this game">
+                    <input ng-show="inMatch && !canTeach" type="button" ng-click="canTeachGame()" role="button" class="btn btn-default" value="I can teach this game">
+                    <input ng-show="inMatch && canTeach" type="button" ng-click="cannotTeachGame()" role="button" class="btn btn-default" value="I can't teach this game">
+                    <input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success" value="Show interest">
+                    <input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger" value="Remove interest">
+                </div>
+
+            </div>
         </div>
         
     </div>
@@ -40,10 +50,13 @@
     <table ng-if="playerList" class="table table-hover">
         <thead>
         <tr>
-            <th>
+            <th class="col-sm-8">
                 Interested Players
             </th>
-            <th>    
+            <th class="col-sm-3">  
+                Notes
+            </th>
+            <th class="col-sm-1">    
             </th>
         </tr>
         </thead>
@@ -51,8 +64,12 @@
             <td>
                 <p>{{ply.value.name}}</p>
             </td>
+            <td>
+                <span ng-if="ply.value.canBring" class="label label-info">Can bring game</span>
+                <span ng-if="ply.value.canTeach" class="label label-info">Can teach game</span>
+            </td>
             <td style="text-align: right">
-                <a ng-if="user.admin" ng-click="delete(ply)" role="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="delete(ply)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         
