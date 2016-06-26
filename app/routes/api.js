@@ -370,7 +370,7 @@ routerAPI.post('/events/:event/matches/:match', //join match
       .to('Matches', req.params.match)
       .then(function (result) {
         console.log("link created");
-        res.sendStatus(200);
+        //res.sendStatus(200);
       });
     db.newGraphBuilder() //CREATE MATCH > USER LINK
       .create()
@@ -381,6 +381,34 @@ routerAPI.post('/events/:event/matches/:match', //join match
         console.log("link created");
         res.sendStatus(200);
       });
+  });
+  
+routerAPI.delete('/events/:event/matches/:match', //leave match
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("leave match " + req.params.match);
+    
+    db.newGraphBuilder() //CREATE USER > MATCH LINK
+      .remove()
+      .from('Users', req.user.username)
+      .related('playing')
+      .to('Matches', req.params.match)
+      .then(function (result) {
+        console.log("link removed");
+        //res.sendStatus(200);
+      });
+    db.newGraphBuilder() //CREATE MATCH > USER LINK
+      .remove()
+      .from('Matches', req.params.match)
+      .related('players')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link removed");
+        res.sendStatus(200);
+      });
+    
   });
   
 routerAPI.delete('/events/:event/matches/:match', //delete match
@@ -472,6 +500,7 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
         //.withoutFields(['value.password', 'value.salt'])
         .then(function (result) {
           //console.log("Players for match: " + req.params.match);
+          //console.info("DEBUG");
           //console.log(result.body.results);
           res.send(result.body.results);
         });

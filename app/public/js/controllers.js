@@ -475,6 +475,23 @@ angular.module('TM470.controllers', []).
         //console.log("players");
         //console.log(response.data);
         $scope.playerList = response.data;
+        var players = [];
+        // var values = response.data.value;
+        // values.forEach(function(){
+        //   players.push(this.username);
+        // })
+        for(var x in response.data){
+          players.push(response.data[x].value.username);
+        }
+        // console.info(players);
+        // console.info($scope.user.username);
+        // console.info(players.indexOf($scope.user.username));
+        if(players.indexOf($scope.user.username) >= 0){
+          $scope.inMatch = true;
+        }
+        else{
+          $scope.inMatch = false;
+        }
       }, function(error){
         console.log(error.data);
         $location.path("/login");
@@ -514,10 +531,27 @@ angular.module('TM470.controllers', []).
           console.log(response.status);
           //$scope.match = response.data;
           success("Joined match");
+          $scope.match.inMatch = true;
           getPlayers();
         }, function(error){
           console.log(error.data);
           failure("Error joining match");
+          //$location.path("/login");
+          //show login
+        });
+    };
+    
+    $scope.leaveMatch = function(){
+      $http.delete("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey, $scope.user)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Left match");
+          $scope.match.inMatch = false;
+          getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error leaving match");
           //$location.path("/login");
           //show login
         });

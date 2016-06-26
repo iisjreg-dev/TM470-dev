@@ -29,7 +29,7 @@
             <div class="media-body">
                 <div class="media-right"><a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default">Back to event</a> </div> 
             </div>
-            <div class="media-right"><input type="button" ng-click="joinMatch()" role="button" class="btn btn-success" value="Join"></div>
+            <div class="media-right"><input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success" value="Show interest"><input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger" value="Remove interest"></div>
         </div>
         
     </div>

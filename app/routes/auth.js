@@ -145,7 +145,7 @@ routerAuth.post('/login',
     //   res.redirect(req.session.returnTo); 
     // }
     // else{
-      res.redirect('/main'); //TODO: Change to status
+      res.redirect('/events'); //TODO: Change to status
     // }
   });
   
