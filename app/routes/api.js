@@ -3,6 +3,7 @@ var routerAPI = express.Router();
 var console = require('better-console');
 var Q = require('kew');
 var db = require('orchestrate')("725c04b3-ad74-44c6-9c9e-9316e68788cd");
+var moment = require('moment');
 
 db.ping()
 .then(function () {
@@ -128,24 +129,113 @@ routerAPI.get('/events/', //get all events
     else{
       //console.log("user: ");
       //console.log(req.user.username);
-      console.log("list all events");
-      db.list('Events') //will eventually change to accomodate multiple organisations
+      
+      //First check for new repeating events
+      console.log("check repeating");
+      db.list('Repeating')
       .then(function (result) {
         //console.log(result.body);
+        var promises = [];
         
         console.log("count = " + result.body.count);
         //console.log(result.body.results[0].value.password);
-        if(result.body.count == 0){ 
-          console.log("no events found");
-          res.status(200).send("no events found"); 
+        if(result.body.count > 0){ 
+          console.log("repeating...");
+          for(var x in result.body.results){
+            console.info("repeating: " + x + " - " + result.body.results[x].value.name + "; " + result.body.results[x].path.key);
+            console.info(result.body.results[x].value.repeat);
+            promises.push(db.newGraphReader()
+              .get()
+              .from('Repeating', result.body.results[x].path.key)
+              .related('events')
+              .then(function (result3) {
+                console.log("result3: ");
+                console.log(result3.body.results);
+                var repeat = result.body.results[x].value.repeat;
+                var period = "";
+                if(repeat == "daily"){ period = "d";}
+                else if(repeat == "weekly"){ period = "w";}
+                else if(repeat == "monthly"){ period = "M";}
+                
+                if (typeof result3.body.results !== 'undefined' && result3.body.results.length > 0) {
+                  var eventExists = false;
+                  for(var i in result3.body.results){
+
+                    var theDate = moment(result3.body.results[i].value.date);
+                    if(moment().isBefore(theDate.subtract(1, "d"))){
+                      eventExists = true;
+                    }
+                  }
+                  if(!eventExists){
+                    console.log("add event...TODO");
+                    var newEvent = result3.body.results[i].value;
+                    newEvent.date = moment(result.body.results[x].value.date).add(1, "d").add(1, period).toDate(); //NEED TO UPDATE REPEATING DATE
+                    console.log("new date: " + newEvent.date);
+                    promises.push(db.post('Events', newEvent)
+                      .then(function (result4) {
+                        if(result4.statusCode == "201"){
+                          console.log("add success");
+                        }
+                        else{
+                          console.log("error adding");
+                        }
+                        db.newGraphBuilder()
+                          .create()
+                          .from('Repeating', result.body.results[x].path.key)
+                          .related('events')
+                          .to('Events', result4.path.key)
+                          .then(function (result5) {
+                            console.log("events link created");
+                            return true;
+                          });
+                        //return true;
+                      })
+                    );
+                    //add event
+                  }
+                }
+                return true;
+              })
+            );
+          }
         }
-        //console.log("done");
-        res.send(result.body); 
+        else{
+          console.log("no repeating");
+          promises.push(true);
+        }
+
+        Q.all(promises) //ONLY GET EVENTS AFTER THE REPEATING HAS BEEN CHECKED
+        .then(function (content) {
+          console.log("promises: " + content);
+          console.log("list all events");
+          db.list('Events') //will eventually change to accomodate multiple organisations
+          .then(function (result2) {
+            //console.log(result.body);
+            
+            console.log("count = " + result2.body.count);
+            //console.log(result.body.results[0].value.password);
+            if(result2.body.count == 0){ 
+              console.log("no events found");
+              res.status(200).send("no events found"); 
+            }
+            //console.log("done");
+            res.send(result2.body); 
+          })
+          .fail(function (err) {
+            console.log("error : count=" + err.body.count);
+            res.send(err); 
+          });
+        });
+
+
+
       })
       .fail(function (err) {
         console.log("error : count=" + err.body.count);
-        res.send(err); 
       });
+      
+      
+      
     }
   });
   
@@ -245,18 +335,58 @@ routerAPI.post('/events/', //post event
     db.post('Events', req.body)
     .then(function (result) {
       if(result.statusCode == "201"){
+        
+        var promises = [];
+        
         console.log("status: 201");
         console.log("create link to user");
-        db.newGraphBuilder()
-        .create()
-        .from('Users', req.user.username)
-        .related('created')
-        .to('Events', result.path.key)
-        .then(function (result2) {
-          console.log("link created");
-        });
+        
+        promises.push(db.newGraphBuilder()
+          .create()
+          .from('Users', req.user.username)
+          .related('created')
+          .to('Events', result.path.key)
+          .then(function (result2) {
+            console.log("link created");
+            return true;
+          })
+        );
+        if(req.body.showRepeating){
+          console.log("create repeating event");
+          promises.push(db.post('Repeating', req.body)
+            .then(function (result2) {
+              console.log("repeat added");
+              console.log("create link to event");
+              //return true;
+              
+              db.newGraphBuilder()
+                .create()
+                .from('Repeating', result2.path.key)
+                .related('events')
+                .to('Events', result.path.key)
+                .then(function (result3) {
+                  console.log("events link created");
+                  return true;
+                });
+              
+            })
+            .fail(function (err) {
+              console.log("error " + err);
+            })
+          );
+        }
+        
+        Q.all(promises) //all promises are now complete (returned true), so send response
+          .then(function (content) {
+            res.status(201).send(result.path.key);
+          })
+          .fail(function (err) {
+            console.log("promise error send: " + err);
+          });
+        
+        
         console.log("done");
-        res.status(201).send(result.path.key); 
+         
         //res.redirect("/events/" + result.path.key); //should change response for API usage
       }
       else{
@@ -609,7 +739,7 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
         .related('players')
         //.withoutFields(['value.password', 'value.salt']) //WHY IS THIS COMMENTED OUT?
         .then(function (result) {
-          console.log(result.body.results);
+          //console.log(result.body.results);
           return result.body.results;
         })
         .then(function(playerList){

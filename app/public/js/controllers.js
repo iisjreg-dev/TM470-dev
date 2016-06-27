@@ -154,7 +154,9 @@ angular.module('TM470.controllers', []).
         var futureEvents = [];
         response.data.results.forEach(function(event){
           //console.log("event date", event.value.date);
-          var aMoment = moment(event.value.date);
+          var theDate = new Date(event.value.date);
+          var theTime = new Date(event.value.time);
+          var aMoment = moment(theDate.toDateString() + " " + theTime.toTimeString());
           if(aMoment.isBefore()){
             pastEvents.push(event);
           }

@@ -39,13 +39,23 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
-            </div>
-            <div class="media">
-                <div class="media-body">
-                    <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">    
+                <div class="row">
+                      <div class="col-lg-5">
+                          <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
+                          <a ng-hide="event.showRepeating" class="btn btn-info" ng-click="event.showRepeating = true;">Repeating?</a>
+                          <select ng-show="event.showRepeating" name="repeat" ng-model="event.repeat" class="form-control has-success">
+                              <option value="daily">Repeat Daily</option>
+                              <option value="weekly">Repeat Weekly</option>
+                              <option value="monthly">Repeat Monthly</option>
+                          </select>
+                      </div>
+                      <div class="col-lg-1 text-right">
+                        <a role="button" ng-show="event.showRepeating" class="btn btn-default" ng-click="event.showRepeating = false;"><i class="glyphicon glyphicon-remove text-muted"></i></a>
+                    </div>
+                      <div class="col-lg-6 text-right">
+                        <button type="submit" class="btn btn-success">Add</button>
+                    </div>
                 </div>
-                <div class="media-right"><button type="submit" class="btn btn-success">Add</button></div>
             </div>
         </form>
     </div>
@@ -61,10 +71,13 @@
             <th class="col-sm-2">
                 Date
             </th>
-            <th class="col-sm-2">
+            <th class="col-sm-1">
                 Time
             </th>
-            <th class="col-sm-5">
+            <th class="col-sm-2">
+                Location
+            </th>
+            <th class="col-sm-4">
                 Description
             </th>
             <th>
@@ -81,6 +94,9 @@
             </td>
             <td ng-click="go(ev.path.key)">
                 {{ev.value.time | dateFilter:"HH:mm"}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.venue}}
             </td>
             <td ng-click="go(ev.path.key)">
                 {{ev.value.description}}
@@ -104,10 +120,13 @@
             <th class="col-sm-2 text-muted">
                 Date
             </th>
-            <th class="col-sm-2 text-muted">
+            <th class="col-sm-1 text-muted">
                 Time
             </th>
-            <th class="col-sm-5 text-muted">
+            <th class="col-sm-2 text-muted">
+                Location
+            </th>
+            <th class="col-sm-4 text-muted">
                 Description
             </th>
             <th>
@@ -124,6 +143,9 @@
             </td>
             <td ng-click="go(ev.path.key)" class="text-muted">
                 {{ev.value.time | dateFilter:"HH:mm"}}
+            </td>
+            <td ng-click="go(ev.path.key)" class="text-muted">
+                {{ev.value.venue}}
             </td>
             <td ng-click="go(ev.path.key)" class="text-muted">
                 {{ev.value.description}}
