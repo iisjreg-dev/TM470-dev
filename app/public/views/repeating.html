@@ -2,9 +2,9 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
-                List of events</div>
+                List of <b>repeating</b> events (event templates)</div>
             <div class="col-md-6 text-right">
-                <a href="/repeating" role="button" ng-if="user.admin" role="button" class="btn btn-default">View repeating events</a> 
+                <a href="/events" role="button" ng-if="user.admin" role="button" class="btn btn-default">View events</a> 
                 <input type="button" ng-hide="showAddEvent" ng-click="addEvent()" role="button" class="btn btn-success" value="Add event">
                 <a role="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i></a>
             </div>
@@ -42,17 +42,16 @@
             <div class="form-group">
                 <div class="row">
                       <div class="col-md-5">
+                          <input type="hidden" name="showRepeating" placeholder="Group" ng-model="event.showRepeating" class="form-control" value="true">
                           <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
-                          <a ng-hide="event.showRepeating" class="btn btn-info" ng-click="event.showRepeating = true;">Repeating?</a>
-                          <select ng-show="event.showRepeating" name="repeat" ng-model="event.repeat" class="form-control has-success">
+                          <select name="repeat" ng-model="event.repeat" class="form-control has-success">
                               <option value="daily">Repeat Daily</option>
                               <option value="weekly">Repeat Weekly</option>
                               <option value="monthly">Repeat Monthly</option>
                           </select>
                       </div>
-                      <div class="col-md-1 text-right">
-                        <a role="button" ng-show="event.showRepeating" class="btn btn-default" ng-click="event.showRepeating = false;"><i class="glyphicon glyphicon-remove text-muted"></i></a>
-                    </div>
+                      <div class="col-md-1 text-right"> 
+                      </div>
                       <div class="col-md-6 text-right">
                         <button type="submit" class="btn btn-success">Add</button>
                     </div>
@@ -61,65 +60,20 @@
         </form>
     </div>
 </div>
-    <div ng-show="eventlist">
-        <h3>Upcoming events</h3>
-    <table class="table table-hover"> <!--change ng-show to also look at user object -->
-        <thead>
-        <tr>
-            <th class="col-sm-3">
-                Name
-            </th>
-            <th class="col-sm-2">
-                Date
-            </th>
-            <th class="col-sm-1">
-                Time
-            </th>
-            <th class="col-sm-2">
-                Location
-            </th>
-            <th class="col-sm-4">
-                Description
-            </th>
-            <th>
-                
-            </th>
-        </tr>
-        </thead>
-        <tr ng-repeat="ev in eventlist" style="cursor: pointer;">
-            <td ng-click="go(ev.path.key)">
-                {{ev.value.name}}
-            </td>
-            <td ng-click="go(ev.path.key)">
-                {{ev.value.date | dateFilter:"Do MMM YYYY"}}
-            </td>
-            <td ng-click="go(ev.path.key)">
-                {{ev.value.time | dateFilter:"HH:mm"}}
-            </td>
-            <td ng-click="go(ev.path.key)">
-                {{ev.value.venue}}
-            </td>
-            <td ng-click="go(ev.path.key)">
-                <div class="label label-xs label-info" ng-if="ev.value.showRepeating"><small>{{ev.value.repeat}}</small></div> {{ev.value.description}}
-            </td>
-            <td>
-                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
-            </td>
-        </tr>
-        
-    </table>
-    </div>
     
-    <div ng-show="eventlist2">
-        <h3 class="text-muted">Past Events</h3>
+    <div ng-show="eventlist3">
+        <h3 class="text-danger">Repeating Events</h3>
     <table class="table table-hover"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
             <th class="col-sm-3 text-muted">
                 Name
             </th>
-            <th class="col-sm-2 text-muted">
-                Date
+            <th class="col-sm-1 text-muted">
+                Period
+            </th>
+            <th class="col-sm-1 text-muted">
+                Started
             </th>
             <th class="col-sm-1 text-muted">
                 Time
@@ -135,24 +89,27 @@
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="ev in eventlist2" style="cursor: pointer;">
-            <td ng-click="go(ev.path.key)" class="text-muted">
-                {{ev.value.name}}
+        <tr ng-repeat="rep in eventlist3" style="cursor: pointer;">
+            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+                {{rep.value.name}}
             </td>
-            <td ng-click="go(ev.path.key)" class="text-muted">
-                {{ev.value.date | dateFilter:"Do MMM YYYY"}}
+            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+                {{rep.value.repeat}}
             </td>
-            <td ng-click="go(ev.path.key)" class="text-muted">
-                {{ev.value.time | dateFilter:"HH:mm"}}
+            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+                {{rep.value.date | dateFilter:"Do MMM YYYY"}}
             </td>
-            <td ng-click="go(ev.path.key)" class="text-muted">
-                {{ev.value.venue}}
+            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+                {{rep.value.time | dateFilter:"HH:mm"}}
             </td>
-            <td ng-click="go(ev.path.key)" class="text-muted">
-                <div class="label label-xs label-info" ng-if="ev.value.showRepeating"><small>{{ev.value.repeat}}</small></div> {{ev.value.description}}
+            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+                {{rep.value.venue}}
+            </td>
+            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+                {{rep.value.description}}
             </td>
             <td>
-                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="deleteRepeat(rep.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         

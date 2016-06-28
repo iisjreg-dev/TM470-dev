@@ -28,6 +28,10 @@ config(function ($routeProvider, $locationProvider) {
       templateUrl: 'views/match.html',
       controller: 'matchController'
     }).
+    when('/repeating', {
+      templateUrl: 'views/repeating.html',
+      controller: 'repeatingController'
+    }).
     when('/mymatches/', {
       templateUrl: 'views/mymatches.html',
       controller: 'mymatchController'

@@ -231,6 +231,81 @@ angular.module('TM470.controllers', []).
         });
     }
   }]).
+  controller('repeatingController', ['$scope', '$http', '$location', //REPEATING.HTML
+  function ($scope, $http, $location) {
+    $scope.event = {};
+    $scope.showAddEvent = false;
+    
+    //Load event list
+    function getEvents(){
+      $http.get("/api/repeating")
+      .then(function(response) {
+        console.log(response.status);
+        $scope.eventlist3 = response.data.results;
+      }, function(error){
+        console.log(error.data);
+        $location.path("/login");
+        //show login
+      });
+    }
+    getEvents();
+    
+    $scope.addEvent = function(){
+      $scope.event = {}; //clear addEvent form
+      $scope.showAddEvent = true;
+    };
+    
+    $scope.goRepeat = function(key){
+      console.log("/repeating/" + key);
+      $location.path("/repeating/" + key);
+    }
+    
+    $scope.submitForm = function(){
+      if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){ //all fields completed
+        $http.post("/api/repeating", $scope.event)
+        .then(function(data) {
+          //console.log(data.status);
+          if(data.status == 201){ //CREATED
+            $scope.event = {};
+            success("Event added");
+            console.log("success");
+            getEvents();
+          }
+        }, function(err){
+          console.error("update error: ");
+          console.error(err);
+          failure("Error adding event"); 
+          //$location.path("/login");
+        });
+      }
+      else{
+        failure("Please complete the form");
+      }
+    }
+    
+    $scope.deleteRepeat = function(key){
+      console.log("deleting " + key);
+      $http.delete("/api/repeating/" + key)
+        .then(function(data) {
+          console.log(data.status);
+          // if(data.status == 201){
+          //   $scope.match = {}; //clear results
+          //   $scope.BGGresults = []; 
+          //   $scope.gameDetail = {};
+          //   $scope.showGameDetail = false;
+          //   success("Match added");
+          //   console.log("success");
+          getEvents();
+
+          // }
+        }, function(err){
+          console.error("delete error: ");
+          console.error(err);
+          failure("Error deleting repeating event"); 
+          //$location.path("/login");
+        });
+    }
+  }]).
   controller('eventController', ['$scope', '$routeParams', '$http', '$location', //EVENT.HTML
   function($scope, $routeParams, $http, $location) {
     $scope.itemId = $routeParams.event;

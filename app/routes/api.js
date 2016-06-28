@@ -143,14 +143,14 @@ routerAPI.get('/events/', //get all events
           console.log("repeating...");
           for(var x in result.body.results){
             console.info("repeating: " + x + " - " + result.body.results[x].value.name + "; " + result.body.results[x].path.key);
-            console.info(result.body.results[x].value.repeat);
+            //console.info(result.body.results[x].value.repeat);
             promises.push(db.newGraphReader()
               .get()
               .from('Repeating', result.body.results[x].path.key)
               .related('events')
               .then(function (result3) {
-                console.log("result3: ");
-                console.log(result3.body.results);
+                //console.log("result3: ");
+                //console.log(result3.body.results);
                 var repeat = result.body.results[x].value.repeat;
                 var period = "";
                 if(repeat == "daily"){ period = "d";}
@@ -167,11 +167,11 @@ routerAPI.get('/events/', //get all events
                     }
                   }
                   if(!eventExists){
-                    console.log("add event...TODO");
+                    console.log("add event");
                     var newEvent = result3.body.results[i].value;
-                    newEvent.date = moment(result.body.results[x].value.date).add(1, "d").add(1, period).toDate(); //NEED TO UPDATE REPEATING DATE
-                    console.log("new date: " + newEvent.date);
-                    promises.push(db.post('Events', newEvent)
+                    newEvent.date = moment(result.body.results[x].value.date).add(1, "d").add(1, period).toDate(); //NEED TO UPDATE REPEATING DATE...
+                    //console.log("new date: " + newEvent.date);
+                    promises.push(db.post('Events', newEvent) //IS NOT BEING WAITED FOR - NEED TO RE-THINK PROMISES
                       .then(function (result4) {
                         if(result4.statusCode == "201"){
                           console.log("add success");
@@ -397,6 +397,58 @@ routerAPI.post('/events/', //post event
       console.log("error");
       res.send(err); 
     });
+  });
+  
+////REPEATING EVENT MANAGEMENT
+
+routerAPI.get('/repeating', //get all repeating events
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    if(!req.user){
+      console.error("not logged in");
+      res.status(403).send("not logged in");
+    }
+    else{
+      console.log("list all repeating events");
+      db.list('Repeating') //will eventually change to accomodate multiple organisations
+      .then(function (result2) {
+        //console.log(result.body);
+        
+        console.log("count = " + result2.body.count);
+        //console.log(result.body.results[0].value.password);
+        if(result2.body.count == 0){ 
+          console.log("no events found");
+          res.status(200).send("no events found"); 
+        }
+        //console.log("done");
+        res.send(result2.body); 
+      })
+      .fail(function (err) {
+        console.log("error : count=" + err.body.count);
+        res.send(err); 
+      });
+    }
+  });
+  
+
+routerAPI.delete('/repeating/:event', //delete repeating event
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("delete event " + req.params.event);
+    
+    //delete repeating event 
+    db.remove('Repeating', req.params.event, true)
+    .then(function (result) {
+      console.log("repeating event " + req.params.event + " deleted");
+      res.sendStatus(200); 
+    })
+    .fail(function (err) {
+      console.error("Repeating Event remove error : " + err);
+      res.send(err); 
+    });
+        
   });
   
   
