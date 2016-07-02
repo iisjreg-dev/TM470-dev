@@ -152,20 +152,27 @@ angular.module('TM470.controllers', []).
         console.log(response.status);
         var pastEvents = [];
         var futureEvents = [];
-        response.data.results.forEach(function(event){
-          //console.log("event date", event.value.date);
-          var theDate = new Date(event.value.date);
-          var theTime = new Date(event.value.time);
-          var aMoment = moment(theDate.toDateString() + " " + theTime.toTimeString());
-          if(aMoment.isBefore()){
-            pastEvents.push(event);
-          }
-          else{
-            futureEvents.push(event);
-          }
-        });
-        if(futureEvents.length > 0){$scope.eventlist = futureEvents;}
-        if(pastEvents.length > 0){$scope.eventlist2 = pastEvents;}
+        if (typeof response.data.results !== 'undefined' && response.data.results.length > 0) {
+          response.data.results.forEach(function(event){
+            //console.log("event date", event.value.date);
+            var theDate = new Date(event.value.date);
+            var theTime = new Date(event.value.time);
+            var aMoment = moment(theDate.toDateString() + " " + theTime.toTimeString()); //TODO: SORT OUT PROPER TIMESTAMP
+            if(aMoment.isBefore()){
+              pastEvents.push(event);
+            }
+            else{
+              futureEvents.push(event);
+            }
+          });
+          if(futureEvents.length > 0){$scope.eventlist = futureEvents;}
+          if(pastEvents.length > 0){$scope.eventlist2 = pastEvents;}
+        }
+        else{
+          $scope.eventlist = null;
+          $scope.eventlist2 = null;
+          $scope.noEvents= true;
+        }
       //$scope.orderProp = 'created';
       }, function(error){
         console.log(error.data);
@@ -213,16 +220,10 @@ angular.module('TM470.controllers', []).
       $http.delete("/api/events/" + key)
         .then(function(data) {
           console.log(data.status);
-          // if(data.status == 201){
-          //   $scope.match = {}; //clear results
-          //   $scope.BGGresults = []; 
-          //   $scope.gameDetail = {};
-          //   $scope.showGameDetail = false;
-          //   success("Match added");
-          //   console.log("success");
-          getEvents();
-
-          // }
+           if(data.status == 200){
+            success("Event deleted");
+            getEvents();
+           }
         }, function(err){
           console.error("delete error: ");
           console.error(err);

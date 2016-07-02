@@ -131,98 +131,152 @@ routerAPI.get('/events/', //get all events
       //console.log(req.user.username);
       
       //First check for new repeating events
-      console.log("check repeating");
-      db.list('Repeating')
-      .then(function (result) {
-        //console.log(result.body);
-        var promises = [];
-        
-        console.log("count = " + result.body.count);
-        //console.log(result.body.results[0].value.password);
-        if(result.body.count > 0){ 
-          console.log("repeating...");
-          for(var x in result.body.results){
-            console.info("repeating: " + x + " - " + result.body.results[x].value.name + "; " + result.body.results[x].path.key);
-            //console.info(result.body.results[x].value.repeat);
-            promises.push(db.newGraphReader()
+      //console.log("check repeating");
+      db.list('Repeating', {limit: 100}) //GET ALL REPEATING RECORDS
+      .then(function (repeatResult) {
+        //console.log(repeatResult.body);
+        var repeatPromises = [];
+        //console.log("count = " + repeatResult.body.count);
+        //console.log(repeatResult.body.results[0].value.password);
+        if(repeatResult.body.count > 0){ 
+          //console.log("repeating:" + repeatResult.body.count);
+          for(var x in repeatResult.body.results){ //GO THROUGH ALL RECORDS
+            //console.info("repeating: " + x + " - " + repeatResult.body.results[x].value.name + "; " + repeatResult.body.results[x].path.key);
+            //console.info(repeatResult.body.results[x].value.repeat);
+            repeatPromises.push(db.newGraphReader() //GET ALL LINKED EVENTS
               .get()
-              .from('Repeating', result.body.results[x].path.key)
+              .from('Repeating', repeatResult.body.results[x].path.key)
               .related('events')
-              .then(function (result3) {
+              .then(function (eventResult) {
                 //console.log("result3: ");
                 //console.log(result3.body.results);
-                var repeat = result.body.results[x].value.repeat;
+                var newEvent = {};
+                var newEventKey = "";
+                var newDate = "";
+                var repeat = repeatResult.body.results[x].value.repeat;
                 var period = "";
                 if(repeat == "daily"){ period = "d";}
                 else if(repeat == "weekly"){ period = "w";}
                 else if(repeat == "monthly"){ period = "M";}
                 
-                if (typeof result3.body.results !== 'undefined' && result3.body.results.length > 0) {
+                if (typeof eventResult.body.results !== 'undefined' && eventResult.body.results.length > 0) {
                   var eventExists = false;
-                  for(var i in result3.body.results){
-
-                    var theDate = moment(result3.body.results[i].value.date);
-                    if(moment().isBefore(theDate.subtract(1, "d"))){
+                  //console.log("checking events...");
+                  for(var i in eventResult.body.results){ //GO THROUGH ALL EVENTS
+                    //console.log("event " + eventResult.body.results[i].value.name + " - " + eventResult.body.results[i].value.date);
+                    
+                    var theDate = moment(eventResult.body.results[i].value.date);
+                    var now = moment();
+                    if(now.isBefore(theDate.subtract(1, "d"))){ //CHECK TO SEE IF AN EVENT EXISTS IN THE FUTURE (NOT INCLUDING TODAY)
+                      //console.log("future event found");
                       eventExists = true;
                     }
                   }
-                  if(!eventExists){
-                    console.log("add event");
-                    var newEvent = result3.body.results[i].value;
-                    newEvent.date = moment(result.body.results[x].value.date).add(1, "d").add(1, period).toDate(); //NEED TO UPDATE REPEATING DATE...
-                    //console.log("new date: " + newEvent.date);
-                    promises.push(db.post('Events', newEvent) //IS NOT BEING WAITED FOR - NEED TO RE-THINK PROMISES
-                      .then(function (result4) {
-                        if(result4.statusCode == "201"){
-                          console.log("add success");
-                        }
-                        else{
-                          console.log("error adding");
-                        }
-                        db.newGraphBuilder()
-                          .create()
-                          .from('Repeating', result.body.results[x].path.key)
-                          .related('events')
-                          .to('Events', result4.path.key)
-                          .then(function (result5) {
-                            console.log("events link created");
-                            return true;
-                          });
-                        //return true;
-                      })
-                    );
-                    //add event
-                  }
+                  
                 }
-                return true;
+                //console.log("eventExists: " + eventExists);
+                if(!eventExists){ //NO FUTURE EVENT SO CREATE ONE
+                  newEvent = eventResult.body.results[i].value; //COPY EVENT DATA FROM TEMPLATE
+                  newDate = moment(repeatResult.body.results[x].value.date).add(1, period).toDate();
+                  newEvent.date = newDate;
+                  console.log("new repeating event to be added for: " + repeatResult.body.results[x].value.name + " - " + newDate);
+                  return newEvent;
+                }
+                else{
+                  throw "no events needs to be added";
+                }
+
+                //return !eventExists;
+                
+              })
+              .then(function(event){
+                if(event){
+                  return db.post('Events', event) //ADD NEW EVENT
+                  .then(function (newEventResult) {
+                    //console.log("add success");
+                    event.key = newEventResult.path.key;
+                    return event;
+                  })
+                  .fail(function(error){
+                    throw "post fail: " + error.body.message;
+                  });
+                }
+                else{
+                  return false;
+                }
+              })
+              .then(function(event){
+                if(event){
+                  return db.newGraphBuilder() //CREATE LINK FROM TEMPLATE TO EVENT
+                  .create()
+                  .from('Repeating', repeatResult.body.results[x].path.key)
+                  .related('events')
+                  .to('Events', event.key)
+                  .then(function (newEventLinkResult) {
+                    //console.log("events link created");
+                    return event;
+                  })
+                  .fail(function(error){
+                    throw "link fail: " + error.body.message;
+                  });
+                }
+                else{
+                  return false;
+                }
+              })
+              .then(function(event){
+                if(event){
+                  return db.newPatchBuilder('Repeating', repeatResult.body.results[x].path.key) // UPDATE TEMPLATE
+                  .replace('date', event.date)
+                  .apply()
+                  .then(function (result) {
+                      // All changes were applied successfully
+                      //console.log("template updated");
+                      return true; //FINAL PROMISE RETURN
+                  })
+                  .fail(function(error){
+                    throw "patch fail: " + error.body.message;
+                  });
+                }
+                else{
+                  throw "promise fail";  //SOMETHING WENT WRONG?
+                }
+              })
+              .fail(function(err){
+                console.error(err);
+                return false; //FINAL PROMISE RETURN (FAIL)
               })
             );
+              
           }
         }
         else{
           console.log("no repeating");
-          promises.push(true);
+          repeatPromises.push(true);
         }
 
-        Q.all(promises) //ONLY GET EVENTS AFTER THE REPEATING HAS BEEN CHECKED
+        Q.all(repeatPromises) //ONLY GET EVENTS AFTER THE REPEATING HAS BEEN CHECKED
         .then(function (content) {
-          console.log("promises: " + content);
+          //console.log("repeatPromises: ");
+          //console.log(content);
           console.log("list all events");
-          db.list('Events') //will eventually change to accomodate multiple organisations
+          db.list('Events', {limit:100}) //will eventually change to accomodate multiple organisations
           .then(function (result2) {
             //console.log(result.body);
             
-            console.log("count = " + result2.body.count);
+            //console.log("count = " + result2.body.count);
             //console.log(result.body.results[0].value.password);
             if(result2.body.count == 0){ 
               console.log("no events found");
               res.status(200).send("no events found"); 
             }
             //console.log("done");
+            //console.info("RES.SEND");
             res.send(result2.body); 
           })
           .fail(function (err) {
-            console.log("error : count=" + err.body.count);
+            console.log("error : " + err.body.message);
+            console.log("count=" + err.body.count);
             res.send(err); 
           });
         });
@@ -231,7 +285,8 @@ routerAPI.get('/events/', //get all events
 
       })
       .fail(function (err) {
-        console.log("error : count=" + err.body.count);
+        console.log("error : " + err.body.message);
+        console.log("count=" + err.body.count);
       });
       
       
@@ -732,7 +787,7 @@ routerAPI.post('/events/:event/matches/', //post match
         console.log("status: 201");
         console.log("create links");
         console.log("user key: " + req.user.username);
-        console.log("event key: " + req.body.eventKey);
+        console.log("event key: " + req.params.event);
         console.log("match key: " + result.path.key);
         db.newGraphBuilder()
         .create()
@@ -747,7 +802,7 @@ routerAPI.post('/events/:event/matches/', //post match
         });
         db.newGraphBuilder()
         .create()
-        .from('Events', req.body.eventKey)
+        .from('Events', req.params.event)
         .related('contains')
         .to('Matches', result.path.key)
         .then(function (res) {

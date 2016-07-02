@@ -155,6 +155,13 @@
                 <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
-        
+
     </table>
+    
+</div>
+    <div ng-hide="eventlist || eventlist2">
+        <h4>Getting events...</h4>
+    </div>
+    <div ng-show="noEvents">
+        <h4>No events. Add one above.</h4>
     </div>
