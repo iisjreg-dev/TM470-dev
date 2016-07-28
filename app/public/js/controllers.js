@@ -190,7 +190,7 @@ angular.module('TM470.controllers', []).
     $scope.go = function(key){
       console.log("/events/" + key);
       $location.path("/events/" + key);
-    }
+    };
     
     $scope.submitForm = function(){
       if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){ //all fields completed
@@ -213,7 +213,7 @@ angular.module('TM470.controllers', []).
       else{
         failure("Please complete the form");
       }
-    }
+    };
     
     $scope.delete = function(key){
       console.log("deleting " + key);
@@ -230,7 +230,7 @@ angular.module('TM470.controllers', []).
           failure("Error deleting match"); 
           //$location.path("/login");
         });
-    }
+    };
   }]).
   controller('repeatingController', ['$scope', '$http', '$location', //REPEATING.HTML
   function ($scope, $http, $location) {
@@ -259,7 +259,7 @@ angular.module('TM470.controllers', []).
     $scope.goRepeat = function(key){
       console.log("/repeating/" + key);
       $location.path("/repeating/" + key);
-    }
+    };
     
     $scope.submitForm = function(){
       if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){ //all fields completed
@@ -282,7 +282,7 @@ angular.module('TM470.controllers', []).
       else{
         failure("Please complete the form");
       }
-    }
+    };
     
     $scope.deleteRepeat = function(key){
       console.log("deleting " + key);
@@ -305,7 +305,7 @@ angular.module('TM470.controllers', []).
           failure("Error deleting repeating event"); 
           //$location.path("/login");
         });
-    }
+    };
   }]).
   controller('eventController', ['$scope', '$routeParams', '$http', '$location', //EVENT.HTML
   function($scope, $routeParams, $http, $location) {
@@ -379,7 +379,7 @@ angular.module('TM470.controllers', []).
             $scope.notFound = true;
           });
       }
-    }
+    };
     
     $scope.select = function(id,name,type){
       console.log("selected: " + id);
@@ -433,7 +433,7 @@ angular.module('TM470.controllers', []).
             //$scope.notFound = true;
           });
       
-    }
+    };
     
     $scope.submitForm = function(){
       if($scope.match.game && $scope.match.description){
@@ -472,7 +472,7 @@ angular.module('TM470.controllers', []).
       else{
         failure("Please complete the form");
       }
-    }
+    };
     
     $scope.delete = function(key){
       console.log("deleting " + key);

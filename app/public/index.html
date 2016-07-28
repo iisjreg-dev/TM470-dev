@@ -13,20 +13,24 @@
    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
    <title>BoG Night - Organising Board Game Events</title>
 
-   <!-- Custom styles for this template -->
-   <link href="stylesheets/style.css" rel="stylesheet">
    <!-- Bootstrap core CSS -->
    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
    <link href="bower_components/notie/dist/notie.css" rel="stylesheet">
    <script src="bower_components/angular/angular.min.js"></script>
    <script src="bower_components/angular-route/angular-route.min.js"></script>
    <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+   
+   <!-- Custom styles for this template -->
+   <link href="stylesheets/style.css" rel="stylesheet">
+   <link href="stylesheets/ct-paper.css" rel="stylesheet">
+   
+   
 
 </head>
 
 <body ng-controller="BodyController">
 
-   <nav class="navbar navbar-default navbar-fixed-top">
+   <nav class="navbar navbar-ct-info">
       <div ng-cloak class="container ng-cloak">
          <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -55,13 +59,15 @@
          <!--/.navbar-collapse -->
       </div>
    </nav>
-   <div class="container">
-      <div class="row"><br />
-         <div class="col-xs-12" ng-view>
-
-
+   <br />
+   <div class="wrapper">
+         <div class="container">
+            <div class="row">
+               <div class="col-xs-12" ng-view>
+                  
+               </div>
+            </div>
          </div>
-      </div>
    </div>
    <hr>
 
@@ -86,10 +92,18 @@
    <script src="js/client.js"></script>
    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js "></script>
    
+   <!--  Plugins -->
+	<script src="js/ct-paper-checkbox.js"></script>
+	<script src="js/ct-paper-radio.js"></script>
+	<script src="js/bootstrap-select.js"></script>
+	<script src="js/bootstrap-datepicker.js"></script>
+
+	<script src="js/ct-paper.js"></script> 
+   
    <script>
       $(function() {
          $('[data-toggle="tooltip "]').tooltip()
-      })
+      });
    </script>
    <script src="bower_components/notie/dist/notie.js "></script>
    <script>

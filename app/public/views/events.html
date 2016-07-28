@@ -81,9 +81,6 @@
             <th class="col-sm-4">
                 Description
             </th>
-            <th>
-                
-            </th>
         </tr>
         </thead>
         <tr ng-repeat="ev in eventlist" style="cursor: pointer;">
@@ -101,9 +98,6 @@
             </td>
             <td ng-click="go(ev.path.key)">
                 <div class="label label-xs label-info" ng-if="ev.value.showRepeating"><small>{{ev.value.repeat}}</small></div> {{ev.value.description}}
-            </td>
-            <td>
-                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
         
@@ -130,9 +124,6 @@
             <th class="col-sm-4 text-muted">
                 Description
             </th>
-            <th>
-                
-            </th>
         </tr>
         </thead>
         <tr ng-repeat="ev in eventlist2" style="cursor: pointer;">
@@ -150,9 +141,6 @@
             </td>
             <td ng-click="go(ev.path.key)" class="text-muted">
                 <div class="label label-xs label-info" ng-if="ev.value.showRepeating"><small>{{ev.value.repeat}}</small></div> {{ev.value.description}}
-            </td>
-            <td>
-                <a ng-if="user.admin" ng-click="delete(ev.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
             </td>
         </tr>
 

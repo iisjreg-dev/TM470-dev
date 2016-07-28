@@ -53,7 +53,7 @@ app.use(function(req, res, next) { //log all requests at start of request, becau
 });
 
 //log more detail to file
-expressWinston.requestWhitelist.push('id');
+expressWinston.requestWhitelist.push('id'); //add request id to persistent log
 app.use(expressWinston.logger({
       transports: [
         new winston.transports.File({

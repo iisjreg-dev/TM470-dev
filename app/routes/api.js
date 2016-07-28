@@ -151,7 +151,6 @@ routerAPI.get('/events/', //get all events
                 //console.log("result3: ");
                 //console.log(result3.body.results);
                 var newEvent = {};
-                var newEventKey = "";
                 var newDate = "";
                 var repeat = repeatResult.body.results[x].value.repeat;
                 var period = "";
@@ -180,10 +179,10 @@ routerAPI.get('/events/', //get all events
                   newDate = moment(repeatResult.body.results[x].value.date).add(1, period).toDate();
                   newEvent.date = newDate;
                   console.log("new repeating event to be added for: " + repeatResult.body.results[x].value.name + " - " + newDate);
-                  return newEvent;
+                  return newEvent; //pass event on to next then() function
                 }
                 else{
-                  throw "no events needs to be added";
+                  throw "no events needs to be added"; //reject promise
                 }
 
                 //return !eventExists;
@@ -195,10 +194,10 @@ routerAPI.get('/events/', //get all events
                   .then(function (newEventResult) {
                     //console.log("add success");
                     event.key = newEventResult.path.key;
-                    return event;
+                    return event; //pass event on to next then() function
                   })
                   .fail(function(error){
-                    throw "post fail: " + error.body.message;
+                    throw "post fail: " + error.body.message; //reject promise
                   });
                 }
                 else{
@@ -214,10 +213,10 @@ routerAPI.get('/events/', //get all events
                   .to('Events', event.key)
                   .then(function (newEventLinkResult) {
                     //console.log("events link created");
-                    return event;
+                    return event; //pass event on to next then() function
                   })
                   .fail(function(error){
-                    throw "link fail: " + error.body.message;
+                    throw "link fail: " + error.body.message; //end promise
                   });
                 }
                 else{
@@ -235,7 +234,7 @@ routerAPI.get('/events/', //get all events
                       return true; //FINAL PROMISE RETURN
                   })
                   .fail(function(error){
-                    throw "patch fail: " + error.body.message;
+                    throw "patch fail: " + error.body.message; //reject promise
                   });
                 }
                 else{
@@ -255,12 +254,15 @@ routerAPI.get('/events/', //get all events
           repeatPromises.push(true);
         }
 
-        Q.all(repeatPromises) //ONLY GET EVENTS AFTER THE REPEATING HAS BEEN CHECKED
-        .then(function (content) {
+        Q.all(repeatPromises) //ONLY GET EVENTS AFTER THE REPEATING TEMPLTATES HAVE BEEN CHECKED
+        .then(function (content) { 
+          //content contains the results of the promisestrue for event created or no templates and false for fail/no creation needed
+          //I think this could contain more details rather than true/false
+          
           //console.log("repeatPromises: ");
           //console.log(content);
           console.log("list all events");
-          db.list('Events', {limit:100}) //will eventually change to accomodate multiple organisations
+          db.list('Events', {limit:100}) //will eventually change to accomodate multiple organisations - should change to a search!
           .then(function (result2) {
             //console.log(result.body);
             
