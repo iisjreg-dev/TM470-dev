@@ -52,6 +52,14 @@ config(function ($routeProvider, $locationProvider) {
       templateUrl: 'views/main.html',
       controller: 'aboutController'
     }).
+    when('/groups', {
+      templateUrl: 'views/groups.html',
+      controller: 'groupsController'
+    }).
+    when('/group', {
+      templateUrl: 'views/group.html',
+      controller: 'groupController'
+    }).
     otherwise({
       //failure("404");
       redirectTo: '/'

@@ -596,8 +596,8 @@ input.ct-red + span + label + span.switch-right {
 
 .form-control {
   background-color: #fffcf5;
-  border: medium none;
-  border-radius: 4px;
+  /*border: medium none;*/
+  border-radius: 20px;
   color: #66615b;
   font-size: 16px;
   transition: background-color 0.3s ease 0s;

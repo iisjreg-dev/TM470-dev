@@ -232,6 +232,64 @@ angular.module('TM470.controllers', []).
         });
     };
   }]).
+  controller('groupsController', ['$scope', '$http', '$location', //GROUPS.HTML
+  function ($scope, $http, $location) {
+    $scope.group = {};
+    $scope.showAddGroup = false;
+    
+    //Load group list
+    function getGroups(){
+      $http.get("/api/groups")
+      .then(function(response) {
+        console.log(response.status);
+        if (typeof response.data.results !== 'undefined' && response.data.results.length > 0) {
+          $scope.grouplist = response.data.results;
+        }
+        else{
+          $scope.grouplist = null;
+          $scope.noGroups= true;
+        }
+      }, function(error){
+        console.log(error.data);
+        $location.path("/login");
+        //show login
+      });
+    }
+    getGroups();
+    
+    $scope.addGroup = function(){
+      $scope.group = {}; //clear addGroup form
+      $scope.showAddGroup = true;
+    };
+    
+    $scope.go = function(key){
+      console.log("/groups/" + key);
+      $location.path("/groups/" + key);
+    };
+    
+    $scope.submitForm = function(){
+      if($scope.group.name && $scope.group.description){ //NOT all fields mandatory
+        $http.post("/api/groups", $scope.group)
+        .then(function(data) {
+          //console.log(data.status);
+          if(data.status == 201){ //CREATED
+            $scope.group = {};
+            success("Group created");
+            console.log("success");
+            getGroups();
+          }
+        }, function(err){
+          console.error("update error: ");
+          console.error(err);
+          failure("Error adding group"); 
+        });
+      }
+      else{
+        failure("Please complete the mandatory fields");
+      }
+    };
+    
+  }]).
   controller('repeatingController', ['$scope', '$http', '$location', //REPEATING.HTML
   function ($scope, $http, $location) {
     $scope.event = {};
@@ -474,6 +532,25 @@ angular.module('TM470.controllers', []).
       }
     };
     
+    
+    $scope.deleteEvent = function(){
+      console.log("deleting " + $routeParams.event);
+      $http.delete("/api/events/" + $routeParams.event)
+        .then(function(data) {
+          console.log(data.status);
+           if(data.status == 200){
+            success("Event deleted");
+            //getEvents();
+            $location.path("/events");
+           }
+        }, function(err){
+          console.error("delete error: ");
+          console.error(err);
+          failure("Error deleting event"); 
+          //$location.path("/login");
+        });
+    };
+    
     $scope.delete = function(key){
       console.log("deleting " + key);
       $http.delete("/api/events/"+ $routeParams.event +"/matches/" + key)
@@ -714,6 +791,32 @@ angular.module('TM470.controllers', []).
           failure("Error leaving match");
           //$location.path("/login");
           //show login
+        });
+    };
+    
+    $scope.deleteMatch = function(){
+      console.log("deleting " + $routeParams.match);
+      $http.delete("/api/events/"+ $routeParams.event +"/matches/" + $routeParams.match)
+        .then(function(data) {
+          console.log(data.status);
+          if(data.status == 200){
+            success("Match deleted");
+          }
+          //   $scope.match = {}; //clear results
+          //   $scope.BGGresults = []; 
+          //   $scope.gameDetail = {};
+          //   $scope.showGameDetail = false;
+          //   
+          //   console.log("success");
+          //getMatches();
+          $location.path("/events/"+ $routeParams.event);
+
+          // }
+        }, function(err){
+          console.error("delete error: ");
+          console.error(err);
+          failure("Error deleting match"); 
+          //$location.path("/login");
         });
     };
 

@@ -160,14 +160,14 @@ routerAPI.get('/events/', //get all events
                 
                 if (typeof eventResult.body.results !== 'undefined' && eventResult.body.results.length > 0) {
                   var eventExists = false;
-                  //console.log("checking events...");
+                  console.info("checking events...");
                   for(var i in eventResult.body.results){ //GO THROUGH ALL EVENTS
-                    //console.log("event " + eventResult.body.results[i].value.name + " - " + eventResult.body.results[i].value.date);
+                    console.info("event " + eventResult.body.results[i].value.name + " - " + eventResult.body.results[i].value.date);
                     
                     var theDate = moment(eventResult.body.results[i].value.date);
                     var now = moment();
                     if(now.isBefore(theDate.subtract(1, "d"))){ //CHECK TO SEE IF AN EVENT EXISTS IN THE FUTURE (NOT INCLUDING TODAY)
-                      //console.log("future event found");
+                      console.info("event " + eventResult.body.results[i].value.name + " - future event found");
                       eventExists = true;
                     }
                   }
@@ -175,7 +175,7 @@ routerAPI.get('/events/', //get all events
                 }
                 //console.log("eventExists: " + eventExists);
                 if(!eventExists){ //NO FUTURE EVENT SO CREATE ONE
-                  newEvent = eventResult.body.results[i].value; //COPY EVENT DATA FROM TEMPLATE
+                  newEvent = repeatResult.body.results[x].value; //COPY EVENT DATA FROM TEMPLATE
                   newDate = moment(repeatResult.body.results[x].value.date).add(1, period).toDate();
                   newEvent.date = newDate;
                   console.log("new repeating event to be added for: " + repeatResult.body.results[x].value.name + " - " + newDate);
@@ -263,6 +263,7 @@ routerAPI.get('/events/', //get all events
           //console.log(content);
           console.log("list all events");
           db.list('Events', {limit:100}) //will eventually change to accomodate multiple organisations - should change to a search!
+          //db.search('Events', 'value.group:' + group)
           .then(function (result2) {
             //console.log(result.body);
             
@@ -433,6 +434,111 @@ routerAPI.post('/events/', //post event
           );
         }
         
+        Q.all(promises) //all promises are now complete (returned true), so send response
+          .then(function (content) {
+            res.status(201).send(result.path.key);
+          })
+          .fail(function (err) {
+            console.log("promise error send: " + err);
+          });
+        
+        
+        console.log("done");
+         
+        //res.redirect("/events/" + result.path.key); //should change response for API usage
+      }
+      else{
+        res.status(result.statusCode).send("error");
+      }
+    })
+    .fail(function (err) {
+      console.log("error");
+      res.send(err); 
+    });
+  });
+  
+//GROUP MANAGEMENT
+
+
+routerAPI.get('/groups/', //get all groups
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    if(!req.user){
+      console.error("not logged in");
+      res.status(403).send("not logged in");
+    }
+    else{
+
+      db.list('Groups', {limit:100})
+      .then(function (result2) {
+
+        if(result2.body.count == 0){ 
+          console.log("no events found");
+          res.status(200).send("no events found"); 
+        }
+        res.send(result2.body); 
+      })
+      .fail(function (err) {
+        console.log("error : " + err.body.message);
+        console.log("count=" + err.body.count);
+        res.send(err); 
+      });
+    }
+  });
+  
+  
+routerAPI.get('/groups/:group', //get 1 group
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("get group " + req.params.group);
+    db.get('Groups', req.params.group)
+    .then(function (result) {
+      //console.log(result.body);
+      
+      //console.log("count = " + result.body.count);
+      //console.log(result.body.results[0].value.password);
+      if(result.body.count == 0){ 
+        console.log("no groups found");
+        res.status(404).send("no groups found"); 
+      }
+      console.log("done");
+      result.body.groupKey = req.params.group;
+      res.send(result.body); 
+    })
+    .fail(function (err) {
+      console.log("error : count=" + err.body.count);
+      res.send(err); 
+    });
+  });
+  
+routerAPI.post('/groups/', //post group
+  require('connect-ensure-login').ensureLoggedIn('/auth/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("add group " + req.body.name);
+    db.post('Groups', req.body)
+    .then(function (result) {
+      if(result.statusCode == "201"){
+        
+        var promises = [];
+        
+        console.log("status: 201");
+        console.log("create link to user");
+        
+        promises.push(db.newGraphBuilder()
+          .create()
+          .from('Users', req.user.username)
+          .related('joined')
+          .to('Groups', result.path.key)
+          .then(function (result2) {
+            console.log("link created");
+            return true;
+          })
+        );
+
         Q.all(promises) //all promises are now complete (returned true), so send response
           .then(function (content) {
             res.status(201).send(result.path.key);

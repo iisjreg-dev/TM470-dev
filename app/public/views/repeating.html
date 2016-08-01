@@ -6,11 +6,11 @@
             <div class="col-md-6 text-right">
                 <a href="/events" role="button" ng-if="user.admin" role="button" class="btn btn-default">View events</a> 
                 <input type="button" ng-hide="showAddEvent" ng-click="addEvent()" role="button" class="btn btn-success" value="Add event">
-                <a role="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i></a>
+                <a role="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-default">Close</a>
             </div>
         </div>
     </div>
-    <div class="panel-footer" ng-show="showAddEvent">
+    <div class="panel-body" ng-show="showAddEvent">
         <form name="addEventForm" ng-submit="submitForm()">
             <div class="form-group">
                 <div class="row">
@@ -53,7 +53,7 @@
                       <div class="col-md-1 text-right"> 
                       </div>
                       <div class="col-md-6 text-right">
-                        <button type="submit" class="btn btn-success">Add</button>
+                        <button type="submit" class="btn btn-success btn-fill">Add</button>
                     </div>
                 </div>
             </div>
@@ -66,22 +66,22 @@
     <table class="table table-hover"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
-            <th class="col-sm-3 text-muted">
+            <th class="col-sm-3">
                 Name
             </th>
-            <th class="col-sm-1 text-muted">
+            <th class="col-sm-1">
                 Period
             </th>
-            <th class="col-sm-1 text-muted">
+            <th class="col-sm-1">
                 Next date
             </th>
-            <th class="col-sm-1 text-muted">
+            <th class="col-sm-1">
                 Time
             </th>
-            <th class="col-sm-2 text-muted">
+            <th class="col-sm-2">
                 Location
             </th>
-            <th class="col-sm-4 text-muted">
+            <th class="col-sm-4">
                 Description
             </th>
             <th>
@@ -90,26 +90,26 @@
         </tr>
         </thead>
         <tr ng-repeat="rep in eventlist3" style="cursor: pointer;">
-            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+            <td ng-click="goRepeat(rep.path.key)">
                 {{rep.value.name}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+            <td ng-click="goRepeat(rep.path.key)">
                 {{rep.value.repeat}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+            <td ng-click="goRepeat(rep.path.key)">
                 {{rep.value.date | dateFilter:"Do MMM YYYY"}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+            <td ng-click="goRepeat(rep.path.key)">
                 {{rep.value.time | dateFilter:"HH:mm"}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+            <td ng-click="goRepeat(rep.path.key)">
                 {{rep.value.venue}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)" class="text-muted">
+            <td ng-click="goRepeat(rep.path.key)">
                 {{rep.value.description}}
             </td>
             <td>
-                <a ng-if="user.admin" ng-click="deleteRepeat(rep.path.key)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="deleteRepeat(rep.path.key)" role="button" class="btn btn-danger btn-xs">delete</a>
             </td>
         </tr>
         

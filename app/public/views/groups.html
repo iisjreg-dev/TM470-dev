@@ -1,0 +1,94 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                List of groups</div>
+            <div class="col-md-6 text-right">
+                <input type="button" ng-hide="showAddGroup" ng-click="addGroup()" role="button" class="btn btn-success" value="New Group">
+                <a role="button" ng-show="showAddGroup" ng-click="showAddGroup = false" role="button" class="btn btn-default">Close</a>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body" ng-show="showAddGroup">
+        <form name="addGroupForm" ng-submit="submitForm()">
+            <div class="form-group">
+                <div class="row">
+                      <div class="col-md-6">
+                          <input type="text" name="name" placeholder="Group Name" ng-model="group.name" class="form-control">
+                      </div>
+                      <div class="col-md-6">
+                        <input type="text" name="location" placeholder="Location" ng-model="group.location" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                      <div class="col-md-12">
+                          <input type="text" name="description" placeholder="Description" ng-model="group.description" class="form-control">
+                      </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                      <div class="col-md-6">
+                          <input type="text" name="website" placeholder="Website" ng-model="group.website" class="form-control">
+                      </div>
+                      <div class="col-md-6">
+                          <div class="form-group has-feedback">
+                              
+                              <input type="text" name="twitter" placeholder="Twitter" ng-model="group.twitter" class="form-control">
+                              <!-- <span class="glyphicon glyphicon-triangle-right form-control-feedback"></span> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                      <div class="text-right">
+                        <button type="submit" class="btn btn-success btn-fill">Create</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+    <div ng-show="grouplist">
+        <h3>Groups</h3>
+    <table class="table table-hover"> <!--change ng-show to also look at user object -->
+        <thead>
+        <tr>
+            <th class="col-sm-4">
+                Name
+            </th>
+            <th class="col-sm-3">
+                Location
+            </th>
+            <th class="col-sm-5">
+                Description
+            </th>
+        </tr>
+        </thead>
+        <tr ng-repeat="gr in grouplist" style="cursor: pointer;">
+            <td ng-click="go(gr.path.key)">
+                {{gr.value.name}}
+            </td>
+            <td ng-click="go(gr.path.key)">
+                {{gr.value.location}}
+            </td>
+            <td ng-click="go(gr.path.key)">
+                {{gr.value.description}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                <a ng-href="{{gr.value.website}}" target="_NEW">{{gr.value.website}}</a>
+            </td>
+        </tr>
+        
+    </table>
+    </div>
+    
+    <div ng-hide="grouplist">
+        <h4>Getting groups...</h4>
+    </div>
+    <div ng-show="noGroups">
+        <h4>No groups. Create one above.</h4>
+    </div>
