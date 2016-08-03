@@ -1,4 +1,13 @@
-<div class="panel panel-primary">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-6">
+                Match Details</div>
+            <div class="col-md-6 text-right">
+                <a role="button" ng-click="deleteMatch()" role="button" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
     
     <!-- MATCH SUMMARY -->
     
@@ -26,19 +35,17 @@
     
     <div class="panel-body">
         <div class="row">
-            <div class="col-sm-2">
-                <a role="button" ng-click="deleteMatch()" role="button" class="btn btn-danger">Delete</a>
+            <div class="col-sm-6">
+                
                 <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default">Back to event</a>
             </div>
-            <div class="col-sm-10 text-right">
-                <div class="btn-group" role="group">
+            <div class="col-sm-6 text-right">
                     <input ng-show="inMatch && !canBring" type="button" ng-click="canBringGame()" role="button" class="btn btn-default" value="I can bring this game">
                     <input ng-show="inMatch && canBring" type="button" ng-click="cannotBringGame()" role="button" class="btn btn-default" value="I can't bring this game">
                     <input ng-show="inMatch && !canTeach" type="button" ng-click="canTeachGame()" role="button" class="btn btn-default" value="I can teach this game">
                     <input ng-show="inMatch && canTeach" type="button" ng-click="cannotTeachGame()" role="button" class="btn btn-default" value="I can't teach this game">
                     <input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success" value="Show interest">
                     <input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger" value="Remove interest">
-                </div>
 
             </div>
         </div>

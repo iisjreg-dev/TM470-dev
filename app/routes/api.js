@@ -127,8 +127,29 @@ routerAPI.get('/events/', //get all events
       res.status(403).send("not logged in");
     }
     else{
-      //console.log("user: ");
-      //console.log(req.user.username);
+      var groupSearch = "";
+      db.newGraphReader() //GET GROUPS
+        .get()
+        .from('Users', req.user.username)
+        .related('joined')
+        .then(function (groupResult) {
+          //console.log(groupResult.body.results);
+          if(groupResult.body.count == 0){
+            res.status(204).send("No groups joined");
+            console.log("no groups");
+            throw "no groups";
+          }
+          for(var a in groupResult.body.results){
+            groupSearch += '"' + groupResult.body.results[a].value.name + '"';
+            if(a < groupResult.body.count - 1){ groupSearch += " OR "}
+          }
+          console.log(groupSearch);
+          return groupSearch;
+          
+        })
+        .then(function(groupSearch){
+          
+        
       
       //First check for new repeating events
       //console.log("check repeating");
@@ -262,8 +283,8 @@ routerAPI.get('/events/', //get all events
           //console.log("repeatPromises: ");
           //console.log(content);
           console.log("list all events");
-          db.list('Events', {limit:100}) //will eventually change to accomodate multiple organisations - should change to a search!
-          //db.search('Events', 'value.group:' + group)
+          //db.list('Events', {limit:100}) //will eventually change to accomodate multiple organisations - should change to a search!
+          db.search('Events', 'value.group: ' + groupSearch)
           .then(function (result2) {
             //console.log(result.body);
             
@@ -292,6 +313,7 @@ routerAPI.get('/events/', //get all events
         console.log("count=" + err.body.count);
       });
       
+      });
       
       
     }
@@ -531,11 +553,22 @@ routerAPI.post('/groups/', //post group
         promises.push(db.newGraphBuilder()
           .create()
           .from('Users', req.user.username)
-          .related('joined')
+          .related('created')
           .to('Groups', result.path.key)
           .then(function (result2) {
             console.log("link created");
-            return true;
+            return result;
+          })
+          .then(function(result){
+            db.newGraphBuilder()
+              .create()
+              .from('Users', req.user.username)
+              .related('joined')
+              .to('Groups', result.path.key)
+              .then(function (result2) {
+                console.log("link created");
+                return true;
+              })
           })
         );
 
@@ -561,6 +594,62 @@ routerAPI.post('/groups/', //post group
       res.send(err); 
     });
   });
+  
+routerAPI.post('/groups/:group/members', //join group
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("join group " + req.params.group);
+    
+    db.newGraphBuilder() //CREATE USER > group LINK
+      .create()
+      .from('Users', req.user.username)
+      .related('joined')
+      .to('Groups', req.params.group)
+      .then(function (result) {
+        console.log("link created");
+        res.sendStatus(200);
+      });
+    db.newGraphBuilder() //CREATE GROUP > USER LINK
+      .create()
+      .from('Groups', req.params.match)
+      .related('members')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link created");
+        //res.sendStatus(200);
+      });
+  });
+  
+routerAPI.delete('/groups/:group/members', //leave group
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    console.log("user: ");
+    console.log(req.user.username);
+    console.log("leave group " + req.params.group);
+    
+    db.newGraphBuilder() //REMOVE USER > GROUP LINK
+      .remove()
+      .from('Users', req.user.username)
+      .related('joined')
+      .to('Groups', req.params.group)
+      .then(function (result) {
+        console.log("link removed");
+        res.sendStatus(200);
+      });
+    db.newGraphBuilder() //REMOVE GROUP > USER LINK
+      .remove()
+      .from('Groups', req.params.group)
+      .related('members')
+      .to('Users', req.user.username)
+      .then(function (result) {
+        console.log("link removed");
+        //res.sendStatus(200);
+      });
+    
+  });
+  
   
 ////REPEATING EVENT MANAGEMENT
 

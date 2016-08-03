@@ -1,10 +1,10 @@
-<div class="panel panel-primary">
-    <div class="panel-body">
+<div class="panel panel-default">
+    <div class="panel-heading">
         <div class="row">
             <div class="col-md-6">
                 List of <b>repeating</b> events (event templates)</div>
             <div class="col-md-6 text-right">
-                <a href="/events" role="button" ng-if="user.admin" role="button" class="btn btn-default">View events</a> 
+                <a href="/events" role="button" ng-if="user.admin" role="button" class="btn btn-primary">View events</a> 
                 <input type="button" ng-hide="showAddEvent" ng-click="addEvent()" role="button" class="btn btn-success" value="Add event">
                 <a role="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-default">Close</a>
             </div>
@@ -62,7 +62,7 @@
 </div>
     
     <div ng-show="eventlist3">
-        <h3 class="text-danger">Repeating Event Templates</h3>
+        <h4>Repeating Event Templates</h4>
     <table class="table table-hover"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
@@ -89,23 +89,23 @@
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="rep in eventlist3" style="cursor: pointer;">
-            <td ng-click="goRepeat(rep.path.key)">
+        <tr ng-repeat="rep in eventlist3">
+            <td>
                 {{rep.value.name}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)">
+            <td>
                 {{rep.value.repeat}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)">
+            <td>
                 {{rep.value.date | dateFilter:"Do MMM YYYY"}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)">
+            <td>
                 {{rep.value.time | dateFilter:"HH:mm"}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)">
+            <td>
                 {{rep.value.venue}}
             </td>
-            <td ng-click="goRepeat(rep.path.key)">
+            <td>
                 {{rep.value.description}}
             </td>
             <td>

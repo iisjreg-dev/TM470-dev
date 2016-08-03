@@ -22,7 +22,8 @@
    
    <!-- Custom styles for this template -->
    <link href="stylesheets/style.css" rel="stylesheet">
-   <link href="stylesheets/ct-paper.css" rel="stylesheet">
+   <!-- <link href="stylesheets/ct-paper.css" rel="stylesheet"> -->
+   <link href="bower_components/flat-ui/dist/css/flat-ui.min.css" rel="stylesheet">
    
    
 
@@ -30,7 +31,7 @@
 
 <body ng-controller="BodyController">
 
-   <nav class="navbar navbar-ct-info">
+   <nav class="navbar navbar-inverse navbar-fixed-top">
       <div ng-cloak class="container ng-cloak">
          <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -47,15 +48,13 @@
                <li><a href="/mymatches" data-toggle="collapse" data-target=".navbar-collapse.in">MY MATCHES</a></li>
                <li><a href="/groups" data-toggle="collapse" data-target=".navbar-collapse.in">GROUPS</a></li>
             </ul>
-            <form class="nav navbar-right" role="login">
-               <div ng-if="showlogin" class="navbar-form">
-                  <a href="/login" role="button" class="btn btn-success btn-fill" data-toggle="collapse" data-target=".navbar-collapse.in">Log in</a> &nbsp; 
-                  <a href="/signup" role="button" class="btn btn-info btn-fill" data-toggle="collapse" data-target=".navbar-collapse.in">Sign Up</a>
+            <div class="nav navbar-nav navbar-right" role="login">
+               <div ng-if="showlogin">
+                  <a href="/login" role="button" class="btn btn-success navbar-btn btn-sm" data-toggle="collapse" data-target=".navbar-collapse.in">Log in</a> 
+                  <a href="/signup" role="button" class="btn btn-info navbar-btn btn-sm" data-toggle="collapse" data-target=".navbar-collapse.in">Sign Up</a>
                </div>
-               <div ng-show="user">
-                  <a ng-show="user.name" class="navbar-brand" href="/account">{{user.name}} <small><i class="glyphicon glyphicon-user"></i></small></a>  <a class="navbar-brand" href="" ng-click="logout()">(Log out)</a>
-               </div>
-            </form>
+               <p class="navbar-text navbar-right" ng-show="user.name"><a href="/account">{{user.name}} <small><i class="glyphicon glyphicon-user"></i></small></a> | <a href="" ng-click="logout()">Log out</a></p>
+            </div>
          </div>
          <!--/.navbar-collapse -->
       </div>
@@ -94,18 +93,14 @@
    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js "></script>
    
    <!--  Plugins -->
-	<script src="js/ct-paper-checkbox.js"></script>
-	<script src="js/ct-paper-radio.js"></script>
-	<script src="js/bootstrap-select.js"></script>
-	<script src="js/bootstrap-datepicker.js"></script>
+	<script src="bower_components/flat-ui/dist/js/flat-ui.min.js "></script>
 
-	<script src="js/ct-paper.js"></script> 
    
    <script>
       $(function() {
          $('[data-toggle="tooltip "]').tooltip()
       });
-
+      
    </script>
    <script src="bower_components/notie/dist/notie.js "></script>
    <script>

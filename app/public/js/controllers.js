@@ -150,6 +150,12 @@ angular.module('TM470.controllers', []).
       $http.get("/api/events")
       .then(function(response) {
         console.log(response.status);
+        if(response.status == 204){
+          $scope.eventlist = null;
+          $scope.eventlist2 = null;
+          $scope.noGroups = true;
+          return;
+        }
         var pastEvents = [];
         var futureEvents = [];
         if (typeof response.data.results !== 'undefined' && response.data.results.length > 0) {
@@ -262,9 +268,36 @@ angular.module('TM470.controllers', []).
       $scope.showAddGroup = true;
     };
     
-    $scope.go = function(key){
-      console.log("/groups/" + key);
-      $location.path("/groups/" + key);
+    $scope.joinGroup = function(key){
+      $http.post("/api/groups/" + key + "/members", $scope.user)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Joined group");
+          //$scope.group.inGroup = true;
+          //getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error joining group");
+          //$location.path("/login");
+          //show login
+        });
+    };
+    
+    $scope.leaveGroup = function(key){
+      $http.delete("/api/groups/" + key + "/members", $scope.user)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Left group");
+          //$scope.match.inMatch = false;
+          //getPlayers();
+        }, function(error){
+          console.log(error.data);
+          failure("Error leaving group");
+          //$location.path("/login");
+          //show login
+        });
     };
     
     $scope.submitForm = function(){

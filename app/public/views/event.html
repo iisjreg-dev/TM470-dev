@@ -1,12 +1,8 @@
-<div class="panel panel-primary">
-    <div class="panel-body">
+<div class="panel panel-default">
+    <div class="panel-heading">
         <div class="row">
             <div class="col-md-6">
-                Event Detail<br />
-                <small ng-show="eventDetail.name">
-                    Name: {{eventDetail.name}} ({{eventDetail.description}})<br/>
-                    Date: {{eventDetail.date | dateFilter:"Do MMM YYYY"}}, Time: {{eventDetail.time | dateFilter:"HH:mm"}}
-                </small>    
+                Event Details
             </div>
             <div class="col-md-6 text-right">
                 <button type="button" ng-click="deleteEvent()" role="button" class="btn btn-danger">Delete</button>
@@ -15,10 +11,16 @@
             </div>
         </div>
     </div>
-    
+    <div class="panel-body">
+        <small ng-show="eventDetail.name">
+            Name: <b>{{eventDetail.name}}</b> - {{eventDetail.description}}<br/>
+            Date: {{eventDetail.date | dateFilter:"Do MMM YYYY"}}, Time: {{eventDetail.time | dateFilter:"HH:mm"}}
+        </small> 
+        
+    </div>
     <!-- ADD MATCH FORM -->
     
-    <div class="panel-body" ng-show="showAddMatch">
+    <div class="panel-footer" ng-show="showAddMatch">
         <form name="addMatchForm" ng-submit="submitForm()">
             <div class="form-group">
                 <div class="row">
@@ -74,10 +76,9 @@
                                 <img class="img-responsive img-rounded" ng-src="{{gameDetail.thumbnail}}">
                             </div>
                             <div class="col-md-10">
-                                <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
                                 <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
-                                <small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
-                                <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span><br /><br />
+                                <div style="padding-bottom: 5px;"><small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
+                                <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></div>
                                 <div ng-hide="expand"><p ng-bind-html="gameDetail.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p></div>
                                 <div ng-show="expand"><p ng-bind-html="gameDetail.description"></p><p><a class="btn btn-xs btn-default" ng-click="expand = false;">Less</a></p></div>
                                 <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
@@ -86,11 +87,8 @@
                     </div>
                 </div>
             </div>
-            <div class="media">
-                <div class="media-body">
-                    <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">    
-                </div>
-                <div class="media-right"><button type="submit" class="btn btn-success btn-fill">Add</button></div>
+            <div class="text-right">
+                <button type="submit" class="btn btn-success">Add</button>
             </div>
         </form>
     </div>

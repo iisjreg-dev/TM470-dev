@@ -1,5 +1,5 @@
-<div class="panel panel-primary">
-    <div class="panel-body">
+<div class="panel panel-default">
+    <div class="panel-heading">
         <div class="row">
             <div class="col-md-6">
                 List of groups</div>
@@ -31,20 +31,22 @@
             <div class="form-group">
                 <div class="row">
                       <div class="col-md-6">
-                          <input type="text" name="website" placeholder="Website" ng-model="group.website" class="form-control">
+                          <div class="form-group has-feedback">
+                              <span class="form-control-feedback fui-window"></span>
+                              <input type="text" name="website" placeholder="Website" ng-model="group.website" class="form-control">
+                          </div>
                       </div>
                       <div class="col-md-6">
                           <div class="form-group has-feedback">
-                              
+                              <span class="form-control-feedback fui-twitter"></span>
                               <input type="text" name="twitter" placeholder="Twitter" ng-model="group.twitter" class="form-control">
-                              <!-- <span class="glyphicon glyphicon-triangle-right form-control-feedback"></span> -->
                         </div>
                     </div>
                 </div>
             </div>
             <div class="form-group">
                 <div class="row">
-                      <div class="text-right">
+                      <div class="col-md-12 text-right">
                         <button type="submit" class="btn btn-success btn-fill">Create</button>
                     </div>
                 </div>
@@ -53,33 +55,43 @@
     </div>
 </div>
     <div ng-show="grouplist">
-        <h3>Groups</h3>
+        <h4>Groups</h4>
     <table class="table table-hover"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
-            <th class="col-sm-4">
+            <th class="col-sm-2">
                 Name
             </th>
-            <th class="col-sm-3">
+            <th class="col-sm-2">
                 Location
             </th>
-            <th class="col-sm-5">
+            <th class="col-sm-4">
                 Description
+            </th>
+            <th class="col-sm-3">
+                Website
+            </th>
+            <th class="col-sm-1">
+                
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="gr in grouplist" style="cursor: pointer;">
-            <td ng-click="go(gr.path.key)">
+        <tr ng-repeat="gr in grouplist">
+            <td>
                 {{gr.value.name}}
             </td>
-            <td ng-click="go(gr.path.key)">
+            <td>
                 {{gr.value.location}}
             </td>
-            <td ng-click="go(gr.path.key)">
+            <td>
                 {{gr.value.description}}
             </td>
-            <td ng-click="go(ev.path.key)">
-                <a ng-href="{{gr.value.website}}" target="_NEW">{{gr.value.website}}</a>
+            <td>
+                <small><a ng-href="{{gr.value.website}}" target="_NEW">{{gr.value.website}}</a></small>
+            </td>
+            <td class="text-right">
+                <a ng-show="!inGroup" ng-click="joinGroup(gr.path.key)" role="button" class="btn btn-success btn-sm">join</a>
+                <a ng-show="inGroup" ng-click="leaveGroup(gr.path.key)" role="button" class="btn btn-danger btn-sm">leave</a>
             </td>
         </tr>
         
