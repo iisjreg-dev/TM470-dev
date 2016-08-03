@@ -93,8 +93,8 @@ angular.module('TM470.controllers', []).
           console.log(data.status);
           if(data.status == 200){
             success("Signed up"); 
-            $location.path("/account");
-            location.reload();
+            $location.path("/login");
+            //window.location.reload();
             //UPDATE AUTH?
           }
         }, function(err){

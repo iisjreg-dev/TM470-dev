@@ -67,7 +67,7 @@ passport.use('signup', new SignupStrategy(
       "name": ""
     };
     console.log("signing up user : " + username);
-    db.get('Users', username) //TODO: need to make this .get() and use usernames as keys!!!
+    db.get('Users', username) 
     .then(function (result) {
       console.log('DB: ' + result.body.count + " results");
       if (result.body.count > 0){
@@ -99,20 +99,42 @@ passport.use('signup', new SignupStrategy(
     })
     .fail(function (result1) {
         console.log('DB FAIL: ' + result1.body.message);
+        if(result1.body.code == "items_not_found"){
+          console.log('Username is free for use');
+          db.put('Users', username, user)
+          .then(function () {
+            console.log("POST Success! ");
+            db.get('Users', username, null, { 'without_fields': ['value.password', 'value.salt']})
+            .then(function (result2) {
+              console.log("re-get - user: " + result2.body.username);
+              //    console.log(result2.body);
+              return cb(null, result2.body);
+            })
+            .fail(function (err2) {
+            console.log("GET FAIL:");
+            console.log(err2);
+            return cb(null, false, { message: 'GET FAIL:' + err2.body });
+          });
+          })
+          .fail(function (err) {
+            console.log("PUT FAIL:" + err.body);
+            return cb(null, false, { message: 'PUT FAIL:' + err.body });
+          });
+        }
         return cb(null, false, { message: 'DB FAIL: ' + result1.body.message});
     });
   })
 );
 
 passport.serializeUser(function(user, cb) {
-  console.log("serializeUser: " + user.username);
+  //console.log("serializeUser: " + user.username);
   //console.log(user);
   //console.log("key = " + user.username);
   cb(null, user.username);
 });
 
 passport.deserializeUser(function(id, cb) {
-  console.log("deserializeUser: " + id);
+  //console.log("deserializeUser: " + id);
   //console.log("id = " + id);
   db.get('Users', id, null, { 'without_fields': ['value.password', 'value.salt']})
     .then(function (result) {
@@ -243,7 +265,8 @@ routerAuth.get('/checkuser/:username', //check username is available - returns 2
       if(err.body.code == "items_not_found"){ //username not found
         res.sendStatus(200);
       }
-      console.log("error: ")
+      console.log("error: ");
+      console.error(err.body.code);
       //console.log(err.body);
     });
   });
