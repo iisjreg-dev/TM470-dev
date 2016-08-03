@@ -53,7 +53,7 @@
                   <a href="/login" role="button" class="btn btn-success navbar-btn btn-sm" data-toggle="collapse" data-target=".navbar-collapse.in">Log in</a> 
                   <a href="/signup" role="button" class="btn btn-info navbar-btn btn-sm" data-toggle="collapse" data-target=".navbar-collapse.in">Sign Up</a>
                </div>
-               <p class="navbar-text navbar-right" ng-show="user.name"><a href="/account">{{user.name}} <small><i class="glyphicon glyphicon-user"></i></small></a> | <a href="" ng-click="logout()">Log out</a></p>
+               <p class="navbar-text navbar-right" ng-show="user"><a href="/account">{{user.name}}<span ng-if="!user.name">Account</span> <small><i class="glyphicon glyphicon-user"></i></small></a> | <a href="" ng-click="logout()">Log out</a></p>
             </div>
          </div>
          <!--/.navbar-collapse -->
