@@ -56,7 +56,7 @@
 </div>
     <div ng-show="grouplist">
         <h4>Groups</h4>
-    <table class="table table-hover"> <!--change ng-show to also look at user object -->
+    <table class="table table-hover table-responsive"> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
             <th class="col-sm-2">
@@ -90,8 +90,8 @@
                 <small><a ng-href="{{gr.value.website}}" target="_NEW">{{gr.value.website}}</a></small>
             </td>
             <td class="text-right">
-                <a ng-show="!inGroup" ng-click="joinGroup(gr.path.key)" role="button" class="btn btn-success btn-sm">join</a>
-                <a ng-show="inGroup" ng-click="leaveGroup(gr.path.key)" role="button" class="btn btn-danger btn-sm">leave</a>
+                <a ng-show="!gr.value.inGroup" ng-click="joinGroup(gr.path.key)" role="button" class="btn btn-success btn-sm">join</a>
+                <a ng-show="gr.value.inGroup" ng-click="leaveGroup(gr.path.key)" role="button" class="btn btn-danger btn-sm">leave</a>
             </td>
         </tr>
         

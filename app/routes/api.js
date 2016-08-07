@@ -412,6 +412,7 @@ routerAPI.post('/events/', //post event
     console.log("user: ");
     console.log(req.user.username);
     console.log("add event " + req.body.name);
+    console.log("(req.body.group: " + req.body.group);
     db.post('Events', req.body)
     .then(function (result) {
       if(result.statusCode == "201"){
@@ -427,7 +428,7 @@ routerAPI.post('/events/', //post event
           .related('created')
           .to('Events', result.path.key)
           .then(function (result2) {
-            console.log("link created");
+            console.log("user link created");
             return true;
           })
         );
@@ -459,13 +460,14 @@ routerAPI.post('/events/', //post event
         Q.all(promises) //all promises are now complete (returned true), so send response
           .then(function (content) {
             res.status(201).send(result.path.key);
+            console.log("> done");
           })
           .fail(function (err) {
             console.log("promise error send: " + err);
           });
         
         
-        console.log("done");
+        
          
         //res.redirect("/events/" + result.path.key); //should change response for API usage
       }
@@ -482,6 +484,36 @@ routerAPI.post('/events/', //post event
 //GROUP MANAGEMENT
 
 
+routerAPI.get('/mygroups/', //get my groups
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    if(!req.user){
+      console.error("not logged in");
+      res.status(403).send("not logged in");
+    }
+    else{
+
+      var mygroups = [];
+      db.newGraphReader() //GET GROUPS
+        .get()
+        .from('Users', req.user.username)
+        .related('joined')
+        .then(function (groupResult) {
+          //console.log(groupResult.body.results);
+          if(groupResult.body.count == 0){
+            res.status(204).send("No groups joined");
+            console.log("no groups");
+            throw "no groups";
+          }
+          for(var a in groupResult.body.results){
+            mygroups.push(groupResult.body.results[a].value.name);
+          }
+          //console.log(mygroups);
+          res.send(mygroups);
+        });
+    }
+  });
+  
 routerAPI.get('/groups/', //get all groups
   //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){

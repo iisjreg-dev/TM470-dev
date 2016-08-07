@@ -144,8 +144,19 @@ angular.module('TM470.controllers', []).
   function ($scope, $http, $location) {
     $scope.event = {};
     $scope.showAddEvent = false;
+    $scope.config = {
+      itemsPerPage: 10
+    };
     
     //Load event list
+    function getGroups(){
+      $http.get("/api/mygroups")
+      .then(function(response) {
+        //console.log(response.data);
+        $scope.mygroups = response.data;
+        $scope.numGroups = response.data.length;
+      });
+    }
     function getEvents(){
       $http.get("/api/events")
       .then(function(response) {
@@ -187,6 +198,7 @@ angular.module('TM470.controllers', []).
       });
     }
     getEvents();
+    getGroups();
     
     $scope.addEvent = function(){
       $scope.event = {}; //clear addEvent form
@@ -199,6 +211,7 @@ angular.module('TM470.controllers', []).
     };
     
     $scope.submitForm = function(){
+      console.log("group: " + $scope.event.group);
       if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){ //all fields completed
         $http.post("/api/events", $scope.event)
         .then(function(data) {
@@ -242,14 +255,29 @@ angular.module('TM470.controllers', []).
   function ($scope, $http, $location) {
     $scope.group = {};
     $scope.showAddGroup = false;
-    
+
     //Load group list
     function getGroups(){
       $http.get("/api/groups")
       .then(function(response) {
         console.log(response.status);
         if (typeof response.data.results !== 'undefined' && response.data.results.length > 0) {
-          $scope.grouplist = response.data.results;
+          
+          $http.get("/api/mygroups")
+          .then(function(response2) {
+            //console.log(response2.data);
+            //$scope.mygroups = response2.data;
+            
+            for(var gr in response.data.results){
+              if(response2.data.indexOf(response.data.results[gr].value.name) > -1){
+                response.data.results[gr].value.inGroup = true;
+                //console.log(response.data.results[gr].value);
+              }
+            }
+            $scope.grouplist = response.data.results;
+          });
+          
+          
         }
         else{
           $scope.grouplist = null;
@@ -401,7 +429,9 @@ angular.module('TM470.controllers', []).
   controller('eventController', ['$scope', '$routeParams', '$http', '$location', //EVENT.HTML
   function($scope, $routeParams, $http, $location) {
     $scope.itemId = $routeParams.event;
-    
+    $scope.config = {
+      itemsPerPage: 20
+    };
     //get current event detail
     $http.get("/api/events/" + $scope.itemId)
     .then(function(response) {

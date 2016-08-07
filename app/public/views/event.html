@@ -1,13 +1,15 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 Event Details
             </div>
-            <div class="col-md-6 text-right">
-                <button type="button" ng-click="deleteEvent()" role="button" class="btn btn-danger">Delete</button>
-                <button type="button" ng-hide="showAddMatch" ng-click="addMatch()" role="button" class="btn btn-success">Add Match</button>
-                <button ng-show="showAddMatch" ng-click="showAddMatch = false" role="button" class="btn btn-default">Close</button>
+            <div class="col-md-2 text-right">
+                <button ng-if="user.admin" type="button" ng-click="deleteEvent()" role="button" class="btn btn-danger btn-block">Delete</button>
+            </div>
+            <div class="col-md-2 text-right">
+                <button type="button" ng-hide="showAddMatch" ng-click="addMatch()" role="button" class="btn btn-success btn-block">Add Match</button>
+                <button ng-show="showAddMatch" ng-click="showAddMatch = false" role="button" class="btn btn-default btn-block" style="margin-top: 0px;">Close</button>
             </div>
         </div>
     </div>
@@ -28,10 +30,15 @@
                         <div class="input-group">
                             <input type="text" name="name" placeholder="Game Name (search BoardGameGeek.com)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
                             <span class="input-group-addon" ng-click="checkGame()">
-                            <i ng-hide="checkingGame || match.id || notFound" class="glyphicon glyphicon-search" style="cursor: pointer;"></i>
-                            <i ng-if="checkingGame" class="glyphicon glyphicon-hourglass"></i>
-                            <i ng-if="match.id" ng-hide="checkingGame" class="glyphicon glyphicon-ok"></i>
-                            <i ng-if="notFound" ng-hide="checkingGame" class="glyphicon glyphicon-remove"></i></span>
+                                <i ng-hide="checkingGame || match.id || notFound" class="glyphicon glyphicon-search" style="cursor: pointer;"></i>
+                                <i ng-hide="checkingGame || match.id || notFound" style="cursor: pointer;">&nbsp;&nbsp;Search</i>
+                                <i ng-if="checkingGame" class="glyphicon glyphicon-hourglass"></i>
+                                <i ng-if="checkingGame">&nbsp;&nbsp;Checking</i>
+                                <i ng-if="match.id" ng-hide="checkingGame" class="glyphicon glyphicon-ok"></i>
+                                <i ng-if="match.id" ng-hide="checkingGame">&nbsp;&nbsp;Found</i>
+                                <i ng-if="notFound" ng-hide="checkingGame" class="glyphicon glyphicon-remove"></i>
+                                <i ng-if="notFound" ng-hide="checkingGame">&nbsp;&nbsp;Not found</i>
+                            </span>
                         </div>
                         <input type="hidden" name="BGGid" ng-model="match.id">
                     </div>
@@ -87,8 +94,10 @@
                     </div>
                 </div>
             </div>
-            <div class="text-right">
-                <button type="submit" class="btn btn-success">Add</button>
+            <div class="row">
+                <div class="col-md-2 col-md-offset-10 text-right">
+                    <button type="submit" class="btn btn-success btn-block">Add</button>
+                </div>
             </div>
         </form>
     </div>
@@ -96,36 +105,25 @@
 
 <!-- LIST OF MATCHES -->
 
-    <table ng-show="matchlist" class="table table-hover"> <!--change ng-show to look at user object? -->
+    <table ng-show="matchlist" class="table table-hover table-responsive" wt-responsive-table at-table at-paginated at-list="matchlist" at-config="config"> <!--change ng-show to look at user object? -->
         <thead>
-        <tr>
-            <th>
-                Game
-            </th>
-            <th class="col-sm-5">
-                Categories
-            </th>
-            <th>
-                # players
-            </th>
-            <th>
-                Interested Players
-            </th>
-        </tr>
         </thead>
-        <tr ng-repeat="mch in matchlist" style="cursor: pointer;">
-            <td ng-click="go(mch.path.key)">
-                <p>{{mch.value.game}}</p>
+        <tr style="cursor: pointer;">
+            <td at-attribute="game" at-title="Game" ng-click="go(item.path.key)">
+                <p>{{item.value.game}}</p>
             </td>
-            <td ng-click="go(mch.path.key)">
-                <span ng-repeat="cat in mch.value.catagories">{{cat.value}}&nbsp; </span>
+            <td class="col-sm-5" at-attribute="categories" at-title="Categories" ng-click="go(item.path.key)">
+                <span ng-repeat="cat in item.value.catagories">{{cat.value}}&nbsp; </span>
             </td>
-            <td ng-click="go(mch.path.key)">
-                {{mch.value.numPlayers}}
+            <td at-attribute="numPlayers" at-title="# players" ng-click="go(item.path.key)">
+                {{item.value.numPlayers}}
             </td>
-            <td ng-click="go(mch.path.key)">
-                <small>{{mch.value.players}}</small>
+            <td at-attribute="players" at-title="Interested Players" ng-click="go(item.path.key)">
+                <small>{{item.value.players}}</small>
             </td>
         </tr>
         
     </table>
+    <div class="pull-right" ng-if="matchlist.length > config.itemsPerPage">
+    <nav aria-label="Result Page navigation"><at-pagination at-list="matchlist" at-config="config"></at-pagination></nav>
+    </div>
