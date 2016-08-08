@@ -1,14 +1,17 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
-            <div class="col-md-8">
-                Match Details</div>
-            <div class="col-md-2 text-right">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-2">
                 <a ng-if="user.admin" role="button" ng-click="deleteMatch()" role="button" class="btn btn-danger btn-block">Delete</a>
             </div>
-            <div class="col-md-2 text-right">
-                <input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success btn-block" value="Show interest">
-                <input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger btn-block" value="Remove interest" style="margin-top: 0px;">
+            <div class="col-sm-2">
+                <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default btn-block">Go to event</a>
+            </div>
+            <div class="col-md-2">
+                <input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success btn-block" value="Join Match">
+                <input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger btn-block" value="Leave Match" style="margin-top: 0px;">
             </div>
         </div>
     </div>
@@ -20,12 +23,12 @@
             <div class="col-md-12">
                 <div class="row" ng-if="match">    
                     <div class="col-md-2">
-                        <img class="img-responsive img-rounded" ng-src="{{match.thumbnail}}">
+                        <img class="img-responsive img-rounded" style="margin-bottom: 10px;" ng-src="{{match.thumbnail}}">
                     </div>
                     <div class="col-md-10">
                         <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
-                        <h4 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <small><span class="text-success" ng-if="match.proposedBy">Proposed by {{match.proposedBy.name}}</span></small></h4>
-                        <small><i class="glyphicon glyphicon-user"></i> {{match.numPlayers}} </small>
+                        <h5 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <small><span class="text-success" ng-if="match.proposedBy">Proposed by {{match.proposedBy.name}}</span></small></h5>
+                        <small><span class="fui-user"></span> {{match.numPlayers}} </small>
                         <span class="label label-info" ng-repeat="link in match.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span><br /><br />
                         <div ng-hide="expand"><p ng-bind-html="match.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p> </div>
                         <div ng-show="expand"><p ng-bind-html="match.description"></p><p><a class="btn btn-xs btn-default" ng-click="expand = false;">Less</a></p></div>
@@ -37,21 +40,18 @@
     </div>
     
     
-    <div class="panel-body">
+    <div class="panel-footer">
         <div class="row">
-            <div class="col-sm-2">
-                <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default btn-block">Go to event</a>
-            </div>
-            <div class="col-sm-6">
+            <div class="col-sm-8">
 
             </div>
             <div class="col-sm-2 text-right">
-                <input ng-show="inMatch && !canBring" type="button" ng-click="canBringGame()" role="button" class="btn btn-default btn-block" value="I can bring this game">
-                <input ng-show="inMatch && canBring" type="button" ng-click="cannotBringGame()" role="button" class="btn btn-default btn-block" value="I can't bring this game" style="margin-top: 0px;">
+                <input ng-show="inMatch && !canBring" type="button" ng-click="canBringGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can bring game">
+                <input ng-show="inMatch && canBring" type="button" ng-click="cannotBringGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can't bring game" style="margin-top: 0px;">
             </div>
             <div class="col-sm-2 text-right">
-                <input ng-show="inMatch && !canTeach" type="button" ng-click="canTeachGame()" role="button" class="btn btn-default btn-block" value="I can teach this game">
-                <input ng-show="inMatch && canTeach" type="button" ng-click="cannotTeachGame()" role="button" class="btn btn-default btn-block" value="I can't teach this game" style="margin-top: 0px;">
+                <input ng-show="inMatch && !canTeach" type="button" ng-click="canTeachGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can teach game">
+                <input ng-show="inMatch && canTeach" type="button" ng-click="cannotTeachGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can't teach game" style="margin-top: 0px;">
             </div>
         </div>
         
@@ -60,7 +60,7 @@
 
 <!-- LIST OF PLAYERS -->
 
-    <table ng-if="playerList" class="table table-hover table-responsive">
+    <table ng-if="playerList" class="table table-responsive" wt-responsive-table>
         <thead>
         <tr>
             <th class="col-sm-8">
@@ -73,7 +73,7 @@
             </th>
         </tr>
         </thead>
-        <tr ng-repeat="ply in playerList" style="cursor: pointer;">
+        <tr ng-repeat="ply in playerList">
             <td>
                 <p>{{ply.value.name}}</p>
             </td>
@@ -82,7 +82,7 @@
                 <span ng-if="ply.value.canTeach" class="label label-info">Can teach game</span>
             </td>
             <td style="text-align: right">
-                <a ng-if="user.admin" ng-click="delete(ply)" role="button" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i></a>
+                <a ng-if="user.admin" ng-click="delete(ply)" role="button" class="btn btn-danger btn-xs"><i class="fui-cross"></i></a>
             </td>
         </tr>
         

@@ -1,16 +1,18 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
-            <div class="col-md-6">
-                List of <b>repeating</b> events (event templates)</div>
-            <div class="col-md-6 text-right">
-                <a href="/events" role="button" ng-if="user.admin" role="button" class="btn btn-primary">View events</a> 
-                <input type="button" ng-hide="showAddEvent" ng-click="addEvent()" role="button" class="btn btn-success" value="Add event">
-                <a role="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-default">Close</a>
+            <div class="col-md-8">
+            </div>
+            <div class="col-md-2">
+                <a href="/events" role="button" ng-if="user.admin" role="button" class="btn btn-primary btn-block">View events</a> 
+            </div>
+            <div class="col-md-2">
+                <input type="button" ng-hide="showAddEvent" ng-click="addEvent()" role="button" class="btn btn-success btn-block" value="Add event">
+                <a role="button" ng-show="showAddEvent" ng-click="showAddEvent = false" role="button" class="btn btn-default btn-block" style="margin-top: 0px;">Close</a>
             </div>
         </div>
     </div>
-    <div class="panel-body" ng-show="showAddEvent">
+    <div class="panel-footer" ng-show="showAddEvent">
         <form name="addEventForm" ng-submit="submitForm()">
             <div class="form-group">
                 <div class="row">
@@ -41,19 +43,30 @@
             </div>
             <div class="form-group">
                 <div class="row">
-                      <div class="col-md-5">
-                          <input type="hidden" name="showRepeating" placeholder="Group" ng-model="event.showRepeating" class="form-control" value="true">
-                          <input type="hidden" name="organisation" placeholder="Group" ng-model="event.organisation" class="form-control">
-                          <select name="repeat" ng-model="event.repeat" class="form-control has-success">
-                              <option value="daily">Repeat Daily</option>
-                              <option value="weekly">Repeat Weekly</option>
-                              <option value="monthly">Repeat Monthly</option>
-                          </select>
+                    <div class="col-md-6">
+                        <select name="group" ng-if="numGroups > 1" ng-model="event.group" ng-options="group for group in mygroups" class="form-control">
+                            <option value="">-- Select Group --</option>
+                        </select>
+                        <input ng-if="numGroups == 1" type="text" disabled=disabled name="group" ng-model="mygroups[0]" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="hidden" name="showRepeating" placeholder="Group" ng-model="event.showRepeating" class="form-control" value="true">
+                        <select name="repeat" ng-model="event.repeat" class="form-control has-success">
+                            <option value="">-- Select Frequency --</option>
+                            <option value="daily">Repeat Daily</option>
+                            <option value="weekly">Repeat Weekly</option>
+                            <option value="monthly">Repeat Monthly</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                      <div class="col-md-10">
+                          
                       </div>
-                      <div class="col-md-1 text-right"> 
-                      </div>
-                      <div class="col-md-6 text-right">
-                        <button type="submit" class="btn btn-success btn-fill">Add</button>
+                      <div class="col-md-2 text-right">
+                        <button type="submit" class="btn btn-success btn-block">Add</button>
                     </div>
                 </div>
             </div>
@@ -63,11 +76,14 @@
     
     <div ng-show="eventlist3">
         <h4>Repeating Event Templates</h4>
-    <table class="table table-hover table-responsive"> <!--change ng-show to also look at user object -->
+    <table class="table table-hover table-responsive" wt-responsive-table> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
-            <th class="col-sm-3">
+            <th class="col-sm-2">
                 Name
+            </th>
+            <th class="col-sm-1">
+                Group
             </th>
             <th class="col-sm-1">
                 Period
@@ -92,6 +108,9 @@
         <tr ng-repeat="rep in eventlist3">
             <td>
                 {{rep.value.name}}
+            </td>
+            <td>
+                {{rep.value.group}}
             </td>
             <td>
                 {{rep.value.repeat}}

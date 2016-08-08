@@ -1,15 +1,15 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="row">
-            <div class="col-md-6">
-                List of groups</div>
-            <div class="col-md-6 text-right">
-                <input type="button" ng-hide="showAddGroup" ng-click="addGroup()" role="button" class="btn btn-success" value="New Group">
-                <a role="button" ng-show="showAddGroup" ng-click="showAddGroup = false" role="button" class="btn btn-default">Close</a>
+            <div class="col-md-10">
+            </div>
+            <div class="col-md-2">
+                <input type="button" ng-hide="showAddGroup" ng-click="addGroup()" role="button" class="btn btn-success btn-block" value="New Group">
+                <a role="button" ng-show="showAddGroup" ng-click="showAddGroup = false" role="button" class="btn btn-default btn-block" style="margin-top: 0px;">Close</a>
             </div>
         </div>
     </div>
-    <div class="panel-body" ng-show="showAddGroup">
+    <div class="panel-footer" ng-show="showAddGroup">
         <form name="addGroupForm" ng-submit="submitForm()">
             <div class="form-group">
                 <div class="row">
@@ -46,8 +46,10 @@
             </div>
             <div class="form-group">
                 <div class="row">
-                      <div class="col-md-12 text-right">
-                        <button type="submit" class="btn btn-success btn-fill">Create</button>
+                    <div class="col-md-10">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-success btn-block">Create</button>
                     </div>
                 </div>
             </div>
@@ -56,7 +58,7 @@
 </div>
     <div ng-show="grouplist">
         <h4>Groups</h4>
-    <table class="table table-hover table-responsive"> <!--change ng-show to also look at user object -->
+    <table class="table table-hover table-responsive" wt-responsive-table> <!--change ng-show to also look at user object -->
         <thead>
         <tr>
             <th class="col-sm-2">
@@ -87,7 +89,7 @@
                 {{gr.value.description}}
             </td>
             <td>
-                <small><a ng-href="{{gr.value.website}}" target="_NEW">{{gr.value.website}}</a></small>
+                <a ng-if="gr.value.website" tooltip="{{gr.value.website}}" class="btn btn-sm btn-default" ng-href="{{gr.value.website}}" target="_NEW">Visit website</a>
             </td>
             <td class="text-right">
                 <a ng-show="!gr.value.inGroup" ng-click="joinGroup(gr.path.key)" role="button" class="btn btn-success btn-sm">join</a>

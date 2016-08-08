@@ -1,8 +1,23 @@
 <div class="panel panel-default">
-    <div class="panel-heading">
+    <div class="panel-body">
+        <div ng-show="eventDetail.name">
+            <div class="col-md-6">
+                <b>{{eventDetail.name}}</b><br>
+                {{eventDetail.description}}<br>
+                <div class="label label-xs label-info" ng-if="eventDetail.showRepeating"><small>{{eventDetail.repeat}}</small></div><br>
+                
+            </div>
+            <div class="col-md-6 text-right">
+                {{eventDetail.group}} <span class="fui-user"></span><br>
+                {{eventDetail.date | dateFilter:"Do MMM YYYY"}} <span class="fui-calendar"></span><br>
+                {{eventDetail.time | dateFilter:"HH:mm"}} <span class="fui-time"></span> 
+            </div> 
+        </div>
+    </div>
+    <div class="panel-footer">
         <div class="row">
             <div class="col-md-8">
-                Event Details
+                
             </div>
             <div class="col-md-2 text-right">
                 <button ng-if="user.admin" type="button" ng-click="deleteEvent()" role="button" class="btn btn-danger btn-block">Delete</button>
@@ -13,13 +28,7 @@
             </div>
         </div>
     </div>
-    <div class="panel-body">
-        <small ng-show="eventDetail.name">
-            Name: <b>{{eventDetail.name}}</b> - {{eventDetail.description}}<br/>
-            Date: {{eventDetail.date | dateFilter:"Do MMM YYYY"}}, Time: {{eventDetail.time | dateFilter:"HH:mm"}}
-        </small> 
-        
-    </div>
+    
     <!-- ADD MATCH FORM -->
     
     <div class="panel-footer" ng-show="showAddMatch">
@@ -30,13 +39,13 @@
                         <div class="input-group">
                             <input type="text" name="name" placeholder="Game Name (search BoardGameGeek.com)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
                             <span class="input-group-addon" ng-click="checkGame()">
-                                <i ng-hide="checkingGame || match.id || notFound" class="glyphicon glyphicon-search" style="cursor: pointer;"></i>
+                                <i ng-hide="checkingGame || match.id || notFound" class="fui-search" style="cursor: pointer;"></i>
                                 <i ng-hide="checkingGame || match.id || notFound" style="cursor: pointer;">&nbsp;&nbsp;Search</i>
-                                <i ng-if="checkingGame" class="glyphicon glyphicon-hourglass"></i>
+                                <i ng-if="checkingGame" class="fui-time"></i>
                                 <i ng-if="checkingGame">&nbsp;&nbsp;Checking</i>
-                                <i ng-if="match.id" ng-hide="checkingGame" class="glyphicon glyphicon-ok"></i>
+                                <i ng-if="match.id" ng-hide="checkingGame" class="fui-check"></i>
                                 <i ng-if="match.id" ng-hide="checkingGame">&nbsp;&nbsp;Found</i>
-                                <i ng-if="notFound" ng-hide="checkingGame" class="glyphicon glyphicon-remove"></i>
+                                <i ng-if="notFound" ng-hide="checkingGame" class="fui-cross"></i>
                                 <i ng-if="notFound" ng-hide="checkingGame">&nbsp;&nbsp;Not found</i>
                             </span>
                         </div>
@@ -84,7 +93,7 @@
                             </div>
                             <div class="col-md-10">
                                 <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
-                                <div style="padding-bottom: 5px;"><small><i class="glyphicon glyphicon-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
+                                <div style="padding-bottom: 5px;"><small><i class="fui-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
                                 <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></div>
                                 <div ng-hide="expand"><p ng-bind-html="gameDetail.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p></div>
                                 <div ng-show="expand"><p ng-bind-html="gameDetail.description"></p><p><a class="btn btn-xs btn-default" ng-click="expand = false;">Less</a></p></div>
@@ -104,7 +113,7 @@
 </div>
 
 <!-- LIST OF MATCHES -->
-
+<h4>List of Games</h4>
     <table ng-show="matchlist" class="table table-hover table-responsive" wt-responsive-table at-table at-paginated at-list="matchlist" at-config="config"> <!--change ng-show to look at user object? -->
         <thead>
         </thead>

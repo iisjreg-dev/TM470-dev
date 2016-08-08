@@ -357,6 +357,14 @@ angular.module('TM470.controllers', []).
     $scope.showAddEvent = false;
     
     //Load event list
+    function getGroups(){
+      $http.get("/api/mygroups")
+      .then(function(response) {
+        //console.log(response.data);
+        $scope.mygroups = response.data;
+        $scope.numGroups = response.data.length;
+      });
+    }
     function getEvents(){
       $http.get("/api/repeating")
       .then(function(response) {
@@ -369,7 +377,7 @@ angular.module('TM470.controllers', []).
       });
     }
     getEvents();
-    
+    getGroups();
     $scope.addEvent = function(){
       $scope.event = {}; //clear addEvent form
       $scope.showAddEvent = true;
@@ -381,7 +389,7 @@ angular.module('TM470.controllers', []).
     };
     
     $scope.submitForm = function(){
-      if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time){ //all fields completed
+      if($scope.event.name && $scope.event.description && $scope.event.date && $scope.event.time && $scope.event.group){ //all fields completed
         $http.post("/api/repeating", $scope.event)
         .then(function(data) {
           //console.log(data.status);
@@ -389,6 +397,7 @@ angular.module('TM470.controllers', []).
             $scope.event = {};
             success("Event added");
             console.log("success");
+            showAddEvent = false;
             getEvents();
           }
         }, function(err){
@@ -580,6 +589,7 @@ angular.module('TM470.controllers', []).
             $scope.showGameDetail = false;
             success("Match added");
             console.log("success");
+            showAddMatch = false;
             getMatches();
 
           }
