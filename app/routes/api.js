@@ -38,7 +38,7 @@ routerAPI.get('/bgg/user/:username', function(req, res, next) {
   .then(function(results){
     res.send("Name: " + results.user.firstname.value + " " + results.user.lastname.value);
     //res.sendStatus(200);
-    console.log(results);
+    //console.log(results);
 
   });
 });
@@ -64,7 +64,7 @@ routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for 
   
   var bgg = require('bgg')(options);
   var game = decodeURIComponent(req.params.game);
-  console.log(game);
+  //console.log(game);
   bgg('search', {query: game, type: 'boardgame'})
   .then(function(results){
     res.send(results.items);
@@ -72,7 +72,7 @@ routerAPI.get('/bgg/game/search/:game', function(req, res, next) { //search for 
     //console.log(results.items.item);
 
   }, function(error){
-    console.log(error);
+    console.error(error);
     res.sendStatus(500);
     return;
   });
@@ -108,7 +108,7 @@ routerAPI.get('/bgg/game/:type/:gameId', function(req, res, next) { //GET GAME D
       res.send(results.items.item);
     }
     else{
-      console.log(results);
+      //console.log(results);
       res.sendStatus(404);
     }
   });
@@ -123,7 +123,7 @@ routerAPI.get('/events/', //get all events
   //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
-      console.error("not logged in");
+      //console.error("not logged in");
       res.status(403).send("not logged in");
     }
     else{
@@ -143,7 +143,7 @@ routerAPI.get('/events/', //get all events
             groupSearch += '"' + groupResult.body.results[a].value.name + '"';
             if(a < groupResult.body.count - 1){ groupSearch += " OR "}
           }
-          console.log(groupSearch);
+          //console.log(groupSearch);
           return groupSearch;
           
         })
@@ -199,7 +199,7 @@ routerAPI.get('/events/', //get all events
                   newEvent = repeatResult.body.results[x].value; //COPY EVENT DATA FROM TEMPLATE
                   newDate = moment(repeatResult.body.results[x].value.date).add(1, period).toDate();
                   newEvent.date = newDate;
-                  console.log("new repeating event to be added for: " + repeatResult.body.results[x].value.name + " - " + newDate);
+                  console.info("new repeating event to be added for: " + repeatResult.body.results[x].value.name + " - " + newDate);
                   return newEvent; //pass event on to next then() function
                 }
                 else{
@@ -263,7 +263,7 @@ routerAPI.get('/events/', //get all events
                 }
               })
               .fail(function(err){
-                console.error(err);
+                console.log(">" + err);
                 return false; //FINAL PROMISE RETURN (FAIL)
               })
             );
@@ -282,9 +282,15 @@ routerAPI.get('/events/', //get all events
           
           //console.log("repeatPromises: ");
           //console.log(content);
-          console.log("list all events");
+          //console.log("list all events");
           //db.list('Events', {limit:100}) //will eventually change to accomodate multiple organisations - should change to a search!
-          db.search('Events', 'value.group: ' + groupSearch)
+          //db.search('Events', 'value.group: ' + groupSearch)
+          //console.log('value.group: ' + groupSearch);
+          db.newSearchBuilder()
+          .collection('Events')
+          .sort('date', 'asc')
+          .limit(100)
+          .query('value.group: ' + groupSearch)
           .then(function (result2) {
             //console.log(result.body);
             
@@ -299,9 +305,9 @@ routerAPI.get('/events/', //get all events
             res.send(result2.body); 
           })
           .fail(function (err) {
-            console.log("error : " + err.body.message);
-            console.log("count=" + err.body.count);
-            res.send(err); 
+            console.error("error : " + err.body.message);
+            console.error("count=" + err.body.count);
+            res.status(500).send(err); 
           });
         });
 
@@ -309,7 +315,7 @@ routerAPI.get('/events/', //get all events
 
       })
       .fail(function (err) {
-        console.log("error : " + err.body.message);
+        console.error("error : " + err.body.message);
         console.log("count=" + err.body.count);
       });
       
@@ -323,9 +329,9 @@ routerAPI.get('/events/', //get all events
 routerAPI.get('/events/:event', //get 1 event
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("get event " + req.params.event);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("get event " + req.params.event);
     db.get('Events', req.params.event)
     .then(function (result) {
       //console.log(result.body);
@@ -333,15 +339,15 @@ routerAPI.get('/events/:event', //get 1 event
       //console.log("count = " + result.body.count);
       //console.log(result.body.results[0].value.password);
       if(result.body.count == 0){ 
-        console.log("no events found");
+        console.error("event not found");
         res.status(404).send("no events found"); 
       }
-      console.log("done");
+      //console.log("done");
       result.body.eventKey = req.params.event;
       res.send(result.body); 
     })
     .fail(function (err) {
-      console.log("error : count=" + err.body.count);
+      console.error("error : count=" + err.body.count);
       res.send(err); 
     });
   });
@@ -349,9 +355,9 @@ routerAPI.get('/events/:event', //get 1 event
 routerAPI.delete('/events/:event', //delete event
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("delete event " + req.params.event);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("delete event " + req.params.event);
     
     
     //delete all matches for event
@@ -368,24 +374,24 @@ routerAPI.delete('/events/:event', //delete event
       .from('Events', req.params.event)
       .related('contains')
       .then(function (result) {
-        console.log("Matches for event: " + req.params.event);
+        //console.log("Matches for event: " + req.params.event);
         //console.log(result.body.results);
         //res.send(result.body.results);
         matches = result.body.results;
 
-        console.log("# matches: " + matches.length);
+        //console.log("# matches: " + matches.length);
         
         for(var i=0;i<matches.length;i++){
           var iMatch = matches[i].path.key;
-          console.log(i + " - " + iMatch);
+          //console.log(i + " - " + iMatch);
           db.remove('Matches', iMatch, true)
             .then(function (result) {
               //console.log(result.body);
               //console.log("match " + matches[i].path.key + " deleted");
-              console.log("deleted");
+              //console.log("deleted");
             })
             .fail(function (err) {
-              console.log("Match remove error : " + err);
+              console.error("Match remove error : " + err);
               res.send(err); 
             });
         }  
@@ -393,11 +399,11 @@ routerAPI.delete('/events/:event', //delete event
         //delete event 
         db.remove('Events', req.params.event, true)
         .then(function (result) {
-          console.log("event " + req.params.event + " deleted");
+          console.info("event " + req.params.event + " deleted");
           res.sendStatus(200); 
         })
         .fail(function (err) {
-          console.log("Event remove error : " + err);
+          console.error("Event remove error : " + err);
           res.send(err); 
         });
         
@@ -409,18 +415,18 @@ routerAPI.delete('/events/:event', //delete event
 routerAPI.post('/events/', //post event
   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("add event " + req.body.name);
-    console.log("(req.body.group: " + req.body.group);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("add event " + req.body.name);
+    //console.log("(req.body.group: " + req.body.group);
     db.post('Events', req.body)
     .then(function (result) {
       if(result.statusCode == "201"){
         
         var promises = [];
         
-        console.log("status: 201");
-        console.log("create link to user");
+        //console.log("status: 201");
+        //console.log("create link to user");
         
         promises.push(db.newGraphBuilder()
           .create()
@@ -428,16 +434,16 @@ routerAPI.post('/events/', //post event
           .related('created')
           .to('Events', result.path.key)
           .then(function (result2) {
-            console.log("user link created");
+            //console.log("user link created");
             return true;
           })
         );
         if(req.body.showRepeating){
-          console.log("create repeating event");
+          //console.log("create repeating event");
           promises.push(db.post('Repeating', req.body)
             .then(function (result2) {
-              console.log("repeat added");
-              console.log("create link to event");
+              //console.log("repeat added");
+              //console.log("create link to event");
               //return true;
               
               db.newGraphBuilder()
@@ -446,13 +452,13 @@ routerAPI.post('/events/', //post event
                 .related('events')
                 .to('Events', result.path.key)
                 .then(function (result3) {
-                  console.log("events link created");
+                  //console.log("events link created");
                   return true;
                 });
               
             })
             .fail(function (err) {
-              console.log("error " + err);
+              console.error("error " + err);
             })
           );
         }
@@ -460,10 +466,10 @@ routerAPI.post('/events/', //post event
         Q.all(promises) //all promises are now complete (returned true), so send response
           .then(function (content) {
             res.status(201).send(result.path.key);
-            console.log("> done");
+            //console.log("> done");
           })
           .fail(function (err) {
-            console.log("promise error send: " + err);
+            console.error("promise error send: " + err);
           });
         
         
@@ -476,7 +482,7 @@ routerAPI.post('/events/', //post event
       }
     })
     .fail(function (err) {
-      console.log("error");
+      console.error("error");
       res.send(err); 
     });
   });
@@ -488,7 +494,7 @@ routerAPI.get('/mygroups/', //get my groups
   //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
-      console.error("not logged in");
+      //console.error("not logged in");
       res.status(403).send("not logged in");
     }
     else{
@@ -502,7 +508,7 @@ routerAPI.get('/mygroups/', //get my groups
           //console.log(groupResult.body.results);
           if(groupResult.body.count == 0){
             res.status(204).send("No groups joined");
-            console.log("no groups");
+            //console.log("no groups");
             throw "no groups";
           }
           for(var a in groupResult.body.results){
@@ -518,7 +524,7 @@ routerAPI.get('/groups/', //get all groups
   //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
-      console.error("not logged in");
+      //console.error("not logged in");
       res.status(403).send("not logged in");
     }
     else{
@@ -527,13 +533,13 @@ routerAPI.get('/groups/', //get all groups
       .then(function (result2) {
 
         if(result2.body.count == 0){ 
-          console.log("no events found");
-          res.status(200).send("no events found"); 
+          //console.log("no events found");
+          res.status(200).send("no groups found"); 
         }
         res.send(result2.body); 
       })
       .fail(function (err) {
-        console.log("error : " + err.body.message);
+        console.error("error : " + err.body.message);
         console.log("count=" + err.body.count);
         res.send(err); 
       });
@@ -544,9 +550,9 @@ routerAPI.get('/groups/', //get all groups
 routerAPI.get('/groups/:group', //get 1 group
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("get group " + req.params.group);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("get group " + req.params.group);
     db.get('Groups', req.params.group)
     .then(function (result) {
       //console.log(result.body);
@@ -554,15 +560,15 @@ routerAPI.get('/groups/:group', //get 1 group
       //console.log("count = " + result.body.count);
       //console.log(result.body.results[0].value.password);
       if(result.body.count == 0){ 
-        console.log("no groups found");
+        console.error("Groups not found");
         res.status(404).send("no groups found"); 
       }
-      console.log("done");
+      //console.log("done");
       result.body.groupKey = req.params.group;
       res.send(result.body); 
     })
     .fail(function (err) {
-      console.log("error : count=" + err.body.count);
+      console.error("error : count=" + err.body.count);
       res.send(err); 
     });
   });
@@ -570,17 +576,17 @@ routerAPI.get('/groups/:group', //get 1 group
 routerAPI.post('/groups/', //post group
   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("add group " + req.body.name);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("add group " + req.body.name);
     db.post('Groups', req.body)
     .then(function (result) {
       if(result.statusCode == "201"){
         
         var promises = [];
         
-        console.log("status: 201");
-        console.log("create link to user");
+        //console.log("status: 201");
+        //console.log("create link to user");
         
         promises.push(db.newGraphBuilder()
           .create()
@@ -588,7 +594,7 @@ routerAPI.post('/groups/', //post group
           .related('created')
           .to('Groups', result.path.key)
           .then(function (result2) {
-            console.log("link created");
+            //console.log("link created");
             return result;
           })
           .then(function(result){
@@ -598,7 +604,7 @@ routerAPI.post('/groups/', //post group
               .related('joined')
               .to('Groups', result.path.key)
               .then(function (result2) {
-                console.log("link created");
+                //console.log("link created");
                 return true;
               })
           })
@@ -609,11 +615,11 @@ routerAPI.post('/groups/', //post group
             res.status(201).send(result.path.key);
           })
           .fail(function (err) {
-            console.log("promise error send: " + err);
+            console.error("promise error send: " + err);
           });
         
         
-        console.log("done");
+        //console.log("done");
          
         //res.redirect("/events/" + result.path.key); //should change response for API usage
       }
@@ -622,7 +628,7 @@ routerAPI.post('/groups/', //post group
       }
     })
     .fail(function (err) {
-      console.log("error");
+      console.error("error");
       res.send(err); 
     });
   });
@@ -630,9 +636,9 @@ routerAPI.post('/groups/', //post group
 routerAPI.post('/groups/:group/members', //join group
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("join group " + req.params.group);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("join group " + req.params.group);
     
     db.newGraphBuilder() //CREATE USER > group LINK
       .create()
@@ -640,26 +646,27 @@ routerAPI.post('/groups/:group/members', //join group
       .related('joined')
       .to('Groups', req.params.group)
       .then(function (result) {
-        console.log("link created");
-        res.sendStatus(200);
-      });
-    db.newGraphBuilder() //CREATE GROUP > USER LINK
-      .create()
-      .from('Groups', req.params.match)
-      .related('members')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link created");
+        //console.log("link created");
         //res.sendStatus(200);
+        db.newGraphBuilder() //CREATE GROUP > USER LINK
+        .create()
+        .from('Groups', req.params.match)
+        .related('members')
+        .to('Users', req.user.username)
+        .then(function (result) {
+          //console.log("link created");
+          res.sendStatus(200);
+          return true;
+        });
       });
   });
   
 routerAPI.delete('/groups/:group/members', //leave group
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("leave group " + req.params.group);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("leave group " + req.params.group);
     
     db.newGraphBuilder() //REMOVE USER > GROUP LINK
       .remove()
@@ -667,18 +674,19 @@ routerAPI.delete('/groups/:group/members', //leave group
       .related('joined')
       .to('Groups', req.params.group)
       .then(function (result) {
-        console.log("link removed");
-        res.sendStatus(200);
-      });
-    db.newGraphBuilder() //REMOVE GROUP > USER LINK
-      .remove()
-      .from('Groups', req.params.group)
-      .related('members')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link removed");
+        //console.log("link removed");
         //res.sendStatus(200);
+        db.newGraphBuilder() //REMOVE GROUP > USER LINK
+          .remove()
+          .from('Groups', req.params.group)
+          .related('members')
+          .to('Users', req.user.username)
+          .then(function (result) {
+            console.log("link removed");
+            res.sendStatus(200);
+          });
       });
+    
     
   });
   
@@ -689,26 +697,26 @@ routerAPI.get('/repeating', //get all repeating events
   //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
-      console.error("not logged in");
+      //console.error("not logged in");
       res.status(403).send("not logged in");
     }
     else{
-      console.log("list all repeating events");
+      //console.log("list all repeating events");
       db.list('Repeating') //will eventually change to accomodate multiple organisations
       .then(function (result2) {
         //console.log(result.body);
         
-        console.log("count = " + result2.body.count);
+        //console.log("count = " + result2.body.count);
         //console.log(result.body.results[0].value.password);
         if(result2.body.count == 0){ 
-          console.log("no events found");
+          //console.log("no events found");
           res.status(200).send("no events found"); 
         }
         //console.log("done");
         res.send(result2.body); 
       })
       .fail(function (err) {
-        console.log("error : count=" + err.body.count);
+        console.error("error : count=" + err.body.count);
         res.send(err); 
       });
     }
@@ -718,14 +726,14 @@ routerAPI.get('/repeating', //get all repeating events
 routerAPI.delete('/repeating/:event', //delete repeating event
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("delete event " + req.params.event);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("delete event " + req.params.event);
     
     //delete repeating event 
     db.remove('Repeating', req.params.event, true)
     .then(function (result) {
-      console.log("repeating event " + req.params.event + " deleted");
+      console.info("repeating event " + req.params.event + " deleted");
       res.sendStatus(200); 
     })
     .fail(function (err) {
@@ -742,13 +750,13 @@ routerAPI.get('/events/:event/matches/', //get all matches
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
-      console.error("not logged in");
+      //console.error("not logged in");
       res.status(403).send("not logged in");
     }
     else{
-      console.log("user: ");
-      console.log(req.user.username);
-      console.log("list all matches");
+      //console.log("user: ");
+      //console.log(req.user.username);
+      //console.log("list all matches");
       
       //NEED TO GRAPH SEARCH
       //res.sendStatus(503);
@@ -757,7 +765,7 @@ routerAPI.get('/events/:event/matches/', //get all matches
         .from('Events', req.params.event)
         .related('contains')
         .then(function (result) {
-          console.log("Matches for event: " + req.params.event);
+          //console.log("Matches for event: " + req.params.event);
           //console.log(result.body.results);
           //res.send(result.body.results);
           return result.body.results;
@@ -800,9 +808,9 @@ routerAPI.get('/events/:event/matches/', //get all matches
 routerAPI.get('/events/:event/matches/:match', //get 1 match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("get match " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("get match " + req.params.match);
     db.get('Matches', req.params.match)
     .then(function (result) {
       //console.log(result.body);
@@ -810,14 +818,14 @@ routerAPI.get('/events/:event/matches/:match', //get 1 match
       //console.log("count = " + result.body.count);
       //console.log(result.body.results[0].value.password);
       if(result.body.count == 0){ 
-        console.log("no matches found");
+        console.error("match not found");
         res.status(404).send("no matches found"); 
       }
-      console.log("done");
+      //console.log("done");
       res.send(result.body); 
     })
     .fail(function (err) {
-      console.log("error : count=" + err.body.count);
+      console.error("error : count=" + err.body.count);
       res.send(err); 
     });
   });
@@ -825,9 +833,9 @@ routerAPI.get('/events/:event/matches/:match', //get 1 match
 routerAPI.post('/events/:event/matches/:match/players', //join match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("join match " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("join match " + req.params.match);
     
     db.newGraphBuilder() //CREATE USER > MATCH LINK
       .create()
@@ -835,26 +843,27 @@ routerAPI.post('/events/:event/matches/:match/players', //join match
       .related('playing')
       .to('Matches', req.params.match)
       .then(function (result) {
-        console.log("link created");
+        //console.log("link created");
         //res.sendStatus(200);
+        db.newGraphBuilder() //CREATE MATCH > USER LINK
+          .create()
+          .from('Matches', req.params.match)
+          .related('players')
+          .to('Users', req.user.username)
+          .then(function (result) {
+            //console.log("link created");
+            res.sendStatus(200);
+          });
       });
-    db.newGraphBuilder() //CREATE MATCH > USER LINK
-      .create()
-      .from('Matches', req.params.match)
-      .related('players')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link created");
-        res.sendStatus(200);
-      });
+    
   });
   
 routerAPI.delete('/events/:event/matches/:match/players', //leave match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("leave match " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("leave match " + req.params.match);
     
     db.newGraphBuilder() //REMOVE USER > MATCH LINK
       .remove()
@@ -862,27 +871,28 @@ routerAPI.delete('/events/:event/matches/:match/players', //leave match
       .related('playing')
       .to('Matches', req.params.match)
       .then(function (result) {
-        console.log("link removed");
+        //console.log("link removed");
         //res.sendStatus(200);
+        db.newGraphBuilder() //REMOVE MATCH > USER LINK
+          .remove()
+          .from('Matches', req.params.match)
+          .related('players')
+          .to('Users', req.user.username)
+          .then(function (result2) {
+            //console.log("link removed");
+            res.sendStatus(200);
+          });
       });
-    db.newGraphBuilder() //REMOVE MATCH > USER LINK
-      .remove()
-      .from('Matches', req.params.match)
-      .related('players')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link removed");
-        res.sendStatus(200);
-      });
+    
     
   });
   
 routerAPI.post('/events/:event/matches/:match/bring', //bring game
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("bring game " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("bring game " + req.params.match);
     
     db.newGraphBuilder() //CREATE USER > MATCH BRING LINK
       .create()
@@ -890,26 +900,27 @@ routerAPI.post('/events/:event/matches/:match/bring', //bring game
       .related('canBring')
       .to('Matches', req.params.match)
       .then(function (result) {
-        console.log("link created");
+        //console.log("link created");
         //res.sendStatus(200);
+        db.newGraphBuilder() //CREATE MATCH BRING > USER LINK
+          .create()
+          .from('Matches', req.params.match)
+          .related('canBring')
+          .to('Users', req.user.username)
+          .then(function (result) {
+            //console.log("link created");
+            res.sendStatus(200);
       });
-    db.newGraphBuilder() //CREATE MATCH BRING > USER LINK
-      .create()
-      .from('Matches', req.params.match)
-      .related('canBring')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link created");
-        res.sendStatus(200);
       });
+    
   });
   
 routerAPI.delete('/events/:event/matches/:match/bring', //not bring a game
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("not bring game " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("not bring game " + req.params.match);
     
     db.newGraphBuilder() //REMOVE USER > MATCH BRING LINK
       .remove()
@@ -917,27 +928,28 @@ routerAPI.delete('/events/:event/matches/:match/bring', //not bring a game
       .related('canBring')
       .to('Matches', req.params.match)
       .then(function (result) {
-        console.log("link removed");
+        //console.log("link removed");
         //res.sendStatus(200);
+        db.newGraphBuilder() //REMOVE MATCH BRING > USER LINK
+          .remove()
+          .from('Matches', req.params.match)
+          .related('canBring')
+          .to('Users', req.user.username)
+          .then(function (result) {
+            //console.log("link removed");
+            res.sendStatus(200);
+          });
       });
-    db.newGraphBuilder() //REMOVE MATCH BRING > USER LINK
-      .remove()
-      .from('Matches', req.params.match)
-      .related('canBring')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link removed");
-        res.sendStatus(200);
-      });
+    
     
   });
   
 routerAPI.post('/events/:event/matches/:match/teach', //teach game
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("teach game " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("teach game " + req.params.match);
     
     db.newGraphBuilder() //CREATE USER > MATCH BRING LINK
       .create()
@@ -945,26 +957,27 @@ routerAPI.post('/events/:event/matches/:match/teach', //teach game
       .related('canTeach')
       .to('Matches', req.params.match)
       .then(function (result) {
-        console.log("link created");
+        //console.log("link created");
         //res.sendStatus(200);
+        db.newGraphBuilder() //CREATE MATCH BRING > USER LINK
+          .create()
+          .from('Matches', req.params.match)
+          .related('canTeach')
+          .to('Users', req.user.username)
+          .then(function (result) {
+            //console.log("link created");
+            res.sendStatus(200);
+          });
       });
-    db.newGraphBuilder() //CREATE MATCH BRING > USER LINK
-      .create()
-      .from('Matches', req.params.match)
-      .related('canTeach')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link created");
-        res.sendStatus(200);
-      });
+    
   });
   
 routerAPI.delete('/events/:event/matches/:match/teach', //not teach a game
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("not teach game " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("not teach game " + req.params.match);
     
     db.newGraphBuilder() //REMOVE USER > MATCH BRING LINK
       .remove()
@@ -972,33 +985,34 @@ routerAPI.delete('/events/:event/matches/:match/teach', //not teach a game
       .related('canTeach')
       .to('Matches', req.params.match)
       .then(function (result) {
-        console.log("link removed");
+        //console.log("link removed");
         //res.sendStatus(200);
+        db.newGraphBuilder() //REMOVE MATCH BRING > USER LINK
+          .remove()
+          .from('Matches', req.params.match)
+          .related('canTeach')
+          .to('Users', req.user.username)
+          .then(function (result) {
+            //console.log("link removed");
+            res.sendStatus(200);
+          });
       });
-    db.newGraphBuilder() //REMOVE MATCH BRING > USER LINK
-      .remove()
-      .from('Matches', req.params.match)
-      .related('canTeach')
-      .to('Users', req.user.username)
-      .then(function (result) {
-        console.log("link removed");
-        res.sendStatus(200);
-      });
+    
     
   });
   
 routerAPI.delete('/events/:event/matches/:match', //delete match
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
-    console.log("delete match " + req.params.match);
+    //console.log("user: ");
+    //console.log(req.user.username);
+    //console.log("delete match " + req.params.match);
     db.remove('Matches', req.params.match, true)
     .then(function (result) {
       res.sendStatus(200); 
     })
     .fail(function (err) {
-      console.log("error : " + err.body);
+      console.error("error : " + err.body);
       res.send(err.body); 
     });
   });
@@ -1006,52 +1020,54 @@ routerAPI.delete('/events/:event/matches/:match', //delete match
 routerAPI.post('/events/:event/matches/', //post match
   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
   function(req, res){
-    console.log("user: ");
-    console.log(req.user.username);
+    //console.log("user: ");
+    //console.log(req.user.username);
     console.log("add match " + req.body.game);
-    console.log(req.body);
+    //console.log(req.body);
     db.post('Matches', req.body)
-    .then(function (result) {
-      if(result.statusCode == "201"){
-        console.log("status: 201");
+    .then(function (matchResult) {
+      if(matchResult.statusCode == "201"){
+        console.log("match added");
         console.log("create links");
         console.log("user key: " + req.user.username);
         console.log("event key: " + req.params.event);
-        console.log("match key: " + result.path.key);
+        console.log("match key: " + matchResult.path.key);
         db.newGraphBuilder()
         .create()
         .from('Users', req.user.username)
         .related('created')
-        .to('Matches', result.path.key)
-        .then(function (res) {
+        .to('Matches', matchResult.path.key)
+        .then(function (userLinkResult) {
           console.log("user link created");
+          db.newGraphBuilder()
+            .create()
+            .from('Events', req.params.event)
+            .related('contains')
+            .to('Matches', matchResult.path.key)
+            .then(function (eventLinkResult) {
+              console.log("event link created");
+              res.status(201).send(matchResult.path.key);
+            })
+            .fail(function (err) {
+              console.error("event link error: " + err.body);
+              res.status(500).send("error: " + err.body);
+            });
         })
-        .fail(function (res) {
-          console.log("user link error");
+        .fail(function (err) {
+          console.error("user link error: " + err.body);
+          res.status(500).send("error: " + err.body);
         });
-        db.newGraphBuilder()
-        .create()
-        .from('Events', req.params.event)
-        .related('contains')
-        .to('Matches', result.path.key)
-        .then(function (res) {
-          console.log("event link created");
-        })
-        .fail(function (res) {
-          console.log("event link error");
-        });
-        console.log("done");
-        res.status(201).send(result.path.key); 
+        //console.log("done");
         //res.redirect("/events/" + result.path.key); //should change response for API usage
       }
       else{
-        res.status(result.statusCode).send("error");
+        res.status(matchResult.statusCode).send("error");
       }
     })
     .fail(function (err) {
-      console.log("error");
-      console.log(err);
-      res.status(500).send(err); 
+      console.log("other error");
+      console.error(err.body);
+      res.status(500).send(err.body); 
     });
   });
   
@@ -1059,13 +1075,13 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
-      console.error("not logged in");
+      //console.error("not logged in");
       res.status(403).send("not logged in");
     }
     else{
       //console.log("user: ");
       //console.log(req.user.username);
-      console.log("list all players");
+      //console.log("list all players");
       
       //NEED TO GRAPH SEARCH
       //res.sendStatus(503);
@@ -1102,7 +1118,7 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
               return true;
             })
             .fail(function (err) {
-              console.log("player error 1: " + err);
+              console.error("player error 1: " + err);
             })
           );
           
@@ -1126,7 +1142,7 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
               return true;
             })
             .fail(function (err) {
-              console.log("player error 2: " + err);
+              console.error("player error 2: " + err);
             })
           );
             
@@ -1139,7 +1155,7 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
             res.send(playerList);
           })
           .fail(function (err) {
-            console.log("player error send: " + err);
+            console.error("player error send: " + err);
           });
             
             
@@ -1152,20 +1168,20 @@ routerAPI.get('/mymatches', //get my matches
   require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
-      console.error("not logged in");
+      //console.error("not logged in");
       res.status(403).send("not logged in");
     }
     else{
-      console.log("user: ");
-      console.log(req.user.username);   
-      console.log("list my matches");
+      //console.log("user: ");
+      //console.log(req.user.username);   
+      //console.log("list my matches");
       
       var matches = db.newGraphReader()
         .get()
         .from('Users', req.user.username)
         .related('playing')
         .then(function (result) {
-          console.log(result.body.count);
+          //console.log(result.body.count);
           return result.body.results;
         })
         .then(function (matchlist){
@@ -1181,7 +1197,7 @@ routerAPI.get('/mymatches', //get my matches
                 return event; //return it to the promise
               })
               .fail(function (err) {
-                console.log("event error : " + err);
+                console.error("event error : " + err);
               })
             );
             
@@ -1198,7 +1214,7 @@ routerAPI.get('/mymatches', //get my matches
                 return playerNames.join(", ");
               })
               .fail(function (err) {
-                console.log("player error : " + err);
+                console.error("player error : " + err);
               })
             );
             
@@ -1228,7 +1244,7 @@ routerAPI.get('/mymatches', //get my matches
             res.send(matchlist);
           })
           .fail(function (err) {
-            console.log("player error : " + err);
+            console.error("player error : " + err);
           });
           
           return true;

@@ -25,6 +25,7 @@ git.short(function (str) {
 
 //do not log
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(express.static(path.join(__dirname, 'public'))); //NOT SURE WHETHER TO LOG PUBLIC FILE ACCESS
 
 //logging
 
@@ -91,7 +92,7 @@ app.use(helmet());
 //     next();
 // });
 
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/auth', auth);
 app.use('/api', api);

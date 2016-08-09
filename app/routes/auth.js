@@ -16,7 +16,7 @@ passport.use('local', new Strategy(
   function(username, password, cb) {
     db.get('Users', username)
     .then(function (result) {
-      console.log("authenticating...");
+      //console.log("authenticating...");
       var user = result.body;
       // console.log("DB username:");
       // console.log(result.body.username);
@@ -32,14 +32,14 @@ passport.use('local', new Strategy(
       //check salt and hashhashedPW(password,user.salt)
       var theHash = hashedPW(password,user.salt);
       if(user.password != theHash) { 
-        console.log("password incorrect");
+        console.error("password incorrect");
         return cb(null, false, { message: 'Incorrect password.' }); 
       }
-      console.log("done");
+      //console.log("done");
       return cb(null, user);
     })
     .fail(function (err) {
-      console.log("error : " + err);
+      console.error("error : " + err);
       //return cb(err); //DB failure may not be error, therefore handle as normal
       var dbErr = "DB failure: " + err;
       return cb(null, false, { message: dbErr }); 
@@ -66,58 +66,58 @@ passport.use('signup', new SignupStrategy(
       "snippet": "",
       "name": ""
     };
-    console.log("signing up user : " + username);
+    //console.log("signing up user : " + username);
     db.get('Users', username) 
     .then(function (result) {
-      console.log('DB: ' + result.body.count + " results");
+      //console.log('DB: ' + result.body.count + " results");
       if (result.body.count > 0){
-        console.log("username already exists");
+        //console.log("username already exists");
         return cb(null, false, { message: 'username already exists' });
       }
       if (result.body.count == 0){
-        console.log('Username is free for use');
+        //console.log('Username is free for use');
         db.put('Users', username, user)
         .then(function () {
-          console.log("POST Success! ");
+          //console.log("POST Success! ");
           db.get('Users', username, null, { 'without_fields': ['value.password', 'value.salt']})
           .then(function (result2) {
-            console.log("re-get - user: " + result2.body.username);
+            //console.log("re-get - user: " + result2.body.username);
             //    console.log(result2.body);
             return cb(null, result2.body);
           })
           .fail(function (err2) {
-          console.log("GET FAIL:");
-          console.log(err2);
+          console.error("GET FAIL:");
+          console.error(err2);
           return cb(null, false, { message: 'GET FAIL:' + err2.body });
         });
         })
         .fail(function (err) {
-          console.log("PUT FAIL:" + err.body);
+          console.error("PUT FAIL:" + err.body);
           return cb(null, false, { message: 'PUT FAIL:' + err.body });
         });
       }
     })
     .fail(function (result1) {
-        console.log('DB FAIL: ' + result1.body.message);
+        //console.log('DB FAIL: ' + result1.body.message);
         if(result1.body.code == "items_not_found"){
-          console.log('Username is free for use');
+          //console.log('Username is free for use');
           db.put('Users', username, user)
           .then(function () {
-            console.log("POST Success! ");
+            //console.log("POST Success! ");
             db.get('Users', username, null, { 'without_fields': ['value.password', 'value.salt']})
             .then(function (result2) {
-              console.log("re-get - user: " + result2.body.username);
+              //console.log("re-get - user: " + result2.body.username);
               //    console.log(result2.body);
               return cb(null, result2.body);
             })
             .fail(function (err2) {
-            console.log("GET FAIL:");
-            console.log(err2);
+            console.error("GET FAIL:");
+            console.error(err2);
             return cb(null, false, { message: 'GET FAIL:' + err2.body });
           });
           })
           .fail(function (err) {
-            console.log("PUT FAIL:" + err.body);
+            console.error("PUT FAIL:" + err.body);
             return cb(null, false, { message: 'PUT FAIL:' + err.body });
           });
         }
@@ -142,7 +142,7 @@ passport.deserializeUser(function(id, cb) {
       return cb(null, result.body);
     })
     .fail(function (err) {
-      console.log("error : count=" + err);
+      console.error("error : count=" + err);
       return cb(err);
     });
 });
@@ -154,13 +154,13 @@ passport.deserializeUser(function(id, cb) {
 /* login POST test. This should be changed to allow RESTful authentication via Angular*/
 routerAuth.post('/login', 
   function(req, res, next){
-    console.log("signing in");
-    console.log(req.body.username);
+    //console.log("signing in");
+    //console.log(req.body.username);
     next();
   },
   passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
-    console.log("login done");
+    //console.log("login done");
     //console.log(req.user);
     console.log("Login Success! user = " + req.user.username);
     // if(req.session.returnTo){ 
@@ -174,9 +174,9 @@ routerAuth.post('/login',
 routerAuth.post('/signup', 
   passport.authenticate('signup', { failureRedirect: '/signup', failureFlash: true }),
   function(req, res) {
-    console.log("signup done");
+    //console.log("signup done");
     //console.log(req.user);
-    console.log("Signup Success! user = " + req.user.username);
+    console.info("Signup Success! user = " + req.user.username);
     // if(req.session.returnTo){ 
     //   res.redirect(req.session.returnTo); 
     // }
@@ -191,7 +191,7 @@ routerAuth.post('/update',
     //console.log(req.body); 
     //var update = JSON.parse(Object.keys(req.body)[0]);
     if(req.user){
-      console.log("update " + req.user.username + "/" + req.body.username);
+      //console.log("update " + req.user.username + "/" + req.body.username);
       if(req.body.password){
         //hash and salt
         //var buf = crypto.randomBytes(256);
@@ -206,12 +206,12 @@ routerAuth.post('/update',
         .apply()
         .then(function (result) {
             // All changes were applied successfully
-            console.log("update success");
+            //console.log("update success");
             res.sendStatus(200);
         })
         .fail(function (err) {
             // No changes were applied
-            console.log(err.body);
+            console.error(err.body);
             res.sendStatus(500);
         });
       }
@@ -223,12 +223,12 @@ routerAuth.post('/update',
         .then(function (result) {
             // All changes were applied successfully
             //console.log(result);
-            console.log("update success");
+            //console.log("update success");
             res.sendStatus(200);
         })
         .fail(function (err) {
             // No changes were applied
-            console.log(err.body);
+            console.error(err.body);
             res.sendStatus(500);
         });
       }
@@ -252,12 +252,12 @@ routerAuth.get('/checkuser/:username', //check username is available - returns 2
   function(req, res){
     db.get('Users', decodeURIComponent(req.params.username))
     .then(function (result) {
-      console.log('DB success: Users key found');
+      //console.log('DB success: Users key found');
       if (result.body.username){ //username already exists
         res.sendStatus(406);// Not Acceptable
       }
       else{ //result is not a user, i.e. no result
-        console.log(result.body);
+        //console.log(result.body);
         res.sendStatus(200);
       }
     })
@@ -265,7 +265,7 @@ routerAuth.get('/checkuser/:username', //check username is available - returns 2
       if(err.body.code == "items_not_found"){ //username not found
         res.sendStatus(200);
       }
-      console.log("error: ");
+      //console.log("error: ");
       console.error(err.body.code);
       //console.log(err.body);
     });
@@ -280,13 +280,13 @@ routerAuth.get('/logout',
 routerAuth.get('/', //sends 200 status if logged in
   function(req, res) {
     if(req.user){
-      console.log("user exists: " + req.user.value.name);
+      //console.log("user exists: " + req.user.value.name);
       res.sendStatus(200);
       //res.send(req.user.value.name + " - " + req.user.value.snippet);
       
     }
     else{
-      console.error("user does not exist");
+      //console.error("user does not exist");
       res.status(401).send("user does not exist");
     }
   });
@@ -297,7 +297,7 @@ routerAuth.get('/user', //returns user object
       res.send(req.user);
     }
     else{
-      console.error("user does not exist");
+      //console.error("user does not exist");
       res.status(401).send("user does not exist");
     }
   });

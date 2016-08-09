@@ -40,18 +40,18 @@
     </div>
     
     
-    <div class="panel-footer">
+    <div class="panel-footer" ng-show="inMatch">
         <div class="row">
             <div class="col-sm-8">
 
             </div>
             <div class="col-sm-2 text-right">
-                <input ng-show="inMatch && !canBring" type="button" ng-click="canBringGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can bring game">
-                <input ng-show="inMatch && canBring" type="button" ng-click="cannotBringGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can't bring game" style="margin-top: 0px;">
+                <input ng-show="!canBring" type="button" ng-click="canBringGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can bring game">
+                <input ng-show="canBring" type="button" ng-click="cannotBringGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can't bring game" style="margin-top: 0px;">
             </div>
             <div class="col-sm-2 text-right">
-                <input ng-show="inMatch && !canTeach" type="button" ng-click="canTeachGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can teach game">
-                <input ng-show="inMatch && canTeach" type="button" ng-click="cannotTeachGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can't teach game" style="margin-top: 0px;">
+                <input ng-show="!canTeach" type="button" ng-click="canTeachGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can teach game">
+                <input ng-show="canTeach" type="button" ng-click="cannotTeachGame()" role="button" class="btn btn-sm btn-default btn-block" value="Can't teach game" style="margin-top: 0px;">
             </div>
         </div>
         

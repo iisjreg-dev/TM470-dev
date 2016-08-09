@@ -220,6 +220,7 @@ angular.module('TM470.controllers', []).
             $scope.event = {};
             success("Event added");
             console.log("success");
+            $scope.showAddEvent = false;
             getEvents();
           }
         }, function(err){
@@ -337,6 +338,7 @@ angular.module('TM470.controllers', []).
             $scope.group = {};
             success("Group created");
             console.log("success");
+            $scope.showAddGroup = false;
             getGroups();
           }
         }, function(err){
@@ -397,7 +399,7 @@ angular.module('TM470.controllers', []).
             $scope.event = {};
             success("Event added");
             console.log("success");
-            showAddEvent = false;
+            $scope.showAddEvent = false;
             getEvents();
           }
         }, function(err){
@@ -589,7 +591,7 @@ angular.module('TM470.controllers', []).
             $scope.showGameDetail = false;
             success("Match added");
             console.log("success");
-            showAddMatch = false;
+            $scope.showAddMatch = false;
             getMatches();
 
           }
@@ -842,6 +844,7 @@ angular.module('TM470.controllers', []).
           //$scope.match = response.data;
           success("Joined match");
           $scope.match.inMatch = true;
+          $scope.inMatch = true;
           getPlayers();
         }, function(error){
           console.log(error.data);
@@ -858,6 +861,7 @@ angular.module('TM470.controllers', []).
           //$scope.match = response.data;
           success("Left match");
           $scope.match.inMatch = false;
+          $scope.inMatch = false;
           getPlayers();
         }, function(error){
           console.log(error.data);
