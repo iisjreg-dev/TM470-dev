@@ -157,23 +157,25 @@ routerAPI.get('/events/', //get all events
       .then(function (repeatResult) {
         //console.log(repeatResult.body);
         var repeatPromises = [];
+
         //console.log("count = " + repeatResult.body.count);
         //console.log(repeatResult.body.results[0].value.password);
         if(repeatResult.body.count > 0){ 
           //console.log("repeating:" + repeatResult.body.count);
           for(var x in repeatResult.body.results){ //GO THROUGH ALL RECORDS
-            //console.info("repeating: " + x + " - " + repeatResult.body.results[x].value.name + "; " + repeatResult.body.results[x].path.key);
+            //console.info("repeating: x=" + x + " - " + repeatResult.body.results[x].value.name + "; " + repeatResult.body.results[x].path.key);
             //console.info(repeatResult.body.results[x].value.repeat);
-            repeatPromises.push(db.newGraphReader() //GET ALL LINKED EVENTS
+            repeatPromises.push((function (item){
+              db.newGraphReader() //GET ALL LINKED EVENTS
               .get()
-              .from('Repeating', repeatResult.body.results[x].path.key)
+              .from('Repeating', item.path.key)
               .related('events')
               .then(function (eventResult) {
                 //console.log("result3: ");
                 //console.log(result3.body.results);
                 var newEvent = {};
                 var newDate = "";
-                var repeat = repeatResult.body.results[x].value.repeat;
+                var repeat = item.value.repeat;
                 var period = "";
                 if(repeat == "daily"){ period = "d";}
                 else if(repeat == "weekly"){ period = "w";}
@@ -181,14 +183,14 @@ routerAPI.get('/events/', //get all events
                 
                 if (typeof eventResult.body.results !== 'undefined' && eventResult.body.results.length > 0) {
                   var eventExists = false;
-                  console.info("checking events...");
+                  //console.info("checking events...");
                   for(var i in eventResult.body.results){ //GO THROUGH ALL EVENTS
-                    console.info("event " + eventResult.body.results[i].value.name + " - " + eventResult.body.results[i].value.date);
+                    //console.info("event i=" + i + ": " + eventResult.body.results[i].value.name + " - " + eventResult.body.results[i].value.date);
                     
                     var theDate = moment(eventResult.body.results[i].value.date);
                     var now = moment();
                     if(now.isBefore(theDate.subtract(1, "d"))){ //CHECK TO SEE IF AN EVENT EXISTS IN THE FUTURE (NOT INCLUDING TODAY)
-                      console.info("event " + eventResult.body.results[i].value.name + " - future event found");
+                      //console.info("event " + eventResult.body.results[i].value.name + " - future event found");
                       eventExists = true;
                     }
                   }
@@ -196,10 +198,10 @@ routerAPI.get('/events/', //get all events
                 }
                 //console.log("eventExists: " + eventExists);
                 if(!eventExists){ //NO FUTURE EVENT SO CREATE ONE
-                  newEvent = repeatResult.body.results[x].value; //COPY EVENT DATA FROM TEMPLATE
-                  newDate = moment(repeatResult.body.results[x].value.date).add(1, period).toDate();
+                  newEvent = item.value; //COPY EVENT DATA FROM TEMPLATE
+                  newDate = moment(item.value.date).add(1, period).toDate();
                   newEvent.date = newDate;
-                  console.info("new repeating event to be added for: " + repeatResult.body.results[x].value.name + " - " + newDate);
+                  console.info("new repeating event to be added for x=" + x + ": " + item.value.name + " - " + newDate);
                   return newEvent; //pass event on to next then() function
                 }
                 else{
@@ -229,7 +231,7 @@ routerAPI.get('/events/', //get all events
                 if(event){
                   return db.newGraphBuilder() //CREATE LINK FROM TEMPLATE TO EVENT
                   .create()
-                  .from('Repeating', repeatResult.body.results[x].path.key)
+                  .from('Repeating', item.path.key)
                   .related('events')
                   .to('Events', event.key)
                   .then(function (newEventLinkResult) {
@@ -246,7 +248,7 @@ routerAPI.get('/events/', //get all events
               })
               .then(function(event){
                 if(event){
-                  return db.newPatchBuilder('Repeating', repeatResult.body.results[x].path.key) // UPDATE TEMPLATE
+                  return db.newPatchBuilder('Repeating', item.path.key) // UPDATE TEMPLATE
                   .replace('date', event.date)
                   .apply()
                   .then(function (result) {
@@ -265,8 +267,8 @@ routerAPI.get('/events/', //get all events
               .fail(function(err){
                 console.log(">" + err);
                 return false; //FINAL PROMISE RETURN (FAIL)
-              })
-            );
+              });
+            })(repeatResult.body.results[x])); //PASS THE RESULT TO THE ANONYMOUS CLOSURE FUNCTION
               
           }
         }
@@ -425,7 +427,7 @@ routerAPI.post('/events/', //post event
         
         var promises = [];
         
-        //console.log("status: 201");
+        console.log("Event added");
         //console.log("create link to user");
         
         promises.push(db.newGraphBuilder()
@@ -442,7 +444,7 @@ routerAPI.post('/events/', //post event
           //console.log("create repeating event");
           promises.push(db.post('Repeating', req.body)
             .then(function (result2) {
-              //console.log("repeat added");
+              console.log(" > repeat event");
               //console.log("create link to event");
               //return true;
               
