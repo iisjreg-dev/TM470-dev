@@ -27,7 +27,7 @@
                     </div>
                     <div class="col-md-10">
                         <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
-                        <h5 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <small><span class="text-success" ng-if="match.proposedBy">Proposed by {{match.proposedBy.name}}</span></small></h5>
+                        <h5 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <small><span class="text-success" ng-if="match.proposedBy.name">Proposed by {{match.proposedBy.name}}</span></small></h5>
                         <p><span class="fui-user"></span> {{match.numPlayers}} | <span class="label label-info" ng-repeat="link in match.catagories"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></p>
                         <p ng-if="match.notes"><b>Match Notes:</b> <i>{{match.notes}}</i></p>
                         <div ng-hide="expand"><p ng-bind-html="match.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p> </div>

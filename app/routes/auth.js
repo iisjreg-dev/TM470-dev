@@ -167,7 +167,12 @@ routerAuth.post('/login',
     //   res.redirect(req.session.returnTo); 
     // }
     // else{
+    if(req.user.name){
       res.redirect('/events'); //TODO: Change to status
+    }
+    else{
+      res.redirect('/account');
+    }
     // }
   });
   
