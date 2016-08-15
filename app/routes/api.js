@@ -658,7 +658,7 @@ routerAPI.post('/groups/:group/members', //join group
         .then(function (result) {
           //console.log("link created");
           res.sendStatus(200);
-          return true;
+          //return true;
         });
       });
   });
@@ -1019,6 +1019,59 @@ routerAPI.delete('/events/:event/matches/:match', //delete match
     });
   });
   
+routerAPI.post('/events/:event/matches/:match/comments', //post comment
+  require('connect-ensure-login').ensureLoggedIn('/auth/login'),
+  function(req, res){
+    //console.log("user: ");
+    //console.log(req.user.username);
+    console.log("add comment " + req.params.event + "/" + req.params.match + "/" + req.user.username);
+    //console.log(req.body);
+    db.post('Comments', req.body)
+    .then(function (commentResult) {
+      if(commentResult.statusCode == "201"){
+        console.log("comment added");
+        console.log("create links");
+        console.log("comment key: " + commentResult.path.key);
+        db.newGraphBuilder()
+        .create()
+        .from('Users', req.user.username)
+        .related('posted')
+        .to('Comments', commentResult.path.key)
+        .then(function (userLinkResult) {
+          console.log("user link created");
+          db.newGraphBuilder()
+            .create()
+            .from('Matches', req.params.match)
+            .related('comments')
+            .to('Comments', commentResult.path.key)
+            .then(function (matchLinkResult) {
+              console.log("match link created");
+              res.status(201).send(commentResult.path.key);
+            })
+            .fail(function (err) {
+              console.error("match link error: " + err.body);
+              res.status(500).send("error: " + err.body);
+            });
+        })
+        .fail(function (err) {
+          console.error("user link error: " + err.body);
+          res.status(500).send("error: " + err.body);
+        });
+        //console.log("done");
+        //res.redirect("/events/" + result.path.key); //should change response for API usage
+      }
+      else{
+        res.status(commentResult.statusCode).send("error");
+      }
+    })
+    .fail(function (err) {
+      console.log("other error");
+      console.error(err.body);
+      res.status(500).send(err.body); 
+    });
+  });
+  
+  
 routerAPI.post('/events/:event/matches/', //post match
   require('connect-ensure-login').ensureLoggedIn('/auth/login'),
   function(req, res){
@@ -1071,6 +1124,26 @@ routerAPI.post('/events/:event/matches/', //post match
       console.error(err.body);
       res.status(500).send(err.body); 
     });
+  });
+  
+routerAPI.get('/events/:event/matches/:match/comments', //get comments
+  require('connect-ensure-login').ensureLoggedIn('/login'),
+  function(req, res){
+    if(!req.user){
+      //console.error("not logged in");
+      res.status(403).send("not logged in");
+    }
+    else{
+      db.newGraphReader()
+        .get()
+        .from('Matches', req.params.match)
+        .related('comments')
+        .then(function (result) {
+          //console.log(result.body.results);
+          //return result.body.results; //////////////////////
+          res.send(result.body.results);
+        });
+    }
   });
   
 routerAPI.get('/events/:event/matches/:match/players', //get players

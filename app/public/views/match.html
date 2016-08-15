@@ -6,7 +6,7 @@
             <div class="col-md-2">
                 <a ng-if="user.admin" role="button" ng-click="deleteMatch()" role="button" class="btn btn-danger btn-block">Delete</a>
             </div>
-            <div class="col-sm-2">
+            <div class="col-md-2">
                 <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default btn-block">Go to event</a>
             </div>
             <div class="col-md-2">
@@ -28,8 +28,8 @@
                     <div class="col-md-10">
                         <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
                         <h5 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <small><span class="text-success" ng-if="match.proposedBy">Proposed by {{match.proposedBy.name}}</span></small></h5>
-                        <small><span class="fui-user"></span> {{match.numPlayers}} </small>
-                        <span class="label label-info" ng-repeat="link in match.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span><br /><br />
+                        <p><span class="fui-user"></span> {{match.numPlayers}} | <span class="label label-info" ng-repeat="link in match.catagories"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></p>
+                        <p ng-if="match.notes"><b>Match Notes:</b> <i>{{match.notes}}</i></p>
                         <div ng-hide="expand"><p ng-bind-html="match.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p> </div>
                         <div ng-show="expand"><p ng-bind-html="match.description"></p><p><a class="btn btn-xs btn-default" ng-click="expand = false;">Less</a></p></div>
                         <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
@@ -38,7 +38,6 @@
             </div>
         </div>
     </div>
-    
     
     <div class="panel-footer" ng-show="inMatch">
         <div class="row">
@@ -56,6 +55,26 @@
         </div>
         
     </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="input-group">
+                    <input type="text" name="newComment" placeholder="Post Comment" ng-model="comment.newComment" class="form-control">
+                    <span class="input-group-btn">
+                        <a role="button" ng-click="postComment()" class="btn btn-sm btn-default btn-block">&nbsp;<span class="fui-bubble"></span>&nbsp;</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item" ng-repeat="comment in comments">
+                <small><b>{{comment.value.user.name}}</b>
+                ({{comment.value.datetime | dateFilter:"Do MMM YYYY"}} {{comment.value.datetime | dateFilter:"HH:mm"}})</small> - 
+                <i>{{comment.value.newComment}}</i>
+        </li>
+    </ul>
 </div>
 
 <!-- LIST OF PLAYERS -->

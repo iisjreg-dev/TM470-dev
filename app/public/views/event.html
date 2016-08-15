@@ -102,6 +102,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group has-feedback">
+                            <input type="text" name="notes" placeholder="Notes about the game" ng-model="match.notes" class="form-control">
+                            <span class="form-control-feedback fui-new"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-2 col-md-offset-10 text-right">
@@ -119,9 +127,12 @@
         </thead>
         <tr style="cursor: pointer;">
             <td at-attribute="game" at-title="Game" ng-click="go(item.path.key)">
-                <p>{{item.value.game}}</p>
+                <b>{{item.value.game}}</b>
             </td>
-            <td class="col-sm-5" at-attribute="categories" at-title="Categories" ng-click="go(item.path.key)">
+            <td at-attribute="notes" at-title="Notes" ng-click="go(item.path.key)">
+                <i>{{item.value.notes}}</i>
+            </td>
+            <td class="col-sm-4" at-attribute="categories" at-title="Categories" ng-click="go(item.path.key)">
                 <span ng-repeat="cat in item.value.catagories">{{cat.value}}&nbsp; </span>
             </td>
             <td at-attribute="numPlayers" at-title="# players" ng-click="go(item.path.key)">

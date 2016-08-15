@@ -304,7 +304,7 @@ angular.module('TM470.controllers', []).
           //$scope.match = response.data;
           success("Joined group");
           //$scope.group.inGroup = true;
-          //getPlayers();
+          getGroups();
         }, function(error){
           console.log(error.data);
           failure("Error joining group");
@@ -320,7 +320,7 @@ angular.module('TM470.controllers', []).
           //$scope.match = response.data;
           success("Left group");
           //$scope.match.inMatch = false;
-          //getPlayers();
+          getGroups();
         }, function(error){
           console.log(error.data);
           failure("Error leaving group");
@@ -747,6 +747,29 @@ angular.module('TM470.controllers', []).
       });
     }
     
+    function getComments(){
+      $http.get("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/comments")
+      .then(function(response) {
+        //console.log("players");
+        console.log(response.data);
+        $scope.comments = response.data;
+        //var players = [];
+        // var values = response.data.value;
+        // values.forEach(function(){
+        //   players.push(this.username);
+        // })
+        
+        // console.info(players);
+        // console.info($scope.user.username);
+        // console.info(players.indexOf($scope.user.username));
+
+      }, function(error){
+        console.log(error.data);
+        $location.path("/login");
+        //show login
+      });
+    }
+    
     //get current match detail
     $http.get("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey)
     .then(function(response) {
@@ -758,7 +781,7 @@ angular.module('TM470.controllers', []).
       $scope.match.description = description;
       //$scope.gameDetail.description = description;
       
-      var shortDesc = response.data.description.substr(0,350);
+      var shortDesc = response.data.description.substr(0,200);
       shortDesc = shortDesc.concat("...");
       $scope.match.description_short = shortDesc.replace(/&#10;/g, '<br />');
       //$scope.gameDetail.description_short = shortDesc.replace(/&#10;/g, '<br />'); 
@@ -772,6 +795,7 @@ angular.module('TM470.controllers', []).
     });
     
     getPlayers();
+    getComments();
     
     $scope.canBringGame = function(){
       $http.post("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/bring", $scope.user)
@@ -894,6 +918,24 @@ angular.module('TM470.controllers', []).
           console.error(err);
           failure("Error deleting match"); 
           //$location.path("/login");
+        });
+    };
+    
+    $scope.postComment = function(){
+      $scope.comment.user =  $scope.user;
+      $scope.comment.datetime = moment();
+      $http.post("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/comments", $scope.comment)
+        .then(function(response) {
+          console.log(response.status);
+          //$scope.match = response.data;
+          success("Posted");
+          $scope.comment.newComment = "";
+          getComments();
+        }, function(error){
+          console.log(error.data);
+          failure("Error");
+          //$location.path("/login");
+          //show login
         });
     };
 

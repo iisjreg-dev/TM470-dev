@@ -6,7 +6,11 @@ body {
   /*min-height: 2000px;*/
   padding-top: 50px;
 }
-
+p {
+    margin: 0 0 15px;
+    font-size: 14px;
+    line-height: 1.72222;
+}
 a {
   color: #00B7FF;
 }
