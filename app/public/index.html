@@ -56,6 +56,7 @@
             </ul>
             <div class="nav navbar-nav navbar-right">
                <p class="navbar-text navbar-right" ng-show="user">&nbsp;&nbsp;&nbsp;<a href="/account">{{user.name}}<span ng-if="!user.name">Account</span></a> | <a href="" ng-click="logout()">Log out</a></p>
+               <p class="navbar-text navbar-right" ng-show="!user">&nbsp;&nbsp;&nbsp;<a href="/login">Login</a> | <a href="/signup">Sign up</a></p>
             </div>
          </div>
          <!--/.navbar-collapse -->
@@ -100,8 +101,16 @@
    <script src="bower_components/angular-responsive-tables/release/angular-responsive-tables.js"></script> 
    <script src="bower_components/at-table/dist/angular-table.js"></script> 
 
+   <script src="bower_components/qrcode-generator/js/qrcode.js"></script>
+   <script src="bower_components/angular-qrcode/angular-qrcode.js"></script>
+   
    <script src="bower_components/notie/dist/notie.js "></script>
+   
+   
+   
    <script>
+
+
       function success(text) {
          notie.alert(1, text, 2);
       }

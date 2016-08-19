@@ -329,7 +329,7 @@ routerAPI.get('/events/', //get all events
   
   
 routerAPI.get('/events/:event', //get 1 event
-  require('connect-ensure-login').ensureLoggedIn('/login'),
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     //console.log("user: ");
     //console.log(req.user.username);
@@ -652,13 +652,17 @@ routerAPI.post('/groups/:group/members', //join group
         //res.sendStatus(200);
         db.newGraphBuilder() //CREATE GROUP > USER LINK
         .create()
-        .from('Groups', req.params.match)
+        .from('Groups', req.params.group)
         .related('members')
         .to('Users', req.user.username)
-        .withoutFields('value.password', 'value.salt')
         .then(function (result) {
           //console.log("link created");
           res.sendStatus(200);
+          //return true;
+        })
+        .fail(function (error) {
+          console.error("group link error : " + error.body);
+          res.sendStatus(500);
           //return true;
         });
       });
@@ -684,9 +688,8 @@ routerAPI.delete('/groups/:group/members', //leave group
           .from('Groups', req.params.group)
           .related('members')
           .to('Users', req.user.username)
-          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
-            console.log("link removed");
+            //console.log("link removed");
             res.sendStatus(200);
           });
       });
@@ -698,7 +701,7 @@ routerAPI.delete('/groups/:group/members', //leave group
 ////REPEATING EVENT MANAGEMENT
 
 routerAPI.get('/repeating', //get all repeating events
-  //require('connect-ensure-login').ensureLoggedIn('/login'),
+  require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     if(!req.user){
       //console.error("not logged in");
@@ -751,13 +754,13 @@ routerAPI.delete('/repeating/:event', //delete repeating event
 ////MATCH MANAGEMENT
 
 routerAPI.get('/events/:event/matches/', //get all matches
-  require('connect-ensure-login').ensureLoggedIn('/login'),
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    if(!req.user){
-      //console.error("not logged in");
-      res.status(403).send("not logged in");
-    }
-    else{
+    // if(!req.user){
+    //   //console.error("not logged in");
+    //   res.status(403).send("not logged in");
+    // }
+    // else{
       //console.log("user: ");
       //console.log(req.user.username);
       //console.log("list all matches");
@@ -805,12 +808,12 @@ routerAPI.get('/events/:event/matches/', //get all matches
           return true;
         });
       
-    }
+  //}
   });
   
   
 routerAPI.get('/events/:event/matches/:match', //get 1 match
-  require('connect-ensure-login').ensureLoggedIn('/login'),
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
     //console.log("user: ");
     //console.log(req.user.username);
@@ -854,7 +857,6 @@ routerAPI.post('/events/:event/matches/:match/players', //join match
           .from('Matches', req.params.match)
           .related('players')
           .to('Users', req.user.username)
-          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link created");
             res.sendStatus(200);
@@ -883,7 +885,6 @@ routerAPI.delete('/events/:event/matches/:match/players', //leave match
           .from('Matches', req.params.match)
           .related('players')
           .to('Users', req.user.username)
-          .withoutFields('value.password', 'value.salt')
           .then(function (result2) {
             //console.log("link removed");
             res.sendStatus(200);
@@ -913,7 +914,6 @@ routerAPI.post('/events/:event/matches/:match/bring', //bring game
           .from('Matches', req.params.match)
           .related('canBring')
           .to('Users', req.user.username)
-          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link created");
             res.sendStatus(200);
@@ -942,7 +942,6 @@ routerAPI.delete('/events/:event/matches/:match/bring', //not bring a game
           .from('Matches', req.params.match)
           .related('canBring')
           .to('Users', req.user.username)
-          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link removed");
             res.sendStatus(200);
@@ -972,7 +971,6 @@ routerAPI.post('/events/:event/matches/:match/teach', //teach game
           .from('Matches', req.params.match)
           .related('canTeach')
           .to('Users', req.user.username)
-          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link created");
             res.sendStatus(200);
@@ -1001,7 +999,6 @@ routerAPI.delete('/events/:event/matches/:match/teach', //not teach a game
           .from('Matches', req.params.match)
           .related('canTeach')
           .to('Users', req.user.username)
-          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link removed");
             res.sendStatus(200);

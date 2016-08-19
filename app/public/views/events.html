@@ -93,6 +93,58 @@
         </form>
     </div>
 </div>
+
+    <div ng-show="eventlist3">
+        <h4>Current events!</h4>
+        <div class="table-container">
+    <table class="table table-hover table-responsive" wt-responsive-table> <!--change ng-show to also look at user object -->
+        <thead>
+        <tr>
+            <th class="col-sm-2">
+                Name
+            </th>
+            <th class="col-sm-2">
+                Group
+            </th>
+            <th class="col-sm-2">
+                Date
+            </th>
+            <th class="col-sm-1">
+                Time
+            </th>
+            <th class="col-sm-2">
+                Location
+            </th>
+            <th class="col-sm-3">
+                Description
+            </th>
+        </tr>
+        </thead>
+        <tr ng-repeat="ev in eventlist3" style="cursor: pointer;">
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.name}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.group}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.date | dateFilter:"Do MMM YYYY"}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.time | dateFilter:"HH:mm"}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                {{ev.value.venue}}
+            </td>
+            <td ng-click="go(ev.path.key)">
+                <div class="label label-xs label-info" ng-if="ev.value.showRepeating"><small>{{ev.value.repeat}}</small></div> {{ev.value.description}}
+            </td>
+        </tr>
+        
+    </table>
+    </div>
+    </div>
+
     <div ng-show="eventlist">
         <h4>Upcoming events</h4>
         <div class="table-container">

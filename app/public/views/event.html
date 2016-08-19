@@ -1,20 +1,28 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div ng-show="eventDetail.name">
-            <div class="col-md-6">
+            <div class="col-xs-6">
                 <b>{{eventDetail.name}}</b><br>
                 {{eventDetail.description}}<br>
                 <div class="label label-xs label-info" ng-if="eventDetail.showRepeating"><small>{{eventDetail.repeat}}</small></div><br>
-                
+                  
             </div>
-            <div class="col-md-6 text-right">
+            <div class="col-xs-6 text-right">
                 {{eventDetail.group}} <span class="fui-user"></span><br>
                 {{eventDetail.date | dateFilter:"Do MMM YYYY"}} <span class="fui-calendar"></span><br>
-                {{eventDetail.time | dateFilter:"HH:mm"}} <span class="fui-time"></span> 
+                {{eventDetail.time | dateFilter:"HH:mm"}} <span class="fui-time"></span><br>
             </div> 
+            <div class="col-xs-12 text-right">
+                <div style="cursor: pointer;" ng-click="toggleQR()" ng-hide="QR">QR <span class="glyphicon glyphicon-qrcode"></span></div>
+                <div style="cursor: pointer;" ng-click="toggleQR()" ng-show="QR">QR <span class="glyphicon glyphicon-remove"></span><br>
+                    <qrcode version="4" error-correction-level="M" size="200" data="{{currentUrl}}" href="{{currentUrl}}"></qrcode>
+                </div>
+
+            </div>
         </div>
     </div>
-    <div class="panel-footer">
+    
+    <div class="panel-footer" ng-if="user">
         <div class="row">
             <div class="col-md-8">
                 

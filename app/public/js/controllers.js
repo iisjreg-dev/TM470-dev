@@ -164,11 +164,13 @@ angular.module('TM470.controllers', []).
         if(response.status == 204){
           $scope.eventlist = null;
           $scope.eventlist2 = null;
+          $scope.eventlist3 = null;
           $scope.noGroups = true;
           return;
         }
         var pastEvents = [];
         var futureEvents = [];
+        var currentEvents = [];
         if (typeof response.data.results !== 'undefined' && response.data.results.length > 0) {
           response.data.results.forEach(function(event){
             //console.log("event date", event.value.date);
@@ -179,15 +181,22 @@ angular.module('TM470.controllers', []).
               pastEvents.push(event);
             }
             else{
-              futureEvents.push(event);
+              if(aMoment.isBefore(moment().add(4, "hours"))){ //within 3 hours of start
+                currentEvents.push(event);
+              }
+              else{
+                futureEvents.push(event);
+              }
             }
           });
           if(futureEvents.length > 0){$scope.eventlist = futureEvents;}
+          if(currentEvents.length > 0){$scope.eventlist3 = currentEvents;}
           if(pastEvents.length > 0){$scope.eventlist2 = pastEvents;}
         }
         else{
           $scope.eventlist = null;
           $scope.eventlist2 = null;
+          $scope.eventlist3 = null;
           $scope.noEvents= true;
         }
       //$scope.orderProp = 'created';
@@ -443,6 +452,12 @@ angular.module('TM470.controllers', []).
     $scope.config = {
       itemsPerPage: 20
     };
+    $scope.currentUrl = $location.absUrl();
+    $scope.QR = false;
+    $scope.toggleQR = function(){
+      $scope.QR = !$scope.QR;
+    };
+    
     //get current event detail
     $http.get("/api/events/" + $scope.itemId)
     .then(function(response) {

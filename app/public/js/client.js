@@ -10,7 +10,8 @@ angular.module('TM470', [
   'TM470.directives',
   'ngSanitize',
   'wt.responsive',
-  'angular-table'
+  'angular-table',
+  'monospaced.qrcode'
 ]).
 config(function ($routeProvider, $locationProvider) {
   $routeProvider.
