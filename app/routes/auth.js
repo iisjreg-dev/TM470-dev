@@ -5,7 +5,7 @@ var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var SignupStrategy = require('passport-local').Strategy;
 const crypto = require('crypto');
-var db = require('orchestrate')("725c04b3-ad74-44c6-9c9e-9316e68788cd");
+var db = require('orchestrate')(process.env.API_KEY);
 
 
 function hashedPW(password, salt){
@@ -67,7 +67,7 @@ passport.use('signup', new SignupStrategy(
       "name": ""
     };
     //console.log("signing up user : " + username);
-    db.get('Users', username) 
+    db.get('Users', username, null, { 'without_fields': ['value.password', 'value.salt']}) 
     .then(function (result) {
       //console.log('DB: ' + result.body.count + " results");
       if (result.body.count > 0){
@@ -255,7 +255,7 @@ routerAuth.post('/update',
   
 routerAuth.get('/checkuser/:username', //check username is available - returns 200 if username does not exist or 406 if it does
   function(req, res){
-    db.get('Users', decodeURIComponent(req.params.username))
+    db.get('Users', decodeURIComponent(req.params.username), null, { 'without_fields': ['value.password', 'value.salt']})
     .then(function (result) {
       //console.log('DB success: Users key found');
       if (result.body.username){ //username already exists

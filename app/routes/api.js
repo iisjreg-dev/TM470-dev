@@ -2,7 +2,7 @@ var express = require('express');
 var routerAPI = express.Router();
 var console = require('better-console');
 var Q = require('kew');
-var db = require('orchestrate')("725c04b3-ad74-44c6-9c9e-9316e68788cd");
+var db = require('orchestrate')(process.env.API_KEY);
 var moment = require('moment');
 
 db.ping()
@@ -655,6 +655,7 @@ routerAPI.post('/groups/:group/members', //join group
         .from('Groups', req.params.match)
         .related('members')
         .to('Users', req.user.username)
+        .withoutFields('value.password', 'value.salt')
         .then(function (result) {
           //console.log("link created");
           res.sendStatus(200);
@@ -683,6 +684,7 @@ routerAPI.delete('/groups/:group/members', //leave group
           .from('Groups', req.params.group)
           .related('members')
           .to('Users', req.user.username)
+          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             console.log("link removed");
             res.sendStatus(200);
@@ -852,6 +854,7 @@ routerAPI.post('/events/:event/matches/:match/players', //join match
           .from('Matches', req.params.match)
           .related('players')
           .to('Users', req.user.username)
+          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link created");
             res.sendStatus(200);
@@ -880,6 +883,7 @@ routerAPI.delete('/events/:event/matches/:match/players', //leave match
           .from('Matches', req.params.match)
           .related('players')
           .to('Users', req.user.username)
+          .withoutFields('value.password', 'value.salt')
           .then(function (result2) {
             //console.log("link removed");
             res.sendStatus(200);
@@ -909,6 +913,7 @@ routerAPI.post('/events/:event/matches/:match/bring', //bring game
           .from('Matches', req.params.match)
           .related('canBring')
           .to('Users', req.user.username)
+          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link created");
             res.sendStatus(200);
@@ -937,6 +942,7 @@ routerAPI.delete('/events/:event/matches/:match/bring', //not bring a game
           .from('Matches', req.params.match)
           .related('canBring')
           .to('Users', req.user.username)
+          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link removed");
             res.sendStatus(200);
@@ -966,6 +972,7 @@ routerAPI.post('/events/:event/matches/:match/teach', //teach game
           .from('Matches', req.params.match)
           .related('canTeach')
           .to('Users', req.user.username)
+          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link created");
             res.sendStatus(200);
@@ -994,6 +1001,7 @@ routerAPI.delete('/events/:event/matches/:match/teach', //not teach a game
           .from('Matches', req.params.match)
           .related('canTeach')
           .to('Users', req.user.username)
+          .withoutFields('value.password', 'value.salt')
           .then(function (result) {
             //console.log("link removed");
             res.sendStatus(200);
@@ -1164,9 +1172,10 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
         .get()
         .from('Matches', req.params.match)
         .related('players')
-        //.withoutFields(['value.password', 'value.salt']) //WHY IS THIS COMMENTED OUT?
+        //.to('Users')
+        .withoutFields('value.password', 'value.salt') 
         .then(function (result) {
-          //console.log(result.body.results);
+          console.log("gotten players");
           return result.body.results;
         })
         .then(function(playerList){
