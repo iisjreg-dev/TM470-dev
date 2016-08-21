@@ -11,7 +11,8 @@ angular.module('TM470', [
   'ngSanitize',
   'wt.responsive',
   'angular-table',
-  'monospaced.qrcode'
+  'monospaced.qrcode',
+  'updateMeta'
 ]).
 config(function ($routeProvider, $locationProvider) {
   $routeProvider.

@@ -687,7 +687,7 @@ angular.module('TM470.controllers', []).
     $scope.eventKey = $routeParams.event;
     $scope.matchKey = $routeParams.match;
     $scope.playerList = {};
-    
+    $scope.currentUrl = $location.absUrl();
     
     function getDetail(){
      $http.get("/api/bgg/game/boardgame/" + $scope.match.id)

@@ -24,7 +24,7 @@ git.short(function (str) {
   console.info('GIT version:', str);
 });
 app.use(require('prerender-node').set('prerenderToken', process.env.PRERENDER_API_KEY)); //WEB CRAWLER CACHING - testing
-console.log("process.env.PRERENDER_API_KEY=" + process.env.PRERENDER_API_KEY);
+//console.log("process.env.PRERENDER_API_KEY=" + process.env.PRERENDER_API_KEY);
 
 
 //do not log
