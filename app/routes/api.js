@@ -785,6 +785,7 @@ routerAPI.get('/events/:event/matches/', //get all matches
             promises.push(db.newGraphReader()
               .get()
               .from('Matches', matchlist[i].path.key)
+              .withoutFields('value.password', 'value.salt')
               .related('players')
               //.withoutFields(['value.password', 'value.salt'])
               .then(function (players) {
@@ -1152,27 +1153,26 @@ routerAPI.get('/events/:event/matches/:match/comments', //get comments
   });
   
 routerAPI.get('/events/:event/matches/:match/players', //get players
-  require('connect-ensure-login').ensureLoggedIn('/login'),
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    if(!req.user){
-      //console.error("not logged in");
-      res.status(403).send("not logged in");
-    }
-    else{
+    // if(!req.user){
+    //   //console.error("not logged in");
+    //   res.status(403).send("not logged in");
+    // }
+    // else{
       //console.log("user: ");
       //console.log(req.user.username);
-      //console.log("list all players");
+        //console.log("list all players");
       
       //NEED TO GRAPH SEARCH
       //res.sendStatus(503);
       var players = db.newGraphReader()
         .get()
         .from('Matches', req.params.match)
-        .related('players')
-        //.to('Users')
         .withoutFields('value.password', 'value.salt') 
+        .related('players')
         .then(function (result) {
-          console.log("gotten players");
+          //console.log("gotten players");
           return result.body.results;
         })
         .then(function(playerList){
@@ -1182,6 +1182,7 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
           promises.push(db.newGraphReader() //get players for each match that canBring game
             .get()
             .from('Matches', req.params.match)
+            .withoutFields('value.password', 'value.salt') 
             .related('canBring')
             .then(function (players) {
               var playerNames = [];
@@ -1206,6 +1207,7 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
           promises.push(db.newGraphReader() //get players for each match that canTeach game
             .get()
             .from('Matches', req.params.match)
+            .withoutFields('value.password', 'value.salt')
             .related('canTeach')
             .then(function (players) {
               var playerNames = [];
@@ -1241,8 +1243,11 @@ routerAPI.get('/events/:event/matches/:match/players', //get players
             
             
           //res.send(playerList);
+        })
+        .fail(function(err){
+          console.error(err);
         });
-    }
+    
   });
   
 routerAPI.get('/mymatches', //get my matches
@@ -1285,6 +1290,7 @@ routerAPI.get('/mymatches', //get my matches
             promises2.push(db.newGraphReader() //get players for each match
               .get()
               .from('Matches', matchlist[i].path.key)
+              .withoutFields('value.password', 'value.salt')
               .related('players')
               //.withoutFields(['value.password', 'value.salt'])
               .then(function (players) {
