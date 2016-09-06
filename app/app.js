@@ -12,6 +12,7 @@ var passport = require('passport');
 var flash= require('connect-flash');
 var git = require('git-rev');
 var helmet = require('helmet');
+var compression = require('compression');
 require('date-utils');
 
 var api = require('./routes/api');
@@ -23,6 +24,9 @@ console.info("Started");
 git.short(function (str) {
   console.info('GIT version:', str);
 });
+
+//GZIP compression - compress all - TODO: investigate options
+app.use(compression())
 
 //DOMAIN BLOCKING - MESSY FOR NOW - need to think of better proxy method
 app.use(function(req, res, next) {

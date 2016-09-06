@@ -1,0 +1,32 @@
+{
+  "name": "bognight.com client",
+  "authors": [
+    "Jarryd van Zanten <iisjreg@googlemail.com>"
+  ],
+  "description": "bognight.com client",
+  "main": "",
+  "license": "MIT",
+  "homepage": "http://bognight.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-qrcode": "monospaced/angular-qrcode#^6.2.1",
+    "angular-responsive-tables": "^0.1.3",
+    "angular-route": "^1.5.3",
+    "angular-sanitize": "^1.5.3",
+    "angular-socket-io": "~0.7.0",
+    "angular-update-meta": "^1.9.0",
+    "at-table": "^1.0.7",
+    "bootstrap": "~3.3.6",
+    "flat-ui": "^2.3.0",
+    "moment": "^2.12.0",
+    "notie": "*",
+    "respond": ">=1.4.2"
+  }
+}
