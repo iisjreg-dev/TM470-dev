@@ -25,8 +25,11 @@ git.short(function (str) {
   console.info('GIT version:', str);
 });
 
+//HELMET HTTP SECURITY - TODO: investigate options
+app.use(helmet());
+
 //GZIP compression - compress all - TODO: investigate options
-app.use(compression())
+app.use(compression());
 
 //DOMAIN BLOCKING - MESSY FOR NOW - need to think of better proxy method
 app.use(function(req, res, next) {
@@ -101,7 +104,7 @@ app.use(require('express-session')({ secret: 'TM470', resave: false, saveUniniti
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash()); //NEEDS MORE TESTING
-app.use(helmet());
+
 
 
 // //flash messages TESTING
