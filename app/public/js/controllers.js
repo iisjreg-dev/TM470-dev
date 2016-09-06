@@ -796,7 +796,7 @@ angular.module('TM470.controllers', []).
       $scope.match.description = description;
       //$scope.gameDetail.description = description;
       
-      var shortDesc = response.data.description.substr(0,200);
+      var shortDesc = response.data.description.substr(0,500);
       shortDesc = shortDesc.concat("...");
       $scope.match.description_short = shortDesc.replace(/&#10;/g, '<br />');
       //$scope.gameDetail.description_short = shortDesc.replace(/&#10;/g, '<br />'); 

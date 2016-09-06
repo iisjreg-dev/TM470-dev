@@ -40,11 +40,14 @@
                 <div class="row" ng-if="match">    
                     <div class="col-md-2">
                         <img class="img-responsive img-rounded" style="margin-bottom: 10px;" ng-src="{{match.thumbnail}}">
+                        <p style="text-size: 13px"><span class="fui-user"></span> {{match.numPlayers}}<br>
+                        <small><span class="" ng-repeat="link in match.catagories"><i ng-if="link.type == 'boardgamecategory'"><span class="fui-tag"></span> {{link.value}}<br></i> </span></small></p>
                     </div>
                     <div class="col-md-10">
                         <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
-                        <h5 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <small><span class="text-success" ng-if="match.proposedBy.name">Proposed by {{match.proposedBy.name}}</span></small></h5>
-                        <p><span class="fui-user"></span> {{match.numPlayers}} | <span class="label label-info" ng-repeat="link in match.catagories"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></p>
+                        <h5 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <br>
+                        <small><span class="text-success" ng-if="match.proposedBy.name">Proposed by {{match.proposedBy.name}}</span></small></h5>
+                        
                         <p ng-if="match.notes"><b>Match Notes:</b> <i>{{match.notes}}</i></p>
                         <div ng-hide="expand"><p ng-bind-html="match.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p> </div>
                         <div ng-show="expand"><p ng-bind-html="match.description"></p><p><a class="btn btn-xs btn-default" ng-click="expand = false;">Less</a></p></div>

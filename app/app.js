@@ -23,6 +23,19 @@ console.info("Started");
 git.short(function (str) {
   console.info('GIT version:', str);
 });
+
+//DOMAIN BLOCKING - MESSY FOR NOW - need to think of better proxy method
+app.use(function(req, res, next) {
+    if(req.hostname != process.env.HOSTNAME){
+      console.error("invalid hostname: " + req.hostname);
+      res.status(404).end();
+    }
+    else{
+      next();
+    }
+});
+
+
 app.use(require('prerender-node').set('prerenderToken', process.env.PRERENDER_API_KEY)); //WEB CRAWLER CACHING - testing
 //console.log("process.env.PRERENDER_API_KEY=" + process.env.PRERENDER_API_KEY);
 

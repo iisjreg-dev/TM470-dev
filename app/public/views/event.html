@@ -113,11 +113,12 @@
                         <div class="row" ng-if="showGameDetail">    
                             <div class="col-md-2">
                                 <img class="img-responsive img-rounded" ng-src="{{gameDetail.thumbnail}}">
+                                <p style="text-size: 13px; padding-bottom: 5px;"><span class="fui-user"></span> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} <br>
+                                <small><span class="" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'"><span class="fui-tag"></span> {{link.value}}<br></i></span></small></p>
                             </div>
                             <div class="col-md-10">
                                 <h4 class="media-heading"><span><b>{{gameDetail.name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4>
-                                <div style="padding-bottom: 5px;"><small><i class="fui-user"></i> {{gameDetail.minplayers.value}}-{{gameDetail.maxplayers.value}} </small>
-                                <span class="label label-info" ng-repeat="link in gameDetail.link"><i ng-if="link.type == 'boardgamecategory'">{{link.value}}</i></span></div>
+                                
                                 <div ng-hide="expand"><p ng-bind-html="gameDetail.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p></div>
                                 <div ng-show="expand"><p ng-bind-html="gameDetail.description"></p><p><a class="btn btn-xs btn-default" ng-click="expand = false;">Less</a></p></div>
                                 <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
