@@ -32,8 +32,11 @@ app.use(helmet());
 app.use(compression());
 
 //DOMAIN BLOCKING - MESSY FOR NOW - need to think of better proxy method
+var hostnames = process.env.HOSTNAMES;
+var hostnamesArray = hostnames.split(",");
+console.log("valid hostnames: " + hostnamesArray);
 app.use(function(req, res, next) {
-    if(req.hostname != process.env.HOSTNAME){
+    if(hostnamesArray.indexOf(req.hostname) > -1){
       console.error("invalid hostname: " + req.hostname);
       res.status(404).end();
     }
