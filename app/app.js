@@ -37,11 +37,11 @@ var hostnamesArray = hostnames.split(",");
 console.log("valid hostnames: " + hostnamesArray);
 app.use(function(req, res, next) {
     if(hostnamesArray.indexOf(req.hostname) > -1){
-      console.error("invalid hostname: " + req.hostname);
-      res.status(404).end();
+      next();
     }
     else{
-      next();
+      console.error("invalid hostname: " + req.hostname);
+      res.status(404).end();
     }
 });
 
