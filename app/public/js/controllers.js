@@ -134,10 +134,10 @@ angular.module('TM470.controllers', []).
             //UPDATE AUTH?
           }
         }, function(err){
-          console.log("update error: ");
-          console.log(err);
-          failure("Not logged in"); //TODO: Check
-          $location.path("/login");
+          console.error("update error: ");
+          console.error(err);
+          failure("Error updating details"); //TODO: Check
+          //$location.path("/login");
         });
     };  
   }).
