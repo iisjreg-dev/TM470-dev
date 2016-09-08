@@ -346,7 +346,7 @@ routerAPI.get('/events/:event', //get 1 event
       }
       //console.log("done");
       result.body.eventKey = req.params.event;
-      res.send(result.body); 
+      res.status(200).send(result.body); 
     })
     .fail(function (err) {
       console.error("error : count=" + err.body.count);
