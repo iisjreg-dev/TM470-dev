@@ -53,7 +53,8 @@ app.use(require('prerender-node').set('prerenderToken', process.env.PRERENDER_AP
 //do not log
 var oneDay = 86400000;
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: oneDay })); //NOT SURE WHETHER TO LOG PUBLIC FILE ACCESS
+app.use(express.static(path.join(__dirname, 'public'))); //NOT SURE WHETHER TO LOG PUBLIC FILE ACCESS
+//app.use(express.static(path.join(__dirname, 'public'), { maxAge: oneDay })); //NOT SURE WHETHER TO LOG PUBLIC FILE ACCESS
 
 //logging
 
