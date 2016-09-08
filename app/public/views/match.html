@@ -1,36 +1,20 @@
 <!-- Twitter -->
    <update-meta name="twitter:card" content="summary"></update-meta>
    <update-meta name="twitter:site" content="@BoG_Night"></update-meta>
-   <update-meta name="twitter:title" content="Playing: {{match.game}} ({{match.yearpublished}})"></update-meta>
-   <update-meta name="twitter:description" content='Board Game Night - Supporting event management for board game groups'></update-meta>
+   <update-meta name="twitter:title" content='Playing: {{match.game}} ({{match.yearpublished}})'></update-meta>
+   <update-meta name="twitter:description" content='Board Game Night - {{match.event.group}} {{match.event.name}} @ {{match.event.venue}} - {{match.event.date | dateFilter:"Do MMM YYYY"}}'></update-meta>
    <update-meta name="twitter:image" content="{{match.thumbnail}}"> </update-meta>
 <!-- Facebook -->
    <update-meta property="og:url"                content="{{currentUrl}}"></update-meta>
    <update-meta property="og:type"               content="website"></update-meta>
-   <update-meta property="og:title"              content="Playing: {{match.game}} ({{match.yearpublished}})"></update-meta>
-   <update-meta property="og:description"        content='Board Game Night - Supporting event management for board game groups'></update-meta>
+   <update-meta property="og:title"              content='Playing: {{match.game}} ({{match.yearpublished}})'></update-meta>
+   <update-meta property="og:description"        content='Board Game Night - {{match.event.group}} {{match.event.name}} @ {{match.event.venue}} - {{match.event.date | dateFilter:"Do MMM YYYY"}}'></update-meta>
    <update-meta property="og:image"              content="{{match.thumbnail}}"></update-meta>
    
    <update-title title="BoG Night - Game: {{match.game}}"></update-title>
 
 
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="row">
-            <div class="col-md-6">
-            </div>
-            <div class="col-md-2">
-                <a ng-if="user.admin" role="button" ng-click="deleteMatch()" role="button" class="btn btn-danger btn-block">Delete</a>
-            </div>
-            <div class="col-md-2">
-                <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default btn-block">Go to event</a>
-            </div>
-            <div class="col-md-2">
-                <input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success btn-block" value="Join Match">
-                <input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger btn-block" value="Leave Match" style="margin-top: 0px;">
-            </div>
-        </div>
-    </div>
     
     <!-- MATCH SUMMARY -->
     
@@ -46,9 +30,11 @@
                     <div class="col-md-10">
                         <!-- <h4 class="media-heading" ng-repeat="name in gameDetail.name"><span ng-if="name.type == 'primary'"><b>{{name.value}}</b> ({{gameDetail.yearpublished.value}})</span></h4> -->
                         <h5 class="media-heading"><span><b>{{match.game}}</b> ({{match.yearpublished}})</span> <br>
-                        <small><span class="text-success" ng-if="match.proposedBy.name">Proposed by {{match.proposedBy.name}}</span></small></h5>
+                        <small><span class="text-success" style="text-size: 13px" ng-if="match.proposedBy.name">Proposed by {{match.proposedBy.name}}</span></small><br>
+                        <small><span class="text-primary"> {{match.event.date | dateFilter:"Do MMM YYYY"}}, {{match.event.time | dateFilter:"HH:mm"}} ({{match.event.name}} @ {{match.event.venue}})</span></small>
+                        </h5>
                         
-                        <p ng-if="match.notes"><b>Match Notes:</b> <i>{{match.notes}}</i></p>
+                        <p ng-if="match.notes"><b>Match Notes:</b> <i>{{match.notes}}</i></p><br>
                         <div ng-hide="expand"><p ng-bind-html="match.description_short"></p><p><a class="btn btn-xs btn-default" ng-click="expand = true;">More</a></p> </div>
                         <div ng-show="expand"><p ng-bind-html="match.description"></p><p><a class="btn btn-xs btn-default" ng-click="expand = false;">Less</a></p></div>
                         <p><small><i><a ng-href="http://boardgamegeek.com/{{match.type}}/{{match.id}}" target="_NEW">View this game on BoardGameGeek</a></i></small></p>
@@ -58,6 +44,22 @@
         </div>
     </div>
     
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-2">
+                <a ng-if="user.admin" role="button" ng-click="deleteMatch()" role="button" class="btn btn-danger btn-block">Delete</a>
+            </div>
+            <div class="col-md-2">
+                <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default btn-block">Go to event</a>
+            </div>
+            <div class="col-md-2">
+                <input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success btn-block" value="Join Match">
+                <input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger btn-block" value="Leave Match" style="margin-top: 0px;">
+            </div>
+        </div>
+    </div>
     <div class="panel-footer" ng-show="inMatch">
         <div class="row">
             <div class="col-sm-8">

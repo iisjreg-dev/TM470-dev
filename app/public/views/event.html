@@ -18,18 +18,18 @@
         <div ng-show="eventDetail.name">
             <div class="col-xs-6">
                 <b>{{eventDetail.name}}</b><br>
-                {{eventDetail.description}}<br>
-                <div class="label label-xs label-info" ng-if="eventDetail.showRepeating"><small>{{eventDetail.repeat}}</small></div><br>
-                  
+                <span class="fui-question-circle"></span> {{eventDetail.description}} <span class="label label-xs label-info" ng-if="eventDetail.showRepeating"><small>{{eventDetail.repeat}}</small></span><br>
+                <span class="fui-location"></span> {{eventDetail.venue}}<br>
             </div>
             <div class="col-xs-6 text-right">
                 {{eventDetail.group}} <span class="fui-user"></span><br>
                 {{eventDetail.date | dateFilter:"Do MMM YYYY"}} <span class="fui-calendar"></span><br>
                 {{eventDetail.time | dateFilter:"HH:mm"}} <span class="fui-time"></span><br>
-            </div> 
-            <div class="col-xs-12 text-right">
                 <div style="cursor: pointer;" ng-click="toggleQR()" ng-hide="QR">QR <span class="glyphicon glyphicon-qrcode"></span></div>
-                <div style="cursor: pointer;" ng-click="toggleQR()" ng-show="QR">QR <span class="glyphicon glyphicon-remove"></span><br>
+                <div style="cursor: pointer;" ng-click="toggleQR()" ng-show="QR">QR <span class="glyphicon glyphicon-remove"></span></div>
+            </div> 
+            <div class="col-xs-12 text-center">
+                <div style="cursor: pointer;" ng-click="toggleQR()" ng-show="QR">
                     <qrcode version="4" error-correction-level="M" size="200" data="{{currentUrl}}" href="{{currentUrl}}"></qrcode>
                 </div>
 

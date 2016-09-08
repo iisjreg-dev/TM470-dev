@@ -817,21 +817,23 @@ routerAPI.get('/events/:event/matches/', //get all matches
 routerAPI.get('/events/:event/matches/:match', //get 1 match
   //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    //console.log("user: ");
-    //console.log(req.user.username);
-    //console.log("get match " + req.params.match);
     db.get('Matches', req.params.match)
-    .then(function (result) {
-      //console.log(result.body);
-      
-      //console.log("count = " + result.body.count);
-      //console.log(result.body.results[0].value.password);
-      if(result.body.count == 0){ 
+    .then(function (matchResult) {
+      if(matchResult.body.count == 0){ 
         console.error("match not found");
         res.status(404).send("no matches found"); 
       }
-      //console.log("done");
-      res.send(result.body); 
+      console.log("gotten match");
+      db.get('Events', req.params.event)
+      .then(function (eventResult) {
+        console.log("gotten event");
+        matchResult.body.event = eventResult.body;
+        res.send(matchResult.body);
+      })
+      .fail(function (err) {
+        console.error("error : count=" + err.body.count);
+        res.send(err); 
+      });
     })
     .fail(function (err) {
       console.error("error : count=" + err.body.count);
@@ -1108,7 +1110,20 @@ routerAPI.post('/events/:event/matches/', //post match
             .to('Matches', matchResult.path.key)
             .then(function (eventLinkResult) {
               console.log("event link created");
-              res.status(201).send(matchResult.path.key);
+              db.newGraphBuilder()
+                .create()
+                .from('Matches', matchResult.path.key)
+                .related('event')
+                .to('Events', req.params.event)
+                .then(function (eventLinkResult) {
+                  console.log("reverse event link created");
+                  res.status(201).send(matchResult.path.key);
+                })
+                .fail(function (err) {
+                  console.error("reverse event link error: " + err.body);
+                  res.status(500).send("error: " + err.body);
+                });
+              //res.status(201).send(matchResult.path.key);
             })
             .fail(function (err) {
               console.error("event link error: " + err.body);

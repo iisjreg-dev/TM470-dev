@@ -130,6 +130,30 @@ angular.module('TM470.controllers', []).
           if(data.status == 200){
             success("Details updated");
             console.log($scope.user.name); 
+            $location.path("/events");
+            //UPDATE AUTH?
+          }
+        }, function(err){
+          console.log("update error: ");
+          console.log(err);
+          failure("Not logged in"); //TODO: Check
+          $location.path("/login");
+        });
+    };  
+  }).
+  controller('newAccountController', function ($rootScope, $scope, $http, $location) { //ACCOUNT_NEW.HTML - updating user details for new user
+ 
+    $scope.newpassword = {};
+    $scope.updateName = $scope.name;
+    $scope.submitForm = function() {
+      console.log("updating user");
+      $http.post("/auth/update", $scope.user)
+        .then(function(data) {
+          //console.log(data.status);
+          if(data.status == 200){
+            success("Details updated");
+            console.log($scope.user.name); 
+            $location.path("/groups");
             //UPDATE AUTH?
           }
         }, function(err){
@@ -166,6 +190,7 @@ angular.module('TM470.controllers', []).
           $scope.eventlist2 = null;
           $scope.eventlist3 = null;
           $scope.noGroups = true;
+          $location.path("/groups");
           return;
         }
         var pastEvents = [];

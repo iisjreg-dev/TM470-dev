@@ -171,7 +171,7 @@ routerAuth.post('/login',
       res.redirect('/events'); //TODO: Change to status
     }
     else{
-      res.redirect('/account');
+      res.redirect('/new-account');
     }
     // }
   });

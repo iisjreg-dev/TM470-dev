@@ -52,6 +52,10 @@ config(function ($routeProvider, $locationProvider) {
       templateUrl: 'views/account.html',
       controller: 'accountController'
     }).
+    when('/new-account', {
+      templateUrl: 'views/account_new.html',
+      controller: 'newAccountController'
+    }).
     when('/main', {
       templateUrl: 'views/main.html',
       controller: 'aboutController'
