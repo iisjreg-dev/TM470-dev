@@ -54,9 +54,12 @@
             <div class="col-md-2">
                 <a role="button" ng-href="/events/{{eventKey}}" role="button" class="btn btn-default btn-block">Go to event</a>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2" ng-if="user">
                 <input ng-show="!inMatch" type="button" ng-click="joinMatch()" role="button" class="btn btn-success btn-block" value="Join Match">
                 <input ng-show="inMatch" type="button" ng-click="leaveMatch()" role="button" class="btn btn-danger btn-block" value="Leave Match" style="margin-top: 0px;">
+            </div>
+            <div class="col-md-2" ng-if="!user">
+                <a href="/signup" role="button" class="btn btn-success btn-block">Sign up to join</a>
             </div>
         </div>
     </div>
