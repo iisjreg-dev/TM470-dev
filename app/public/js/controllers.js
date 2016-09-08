@@ -569,7 +569,7 @@ angular.module('TM470.controllers', []).
               
               $scope.match.numPlayers = data.data.minplayers.value + "-" + data.data.maxplayers.value;
               $scope.match.yearpublished = data.data.yearpublished.value;
-              $scope.match.thumbnail = data.data.thumbnail;
+              $scope.match.thumbnail = data.data.thumbnail.substr(2);
             }
           }, function(err){
             //console.log("usercheck error");
