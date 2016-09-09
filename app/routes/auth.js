@@ -186,8 +186,8 @@ routerAuth.post('/signup',
     //   res.redirect(req.session.returnTo); 
     // }
     // else{
-      //res.redirect('/account');
       res.sendStatus(200);
+      //res.redirect('/new-account');
     // }
   });
   

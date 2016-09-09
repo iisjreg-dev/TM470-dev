@@ -9,3 +9,5 @@ upload JSON files to Orchestrate: orcup -a YOUR_API_KEY -c COLLECTION [file]
 bgg node module amended to remove sanitisation: interceptor.js line 4 = var parserConfig = {object: true, sanitize: false};
 
 git log --pretty=format:"%h - %ad : %s" --date=local > git-log.txt 
+
+.env file is needed. See .env.example for necessary values

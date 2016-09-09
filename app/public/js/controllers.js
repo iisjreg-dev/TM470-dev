@@ -336,7 +336,7 @@ angular.module('TM470.controllers', []).
         .then(function(response) {
           console.log(response.status);
           //$scope.match = response.data;
-          success("Joined group");
+          success_action('Joined group<br><br><a role="button" href="/events" class="btn btn-default btn-block" style="margin-top: 0px;">View events</a>');
           //$scope.group.inGroup = true;
           getGroups();
         }, function(error){

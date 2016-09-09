@@ -27,7 +27,7 @@ git.short(function (str) {
 
 //HELMET HTTP SECURITY - TODO: investigate options
 app.use(helmet());
-app.use(helmet.noCache())
+app.use(helmet.noCache());
 
 //GZIP compression - compress all - TODO: investigate options
 app.use(compression());
