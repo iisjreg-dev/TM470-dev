@@ -791,7 +791,7 @@ angular.module('TM470.controllers', []).
       $http.get("/api/events/" + $scope.eventKey + "/matches/" + $scope.matchKey + "/comments")
       .then(function(response) {
         //console.log("players");
-        console.log(response.data);
+        //console.log(response.data);
         $scope.comments = response.data;
         //var players = [];
         // var values = response.data.value;

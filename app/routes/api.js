@@ -1149,13 +1149,9 @@ routerAPI.post('/events/:event/matches/', //post match
   });
   
 routerAPI.get('/events/:event/matches/:match/comments', //get comments
-  require('connect-ensure-login').ensureLoggedIn('/login'),
+  //require('connect-ensure-login').ensureLoggedIn('/login'),
   function(req, res){
-    if(!req.user){
-      //console.error("not logged in");
-      res.status(403).send("not logged in");
-    }
-    else{
+
       db.newGraphReader()
         .get()
         .from('Matches', req.params.match)
@@ -1165,7 +1161,7 @@ routerAPI.get('/events/:event/matches/:match/comments', //get comments
           //return result.body.results; //////////////////////
           res.send(result.body.results);
         });
-    }
+    
   });
   
 routerAPI.get('/events/:event/matches/:match/players', //get players
