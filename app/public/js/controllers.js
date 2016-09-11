@@ -514,6 +514,13 @@ angular.module('TM470.controllers', []).
       $scope.showGameDetail = false;
       $scope.showAddMatch = true;
     };
+    $scope.hideAddMatch = function(){
+      $scope.match = {};
+      $scope.BGGresults = []; //clear results
+      $scope.gameDetail = {};
+      $scope.showGameDetail = false;
+      $scope.showAddMatch = false;
+    };
     
     $scope.go = function(key){
       console.log("/events/" + $routeParams.event + "/matches/" + key);

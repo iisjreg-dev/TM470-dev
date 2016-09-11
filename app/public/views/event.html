@@ -47,7 +47,7 @@
             </div>
             <div class="col-md-2 text-right">
                 <button type="button" ng-hide="showAddMatch" ng-click="addMatch()" role="button" class="btn btn-success btn-block">Add Match</button>
-                <button ng-show="showAddMatch" ng-click="showAddMatch = false" role="button" class="btn btn-default btn-block" style="margin-top: 0px;">Close</button>
+                <button ng-show="showAddMatch" ng-click="hideAddMatch()" role="button" class="btn btn-default btn-block" style="margin-top: 0px;">Close</button>
             </div>
         </div>
     </div>
@@ -60,7 +60,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="input-group">
-                            <input type="text" name="name" placeholder="Game Name (search BoardGameGeek.com)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
+                            <input type="text" name="name" placeholder="Game (search BoardGameGeek.com)" ng-model="match.game" class="form-control" ng-blur="checkGame()">
                             <span class="input-group-addon" ng-click="checkGame()">
                                 <i ng-hide="checkingGame || match.id || notFound" class="fui-search" style="cursor: pointer;"></i>
                                 <i ng-hide="checkingGame || match.id || notFound" style="cursor: pointer;">&nbsp;&nbsp;Search</i>
